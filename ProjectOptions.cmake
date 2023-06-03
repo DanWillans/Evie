@@ -20,7 +20,7 @@ endmacro()
 
 macro(Evie_setup_options)
   option(Evie_ENABLE_HARDENING "Enable hardening" ON)
-  option(Evie_ENABLE_COVERAGE "Enable coverage reporting" OFF)
+  option(Evie_ENABLE_COVERAGE "Enable coverage reporting" ON)
   cmake_dependent_option(
     Evie_ENABLE_GLOBAL_HARDENING
     "Attempt to push hardening options to built dependencies"
@@ -54,8 +54,8 @@ macro(Evie_setup_options)
     option(Evie_ENABLE_SANITIZER_THREAD "Enable thread sanitizer" OFF)
     option(Evie_ENABLE_SANITIZER_MEMORY "Enable memory sanitizer" OFF)
     option(Evie_ENABLE_UNITY_BUILD "Enable unity builds" OFF)
-    option(Evie_ENABLE_CLANG_TIDY "Enable clang-tidy" ON)
-    option(Evie_ENABLE_CPPCHECK "Enable cpp-check analysis" ON)
+    option(Evie_ENABLE_CLANG_TIDY "Enable clang-tidy" OFF)
+    option(Evie_ENABLE_CPPCHECK "Enable cpp-check analysis" OFF)
     option(Evie_ENABLE_PCH "Enable precompiled headers" OFF)
     option(Evie_ENABLE_CACHE "Enable ccache" ON)
   endif()
