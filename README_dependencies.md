@@ -28,6 +28,11 @@ curl -LJO "https://github.com/aminya/setup-cpp/releases/download/v0.5.7/setup_cp
 RefreshEnv.cmd # reload the environment
 ```
 
+Example command installing required llvm dependencies for windows
+```
+./setup-cpp-x64-windows --compiler llvm --cmake true --ninja true --ccache true --vcpkg false --cppcheck true --gcovr true --opencppcoverage true --clangtidy 15.0.2 --vcvarsall true
+```
+
 ### Necessary Dependencies
 1. A C++ compiler that supports C++17.
 See [cppreference.com](https://en.cppreference.com/w/cpp/compiler_support)

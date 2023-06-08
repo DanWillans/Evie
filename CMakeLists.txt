@@ -91,9 +91,6 @@ if(MSVC)
   set_target_properties(${all_targets} PROPERTIES VS_DEBUGGER_ENVIRONMENT "PATH=$(VC_ExecutablePath_x64);%PATH%")
 endif()
 
-# set the startup project for the "play" button in MSVC
-set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT intro)
-
 if(CMAKE_SKIP_INSTALL_RULES)
   return()
 endif()
@@ -104,7 +101,6 @@ include(cmake/PackageProject.cmake)
 # we know we want to ship
 Evie_package_project(
   TARGETS
-  intro
   Evie_options
   Evie_warnings
   # FIXME: this does not work! CK

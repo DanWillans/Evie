@@ -1,10 +1,8 @@
-#include <catch2/catch_test_macros.hpp>
-
+#include <doctest/doctest.h>
 
 #include <Evie/sample_library.hpp>
 
-
-TEST_CASE("Factorials are computed", "[factorial]")
+TEST_CASE("Factorials are computed")
 {
   REQUIRE(factorial(0) == 1);
   REQUIRE(factorial(1) == 1);
