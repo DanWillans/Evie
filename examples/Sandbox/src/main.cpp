@@ -9,9 +9,8 @@ public:
 private:
 };
 
-std::unique_ptr<evie::Application> CreateApplication() { 
-  // const char* name = "Dan";
-  // APP_INFO("Hello! My name is {}", name);
-  auto logger = evie::ClientLoggerManager::GetLogger();
-  logger->Info("Hello");
-  return std::make_unique<Sandbox>(); }
+std::unique_ptr<evie::Application> CreateApplication()
+{
+  APP_INFO("Hello! My name is Dan");
+  return std::make_unique<Sandbox>();
+}

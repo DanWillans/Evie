@@ -2,7 +2,7 @@
 #define EVIE_H_
 
 // ---------- Logging --------------
-#include "logging.h"
+#include "evie/logging.h"
 // ---------------------------------
 
 // ---------- Entry Point ----------
