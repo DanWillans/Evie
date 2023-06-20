@@ -24,7 +24,7 @@ project(
 
 include(cmake/PreventInSourceBuilds.cmake)
 include(ProjectOptions.cmake)
-
+include(cmake/EvieHelpers.cmake)
 
 Evie_setup_options()
 
@@ -115,3 +115,7 @@ set(CPACK_PACKAGE_FILE_NAME
 )
 
 include(CPack)
+
+if(Evie_ENABLE_EXAMPLES)
+  add_subdirectory(examples)
+endif()

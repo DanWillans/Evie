@@ -37,7 +37,6 @@ target_link_libraries(
   tests
   PRIVATE Evie::Evie_warnings
           Evie::Evie_options
-          Evie::sample_library
           doctest::doctest)
 
 if(WIN32 AND BUILD_SHARED_LIBS)
@@ -54,35 +53,4 @@ doctest_discover_tests(
   tests
   TEST_PREFIX
   "unittests."
-)
-
-# Add a file containing a set of constexpr tests
-add_executable(constexpr_tests main.cpp constexpr_tests.cpp)
-target_link_libraries(
-  constexpr_tests
-  PRIVATE Evie::Evie_warnings
-          Evie::Evie_options
-          Evie::sample_library
-          doctest::doctest)
-
-doctest_discover_tests(
-  constexpr_tests
-  TEST_PREFIX
-  "constexpr."
-)
-
-# Disable the constexpr portion of the test, and build again this allows us to have an executable that we can debug when
-# things go wrong with the constexpr testing
-add_executable(relaxed_constexpr_tests main.cpp constexpr_tests.cpp)
-target_link_libraries(
-  relaxed_constexpr_tests
-  PRIVATE Evie::Evie_warnings
-          Evie::Evie_options
-          Evie::sample_library
-          doctest::doctest)
-
-doctest_discover_tests(
-  relaxed_constexpr_tests
-  TEST_PREFIX
-  "relaxed_constexpr."
 )
