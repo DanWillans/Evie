@@ -17,8 +17,10 @@ function(Evie_add_library)
       message(FATAL_ERROR "You must provide at least one source file. Provide SRCS in your function call.")
     endif()
 
+    STRING(TOLOWER ${PARSED_ARG_TARGET} TARGET_LOWER)
+
     add_library(${PARSED_ARG_TARGET} SHARED ${PARSED_ARG_SRCS})
-    set(ALIAS_TARGET evie::${PARSED_ARG_TARGET})
+    set(ALIAS_TARGET Evie::${PARSED_ARG_TARGET})
     add_library(${ALIAS_TARGET} ALIAS ${PARSED_ARG_TARGET})
 
     target_include_directories(${PARSED_ARG_TARGET} ${WARNING_GUARD} PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
@@ -28,12 +30,20 @@ function(Evie_add_library)
 
     Evie_target_export_definitions(${PARSED_ARG_TARGET} PUBLIC)
 
+    if(WIN32)
+      set(SUFFIX ".dll")
+    else()
+      set(SUFFIX ".lib")
+    endif()
+
     set_target_properties(
         ${PARSED_ARG_TARGET}
         PROPERTIES
             VERSION ${PROJECT_VERSION}
             CXX_VISIBILITY_PRESET hidden
-            VISIBILITY_INLINES_HIDDEN YES)
+            VISIBILITY_INLINES_HIDDEN YES
+            OUTPUT_NAME libevie_${TARGET_LOWER}
+            SUFFIX ${SUFFIX})
 
 endfunction()
 

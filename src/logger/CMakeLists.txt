@@ -1,6 +1,6 @@
-evie_add_library(TARGET logging SRCS loggers.cpp)
+evie_add_library(TARGET Logging SRCS logging.cpp)
 
 target_link_system_libraries(
-  logging
+  Logging
   PRIVATE
-    spdlog::spdlog)
+  spdlog::spdlog)

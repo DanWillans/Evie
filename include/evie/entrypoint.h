@@ -12,7 +12,6 @@ extern std::unique_ptr<evie::Application> CreateApplication();
 
 int main([[maybe_unused]]int argc, [[maybe_unused]]const char** argv) {
     auto app = CreateApplication();
-    std::cout << "hello\n";
     app->Run();
     return 0;
 }

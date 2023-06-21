@@ -9,8 +9,4 @@ public:
 private:
 };
 
-std::unique_ptr<evie::Application> CreateApplication()
-{
-  APP_INFO("Hello! My name is Dan");
-  return std::make_unique<Sandbox>();
-}
+std::unique_ptr<evie::Application> CreateApplication() { return std::make_unique<Sandbox>(); }

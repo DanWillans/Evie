@@ -1,7 +1,7 @@
-Evie_add_library(TARGET application SRCS application.cpp)
+Evie_add_library(TARGET Application SRCS application.cpp)
 
-target_link_system_libraries(
-  application
+target_link_libraries(
+  Application
   PRIVATE
-    spdlog::spdlog
-    evie::logging)
+  Evie::Logging
+)

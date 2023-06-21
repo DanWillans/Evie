@@ -1,21 +1,25 @@
 #ifndef EVIE_LOGGING_H_
 #define EVIE_LOGGING_H_
 
+#include "evie/core.h"
+
+#include <iostream>
 #include <memory>
+
 #include <spdlog/spdlog.h>
 
 namespace evie {
 
-class LoggingManager
+class EVIE_API LoggingManager
 {
 public:
   static void Init();
-  static std::shared_ptr<spdlog::logger> GetClientLogger() { return client_logger_; }
-  static std::shared_ptr<spdlog::logger> GetEngineLogger() { return engine_logger_; }
+  static std::shared_ptr<spdlog::logger>& GetClientLogger() { return client_logger_; }
+  static std::shared_ptr<spdlog::logger>& GetEngineLogger() { return engine_logger_; }
 
 private:
-  static std::shared_ptr<spdlog::logger> engine_logger_;
-  static std::shared_ptr<spdlog::logger> client_logger_;
+  inline static std::shared_ptr<spdlog::logger> engine_logger_;
+  inline static std::shared_ptr<spdlog::logger> client_logger_;
 };
 }// namespace evie
 
