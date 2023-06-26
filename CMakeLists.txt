@@ -105,16 +105,13 @@ include(cmake/PackageProject.cmake)
 # we know we want to ship
 Evie_package_project(
   TARGETS
+  Logging
+  Application
   Evie_options
   Evie_warnings
-  # Logging
-  # Application
-  # Package up third party dependencies
-  # spdlog
-  # fmt
 
   # Package up examples
-  # sandbox
+  sandbox
 
   # FIXME: this does not work! CK
   # PRIVATE_DEPENDENCIES_CONFIGURED project_options project_warnings

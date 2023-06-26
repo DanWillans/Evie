@@ -22,6 +22,8 @@ function(Evie_setup_dependencies)
       "gabime/spdlog"
       OPTIONS
       "SPDLOG_FMT_EXTERNAL ON")
+    # This include is needed for global logging access
+    include_directories(SYSTEM ${spdlog_SOURCE_DIR}/include)
   endif()
 
   if(NOT TARGET doctest::doctest)

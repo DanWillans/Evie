@@ -6,6 +6,7 @@
 #include <iostream>
 #include <memory>
 
+#include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
 
 namespace evie {
@@ -14,12 +15,20 @@ class EVIE_API LoggingManager
 {
 public:
   static void Init();
-  static std::shared_ptr<spdlog::logger>& GetClientLogger() { return client_logger_; }
-  static std::shared_ptr<spdlog::logger>& GetEngineLogger() { return engine_logger_; }
+  static spdlog::logger* GetClientLogger() { return GetInternalClientLogger(); }
+  static spdlog::logger* GetEngineLogger() { return GetInternalEngineLogger(); }
 
 private:
-  inline static std::shared_ptr<spdlog::logger> engine_logger_;
-  inline static std::shared_ptr<spdlog::logger> client_logger_;
+  inline static spdlog::logger* GetInternalClientLogger()
+  {
+    static std::shared_ptr<spdlog::logger> logger_ = spdlog::stdout_color_mt("CLIENT");
+    return logger_.get();
+  }
+  inline static spdlog::logger* GetInternalEngineLogger()
+  {
+    static std::shared_ptr<spdlog::logger> logger_ = spdlog::stdout_color_mt("EVIE");
+    return logger_.get();
+  }
 };
 }// namespace evie
 

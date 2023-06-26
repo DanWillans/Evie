@@ -10,13 +10,13 @@
 namespace evie {
 void LoggingManager::Init()
 {
-  // Engine setup logger
-  engine_logger_ = spdlog::stdout_color_mt("EVIE");
+  // Engine logger setup
+  auto* engine_logger_ = GetInternalEngineLogger();
   engine_logger_->set_pattern("[%H:%M:%S %z] [%n] [%^---%L---%$] [thread %t] %v");
   engine_logger_->set_level(spdlog::level::trace);
 
-  // Client setup logger
-  client_logger_ = spdlog::stdout_color_mt("CLIENT");
+  // Client logger setup
+  auto* client_logger_ = GetInternalClientLogger();
   client_logger_->set_pattern("[%H:%M:%S %z] [%n] [%^---%L---%$] [thread %t] %v");
   client_logger_->set_level(spdlog::level::trace);
 }
