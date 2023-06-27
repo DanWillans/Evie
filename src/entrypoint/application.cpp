@@ -1,5 +1,6 @@
 #include "evie/application.h"
 #include "evie/logging.h"
+#include "events.h"
 
 
 namespace evie {

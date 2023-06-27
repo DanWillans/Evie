@@ -105,6 +105,7 @@ Evie_package_project(
   TARGETS
   Logging
   Application
+  EventSystem
   Evie_options
   Evie_warnings
 
