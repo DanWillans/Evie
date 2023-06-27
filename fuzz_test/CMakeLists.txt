@@ -8,10 +8,15 @@ target_link_libraries(
   fuzz_tester
   PRIVATE Evie_options
           Evie_warnings
-          fmt::fmt
           -coverage
           -fsanitize=fuzzer)
 target_compile_options(fuzz_tester PRIVATE -fsanitize=fuzzer)
+
+target_link_system_libraries(
+  fuzz_tester
+  PRIVATE
+    fmt::fmt
+)
 
 # Allow short runs during automated testing to see if something new breaks
 set(FUZZ_RUNTIME

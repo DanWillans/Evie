@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.21)
 # manual dependency management
 
 # Only set the cxx_standard if it is not set by someone else
-if (NOT DEFINED CMAKE_CXX_STANDARD)
+if(NOT DEFINED CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD 20)
 endif()
 
@@ -24,11 +24,11 @@ project(
 
 include(cmake/PreventInSourceBuilds.cmake)
 include(ProjectOptions.cmake)
-
+include(cmake/EvieHelpers.cmake)
 
 Evie_setup_options()
-
 Evie_global_options()
+
 include(Dependencies.cmake)
 Evie_setup_dependencies()
 
@@ -38,21 +38,21 @@ Evie_local_options()
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 
 set(GIT_SHA
-    "Unknown"
-    CACHE STRING "SHA this build was generated from")
+  "Unknown"
+  CACHE STRING "SHA this build was generated from")
 string(
   SUBSTRING "${GIT_SHA}"
-            0
-            8
-            GIT_SHORT_SHA)
+  0
+  8
+  GIT_SHORT_SHA)
 
 target_compile_features(Evie_options INTERFACE cxx_std_${CMAKE_CXX_STANDARD})
 
 add_library(Evie::Evie_options ALIAS Evie_options)
 add_library(Evie::Evie_warnings ALIAS Evie_warnings)
 
-#add_library(Evie::Evie_options INTERFACE IMPORTED)
-#add_library(Evie::Evie_warnings INTERFACE IMPORTED)
+# add_library(Evie::Evie_options INTERFACE IMPORTED)
+# add_library(Evie::Evie_warnings INTERFACE IMPORTED)
 
 # configure files based on CMake configuration options
 add_subdirectory(configured_files)
@@ -73,15 +73,17 @@ if(BUILD_TESTING)
   add_subdirectory(test)
 endif()
 
-
 if(Evie_BUILD_FUZZ_TESTS)
   message(AUTHOR_WARNING "Building Fuzz Tests, using fuzzing sanitizer https://www.llvm.org/docs/LibFuzzer.html")
-  if (NOT Evie_ENABLE_ADDRESS_SANITIZER AND NOT Evie_ENABLE_THREAD_SANITIZER)
+
+  if(NOT Evie_ENABLE_ADDRESS_SANITIZER AND NOT Evie_ENABLE_THREAD_SANITIZER)
     message(WARNING "You need asan or tsan enabled for meaningful fuzz testing")
   endif()
-  add_subdirectory(fuzz_test)
 
+  add_subdirectory(fuzz_test)
 endif()
+
+add_subdirectory(examples)
 
 # If MSVC is being used, and ASAN is enabled, we need to set the debugger environment
 # so that it behaves well with MSVC's debugger, and we can run the target from visual studio
@@ -101,8 +103,14 @@ include(cmake/PackageProject.cmake)
 # we know we want to ship
 Evie_package_project(
   TARGETS
+  Logging
+  Application
   Evie_options
   Evie_warnings
+
+  # Package up examples
+  sandbox
+
   # FIXME: this does not work! CK
   # PRIVATE_DEPENDENCIES_CONFIGURED project_options project_warnings
 )
@@ -111,7 +119,7 @@ Evie_package_project(
 # out potential ABI related issues before they start, while helping you
 # track a build to a specific GIT SHA
 set(CPACK_PACKAGE_FILE_NAME
-    "${CMAKE_PROJECT_NAME}-${CMAKE_PROJECT_VERSION}-${GIT_SHORT_SHA}-${CMAKE_SYSTEM_NAME}-${CMAKE_BUILD_TYPE}-${CMAKE_CXX_COMPILER_ID}-${CMAKE_CXX_COMPILER_VERSION}"
+  "${CMAKE_PROJECT_NAME}-${CMAKE_PROJECT_VERSION}-${GIT_SHORT_SHA}-${CMAKE_SYSTEM_NAME}-${CMAKE_BUILD_TYPE}-${CMAKE_CXX_COMPILER_ID}-${CMAKE_CXX_COMPILER_VERSION}"
 )
 
 include(CPack)

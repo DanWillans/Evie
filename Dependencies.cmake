@@ -9,7 +9,16 @@ function(Evie_setup_dependencies)
   # already been provided to us by a parent project
 
   if(NOT TARGET fmtlib::fmtlib)
-    cpmaddpackage("gh:fmtlib/fmt#9.1.0")
+    cpmaddpackage(
+      NAME
+      fmt
+      GIT_TAG
+      9.1.0
+      GITHUB_REPOSITORY
+      "fmtlib/fmt"
+      OPTIONS
+      "CMAKE_POSITION_INDEPENDENT_CODE ON"
+      SYSTEM)
   endif()
 
   if(NOT TARGET spdlog::spdlog)
@@ -21,7 +30,11 @@ function(Evie_setup_dependencies)
       GITHUB_REPOSITORY
       "gabime/spdlog"
       OPTIONS
-      "SPDLOG_FMT_EXTERNAL ON")
+      "SPDLOG_FMT_EXTERNAL ON"
+      "CMAKE_POSITION_INDEPENDENT_CODE ON"
+      SYSTEM)
+    # This include is needed for global logging access
+    include_directories(SYSTEM ${spdlog_SOURCE_DIR}/include)
   endif()
 
   if(NOT TARGET doctest::doctest)
