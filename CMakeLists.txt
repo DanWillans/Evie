@@ -83,9 +83,7 @@ if(Evie_BUILD_FUZZ_TESTS)
   add_subdirectory(fuzz_test)
 endif()
 
-if(Evie_ENABLE_EXAMPLES)
-  add_subdirectory(examples)
-endif()
+add_subdirectory(examples)
 
 # If MSVC is being used, and ASAN is enabled, we need to set the debugger environment
 # so that it behaves well with MSVC's debugger, and we can run the target from visual studio
