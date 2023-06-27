@@ -9,7 +9,15 @@ function(Evie_setup_dependencies)
   # already been provided to us by a parent project
 
   if(NOT TARGET fmtlib::fmtlib)
-    cpmaddpackage("gh:fmtlib/fmt#9.1.0")
+    cpmaddpackage(
+      NAME
+      fmt
+      GIT_TAG
+      9.1.0
+      GITHUB_REPOSITORY
+      "fmtlib/fmt"
+      OPTIONS
+      "CMAKE_POSITION_INDEPENDENT_CODE ON")
   endif()
 
   if(NOT TARGET spdlog::spdlog)
