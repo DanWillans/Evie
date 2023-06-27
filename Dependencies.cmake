@@ -21,7 +21,8 @@ function(Evie_setup_dependencies)
       GITHUB_REPOSITORY
       "gabime/spdlog"
       OPTIONS
-      "SPDLOG_FMT_EXTERNAL ON")
+      "SPDLOG_FMT_EXTERNAL ON"
+      "CMAKE_POSITION_INDEPENDENT_CODE ON")
     # This include is needed for global logging access
     include_directories(SYSTEM ${spdlog_SOURCE_DIR}/include)
   endif()
