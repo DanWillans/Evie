@@ -31,8 +31,10 @@ function(Evie_add_library)
     Evie_target_export_definitions(${PARSED_ARG_TARGET} PUBLIC)
 
     if(WIN32)
+      set(OUTPUT_NAME libevie_${TARGET_LOWER})
       set(SUFFIX ".dll")
     else()
+      set(OUTPUT_NAME evie_${TARGET_LOWER})
       set(SUFFIX ".so")
     endif()
 
@@ -42,7 +44,7 @@ function(Evie_add_library)
             VERSION ${PROJECT_VERSION}
             CXX_VISIBILITY_PRESET hidden
             VISIBILITY_INLINES_HIDDEN YES
-            OUTPUT_NAME libevie_${TARGET_LOWER}
+            OUTPUT_NAME ${OUTPUT_NAME}
             SUFFIX ${SUFFIX})
 
 endfunction()

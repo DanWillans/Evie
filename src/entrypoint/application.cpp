@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "evie/application.h"
 #include "evie/logging.h"
 
