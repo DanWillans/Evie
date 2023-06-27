@@ -17,7 +17,8 @@ function(Evie_setup_dependencies)
       GITHUB_REPOSITORY
       "fmtlib/fmt"
       OPTIONS
-      "CMAKE_POSITION_INDEPENDENT_CODE ON")
+      "CMAKE_POSITION_INDEPENDENT_CODE ON"
+      SYSTEM)
   endif()
 
   if(NOT TARGET spdlog::spdlog)
@@ -30,7 +31,8 @@ function(Evie_setup_dependencies)
       "gabime/spdlog"
       OPTIONS
       "SPDLOG_FMT_EXTERNAL ON"
-      "CMAKE_POSITION_INDEPENDENT_CODE ON")
+      "CMAKE_POSITION_INDEPENDENT_CODE ON"
+      SYSTEM)
     # This include is needed for global logging access
     include_directories(SYSTEM ${spdlog_SOURCE_DIR}/include)
   endif()
