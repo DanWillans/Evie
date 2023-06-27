@@ -33,7 +33,7 @@ function(Evie_add_library)
     if(WIN32)
       set(SUFFIX ".dll")
     else()
-      set(SUFFIX ".lib")
+      set(SUFFIX ".so")
     endif()
 
     set_target_properties(
