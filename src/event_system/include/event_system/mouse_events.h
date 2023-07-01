@@ -11,7 +11,13 @@
 namespace evie {
 enum class MouseButton { None = 0, Left = 1, Right = 2, Middle = 3 };
 
-class EVIE_API MousePressedEvent : public Event
+struct MousePosition
+{
+  float x{ 0 };
+  float y{ 0 };
+};
+
+class EVIE_API MousePressedEvent final : public Event
 {
 public:
   static constexpr EventType type = EventType::MouseButtonPressed;
@@ -37,11 +43,13 @@ public:
     return stream.str();
   }
 
+  [[nodiscard]] MouseButton GetMouseButton() const { return button_; }
+
 private:
   MouseButton button_ = MouseButton::None;
 };
 
-class EVIE_API MouseReleasedEvent : public Event
+class EVIE_API MouseReleasedEvent final : public Event
 {
 public:
   static constexpr EventType type = EventType::MouseButtonReleased;
@@ -68,16 +76,18 @@ public:
     return stream.str();
   }
 
+  [[nodiscard]] MouseButton GetMouseButton() const { return button_; }
+
 private:
   MouseButton button_ = MouseButton::None;
 };
 
-class EVIE_API MouseMovementEvent : public Event
+class EVIE_API MouseMovementEvent final : public Event
 {
 public:
   static constexpr EventType type = EventType::MouseMoved;
 
-  MouseMovementEvent(const float& x, const float& y) : x_pos_(x), y_pos_(y) {}
+  explicit MouseMovementEvent(const MousePosition& position) : position_(position) {}
   MouseMovementEvent(const MouseMovementEvent&) = default;
   MouseMovementEvent(MouseMovementEvent&&) = default;
   MouseMovementEvent& operator=(const MouseMovementEvent&) = default;
@@ -94,16 +104,18 @@ public:
   [[nodiscard]] std::string ToString() const override
   {
     std::stringstream stream;
-    stream << "MouseMovementEvent: x - " << x_pos_ << " y - " << y_pos_ << "\n";
+    stream << "MouseMovementEvent: x - " << position_.x << " y - " << position_.y << "\n";
     return stream.str();
   }
 
+  [[nodiscard]] const MousePosition& GetMousePosition() const { return position_; }
+
+
 private:
-  float x_pos_{ 0 };
-  float y_pos_{ 0 };
+  MousePosition position_;
 };
 
-class EVIE_API MouseScrolledEvent : public Event
+class EVIE_API MouseScrolledEvent final : public Event
 {
 public:
   static constexpr EventType type = EventType::MouseScrolled;
@@ -128,6 +140,8 @@ public:
     stream << "MouseScolledEvent: direction - " << scroll_direction_ << "\n";
     return stream.str();
   }
+
+  [[nodiscard]] int GetScrollDirection() const { return scroll_direction_; }
 
 private:
   int scroll_direction_{ 0 };

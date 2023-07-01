@@ -58,7 +58,7 @@ class EVIE_API KeyReleasedEvent final : public KeyEvent
 public:
   static constexpr EventType type = EventType::KeyReleased;
 
-  using KeyEvent::KeyEvent;
+  explicit KeyReleasedEvent(int key_code) : KeyEvent(key_code) {}
   KeyReleasedEvent(const KeyReleasedEvent&) = default;
   KeyReleasedEvent(KeyReleasedEvent&&) = default;
   KeyReleasedEvent& operator=(const KeyReleasedEvent&) = default;
