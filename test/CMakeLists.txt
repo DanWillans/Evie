@@ -10,7 +10,7 @@ if(PROJECT_IS_TOP_LEVEL OR TEST_INSTALLED_VERSION)
   find_package(Evie CONFIG REQUIRED) # for intro, project_options, ...
 
   if(NOT TARGET Evie_options)
-    message(FATAL_ERROR "Requiered config package not found!")
+    message(FATAL_ERROR "Required config package not found!")
     return() # be strictly paranoid for Template Janitor github action! CK
   endif()
 endif()
@@ -39,18 +39,27 @@ target_link_libraries(
           Evie::Evie_options
           doctest::doctest)
 
+###### EVENT SYSTEM TESTS ######
+add_executable(event_system_tests main.cpp event_system_tests.cpp)
+target_link_libraries(
+  event_system_tests
+  PRIVATE Evie::Evie_warnings
+          Evie::Evie_options
+          Evie::EventSystem
+          doctest::doctest)
+
 if(WIN32 AND BUILD_SHARED_LIBS)
   add_custom_command(
-    TARGET tests
+    TARGET event_system_tests
     PRE_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:tests> $<TARGET_FILE_DIR:tests>
+    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:event_system_tests> $<TARGET_FILE_DIR:event_system_tests>
     COMMAND_EXPAND_LISTS)
 endif()
 
 # automatically discover tests that are defined in catch based test files you can modify the unittests. Set TEST_PREFIX
 # to whatever you want, or use different for different binaries
 doctest_discover_tests(
-  tests
+  event_system_tests
   TEST_PREFIX
   "unittests."
 )

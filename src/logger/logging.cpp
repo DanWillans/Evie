@@ -6,7 +6,6 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
 
-
 namespace evie {
 void LoggingManager::Init()
 {

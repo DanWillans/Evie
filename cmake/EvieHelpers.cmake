@@ -24,7 +24,8 @@ function(Evie_add_library)
     add_library(${ALIAS_TARGET} ALIAS ${PARSED_ARG_TARGET})
 
     target_include_directories(${PARSED_ARG_TARGET} ${WARNING_GUARD} PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
-                                                                  $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>)
+                                                                  $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
+                                                                  $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>)
 
     target_compile_features(${PARSED_ARG_TARGET} PUBLIC cxx_std_20)
 
