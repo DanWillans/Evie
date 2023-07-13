@@ -9,12 +9,32 @@
 
 
 namespace evie {
-enum class MouseButton { None = 0, Left = 1, Right = 2, Middle = 3 };
+enum class MouseButton {
+  None = 0,
+  One,
+  Two,
+  Three,
+  Four,
+  Five,
+  Six,
+  Seven,
+  Eight,
+  Last = Eight,
+  Left = One,
+  Right = Two,
+  Middle = Three
+};
 
-struct MousePosition
+struct EVIE_API MousePosition
 {
-  float x{ 0 };
-  float y{ 0 };
+  double x{ 0 };
+  double y{ 0 };
+};
+
+struct EVIE_API MouseScrollOffset
+{
+  double x_offset{ 0 };
+  double y_offset{ 0 };
 };
 
 class EVIE_API MousePressedEvent final : public Event
@@ -120,7 +140,7 @@ class EVIE_API MouseScrolledEvent final : public Event
 public:
   static constexpr EventType type = EventType::MouseScrolled;
 
-  explicit MouseScrolledEvent(int scroll_direction) : scroll_direction_(scroll_direction) {}
+  explicit MouseScrolledEvent(const MouseScrollOffset& scroll_offset) : scroll_offset_(scroll_offset) {}
   MouseScrolledEvent(const MouseScrolledEvent&) = default;
   MouseScrolledEvent(MouseScrolledEvent&&) = default;
   MouseScrolledEvent& operator=(const MouseScrolledEvent&) = default;
@@ -137,14 +157,15 @@ public:
   [[nodiscard]] std::string ToString() const override
   {
     std::stringstream stream;
-    stream << "MouseScolledEvent: direction - " << scroll_direction_ << "\n";
+    stream << "MouseScolledEvent: x_offset - " << scroll_offset_.x_offset << " y_offset - " << scroll_offset_.y_offset
+           << "\n";
     return stream.str();
   }
 
-  [[nodiscard]] int GetScrollDirection() const { return scroll_direction_; }
+  [[nodiscard]] MouseScrollOffset GetScrollOffset() const { return scroll_offset_; }
 
 private:
-  int scroll_direction_{ 0 };
+  MouseScrollOffset scroll_offset_{ 0, 0 };
 };
 }// namespace evie
 

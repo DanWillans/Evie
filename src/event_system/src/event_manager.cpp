@@ -7,13 +7,6 @@
 
 namespace evie {
 
-void EventManager::OnEvent(std::unique_ptr<Event> event)
-{
-  if (event->IsInCategory(EventCategoryBitmask::Keyboard)) {
-    EV_INFO(event->ToString());
-  } else if (event->IsInCategory(EventCategoryBitmask::Mouse)) {
-    EV_INFO(event->ToString());
-  }
-}
+void EventManager::OnEvent(std::unique_ptr<Event> event) { EV_INFO(event->ToString()); }
 
 }// namespace evie

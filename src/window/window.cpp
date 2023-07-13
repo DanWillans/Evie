@@ -11,6 +11,8 @@
 
 #include "event_system//key_events.h"
 #include "event_system/event_manager.h"
+#include "event_system/mouse_events.h"
+#include "event_system/window_events.h"
 #include "evie/error.h"
 #include "evie/logging.h"
 #include "window/window.h"
@@ -18,26 +20,134 @@
 
 namespace evie {
 namespace {
-  static void KeyCallback([[maybe_unused]] GLFWwindow* window,
-    int key,
-    [[maybe_unused]] int scancode,
-    int action,
-    [[maybe_unused]] int mods)// NOLINT
+
+  IEventListener* GetEventListener(GLFWwindow* window)
   {
     auto* user_window = static_cast<Window*>(glfwGetWindowUserPointer(window));
-    if (action == GLFW_PRESS) {
-      std::unique_ptr<KeyPressedEvent> key_pressed_event = std::make_unique<KeyPressedEvent>(key, 0);
-      if (user_window != nullptr) {
-        auto* event_listener = user_window->GetEventListener();
-        if (event_listener != nullptr) {
-          event_listener->OnEvent(std::move(key_pressed_event));
-        } else {
-          EV_WARN("No valid event_listener, dropping event");
-        }
+    if (user_window != nullptr) {
+      auto* event_listener = user_window->GetEventListener();
+      if (event_listener != nullptr) {
+        return event_listener;
       } else {
-        EV_WARN("Invalid user window pointer");
+        EV_WARN("No valid event_listener, dropping event");
       }
-    };
+    } else {
+      EV_WARN("Invalid user window pointer");
+    }
+    return nullptr;
+  }
+  void KeyCallback(GLFWwindow* window, int key, [[maybe_unused]] int scancode, int action, [[maybe_unused]] int mods)
+  {
+    auto* event_listener = GetEventListener(window);
+    if (event_listener != nullptr) {
+      // I'm not sure I like how we handle repeat keys in this function but if it becomes a problem then we'll handle
+      // it in the future. Also if this ever becomes multi threaded then it needs fixing.
+      static int repeat_count{ 0 };
+      std::unique_ptr<KeyEvent> key_event;
+      switch (action) {
+      case GLFW_PRESS:
+        repeat_count = 0;
+        key_event = std::make_unique<KeyPressedEvent>(key, 0);
+        break;
+      case GLFW_RELEASE:
+        repeat_count = 0;
+        key_event = std::make_unique<KeyReleasedEvent>(key);
+        break;
+      case GLFW_REPEAT:
+        repeat_count++;
+        key_event = std::make_unique<KeyPressedEvent>(key, repeat_count);
+        break;
+      default:
+        EV_WARN("Unsupported key action {}", action);
+      }
+      if (key_event) {
+        event_listener->OnEvent(std::move(key_event));
+      }
+    }
+  }
+
+  void CursorPositionCallback(GLFWwindow* window, double xpos, double ypos)
+  {
+    auto* event_listener = GetEventListener(window);
+    if (event_listener != nullptr) {
+      std::unique_ptr<MouseMovementEvent> mouse_movement_event =
+        std::make_unique<MouseMovementEvent>(MousePosition{ xpos, ypos });
+      event_listener->OnEvent(std::move(mouse_movement_event));
+    }
+  }
+
+  void MouseButtonCallback(GLFWwindow* window, int button, int action, [[maybe_unused]] int mods)
+  {
+    auto* event_listener = GetEventListener(window);
+    if (event_listener != nullptr) {
+      std::unique_ptr<Event> mouse_event;
+      switch (action) {
+      case GLFW_PRESS:
+        mouse_event = std::make_unique<MousePressedEvent>(static_cast<MouseButton>(button));
+        break;
+      case GLFW_RELEASE:
+        mouse_event = std::make_unique<MouseReleasedEvent>(static_cast<MouseButton>(button));
+        break;
+      default:
+        EV_WARN("Unsupported mouse action {}", action);
+      }
+      if (mouse_event) {
+        event_listener->OnEvent(std::move(mouse_event));
+      }
+    }
+  }
+
+  void MouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
+  {
+    auto* event_listener = GetEventListener(window);
+    if (event_listener != nullptr) {
+      std::unique_ptr<MouseScrolledEvent> mouse_scroll_event =
+        std::make_unique<MouseScrolledEvent>(MouseScrollOffset{ xoffset, yoffset });
+      event_listener->OnEvent(std::move(mouse_scroll_event));
+    }
+  }
+
+  void WindowFocusCallback(GLFWwindow* window, int focused)
+  {
+    auto* event_listener = GetEventListener(window);
+    if (event_listener != nullptr) {
+      std::unique_ptr<WindowEvent> window_event;
+      if (focused == 1) {
+        window_event = std::make_unique<WindowFocusEvent>();
+      } else {
+        window_event = std::make_unique<WindowLostFocusEvent>();
+      }
+      event_listener->OnEvent(std::move(window_event));
+    }
+  }
+
+  void WindowSizeCallback(GLFWwindow* window, int width, int height)
+  {
+    auto* event_listener = GetEventListener(window);
+    if (event_listener != nullptr) {
+      std::unique_ptr<WindowResizeEvent> window_event =
+        std::make_unique<WindowResizeEvent>(WindowDimensions{ width, height });
+      event_listener->OnEvent(std::move(window_event));
+    }
+  }
+
+  void WindowCloseCallback(GLFWwindow* window)
+  {
+    auto* event_listener = GetEventListener(window);
+    if (event_listener != nullptr) {
+      std::unique_ptr<WindowCloseEvent> window_event = std::make_unique<WindowCloseEvent>();
+      event_listener->OnEvent(std::move(window_event));
+    }
+  }
+
+  void WindowPositionCallback(GLFWwindow* window, int xpos, int ypos)
+  {
+    auto* event_listener = GetEventListener(window);
+    if (event_listener != nullptr) {
+      std::unique_ptr<WindowMovedEvent> window_moved_event =
+        std::make_unique<WindowMovedEvent>(WindowPosition{ xpos, ypos });
+      event_listener->OnEvent(std::move(window_moved_event));
+    }
   }
 }// namespace
 
@@ -100,8 +210,14 @@ Error Window::Impl::Initialise()
 
 void Window::Impl::SetupInputCallbacks()
 {
-  // Setup key callbacks
   glfwSetKeyCallback(window_, KeyCallback);
+  glfwSetCursorPosCallback(window_, CursorPositionCallback);
+  glfwSetMouseButtonCallback(window_, MouseButtonCallback);
+  glfwSetScrollCallback(window_, MouseScrollCallback);
+  glfwSetWindowFocusCallback(window_, WindowFocusCallback);
+  glfwSetWindowSizeCallback(window_, WindowSizeCallback);
+  glfwSetWindowCloseCallback(window_, WindowCloseCallback);
+  glfwSetWindowPosCallback(window_, WindowPositionCallback);
 }
 
 void Window::Impl::Update()

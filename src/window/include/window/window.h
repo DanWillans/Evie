@@ -30,6 +30,7 @@ public:
   IEventListener* GetEventListener();
 
 private:
+  // Impl at the minute to avoid leaking the implementation to the user
   class Impl;
   Impl* impl_;
 };
