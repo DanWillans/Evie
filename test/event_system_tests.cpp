@@ -1,5 +1,7 @@
 #include <doctest/doctest.h>
+#include <memory>
 
+#include "event_system/event_manager.h"
 #include "event_system/events.h"
 #include "event_system/key_events.h"
 #include "event_system/mouse_events.h"
@@ -171,5 +173,18 @@ TEST_CASE("WindowMovedEvent Tests")
     auto ret = event.GetWindowPosition();
     REQUIRE(ret.x == pos.x);
     REQUIRE(ret.y == pos.y);
+  }
+}
+
+TEST_CASE("EventManager Tests")
+{
+  evie::EventManager event_manager;
+  SUBCASE("Check subscribing to event type works")
+  {
+    evie::WindowCloseEvent window_close_event;
+    auto callback = [&](
+                      const evie::Event& event) { REQUIRE(event.GetEventType() == window_close_event.GetEventType()); };
+    event_manager.SubscribeToEventType(evie::EventType::WindowClose, callback);
+    event_manager.OnEvent(window_close_event);
   }
 }

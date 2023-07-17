@@ -9,8 +9,9 @@
 
 #include "GLFW/glfw3.h"
 
-#include "event_system//key_events.h"
 #include "event_system/event_manager.h"
+#include "event_system/events.h"
+#include "event_system/key_events.h"
 #include "event_system/mouse_events.h"
 #include "event_system/window_events.h"
 #include "evie/error.h"
@@ -36,6 +37,14 @@ namespace {
     }
     return nullptr;
   }
+
+  template<typename T, typename... Args> void DispatchEvent(IEventListener* listener, Args... args)
+  {
+    T event(args...);
+    listener->OnEvent(event);
+  }
+
+
   void KeyCallback(GLFWwindow* window, int key, [[maybe_unused]] int scancode, int action, [[maybe_unused]] int mods)
   {
     auto* event_listener = GetEventListener(window);
@@ -43,25 +52,22 @@ namespace {
       // I'm not sure I like how we handle repeat keys in this function but if it becomes a problem then we'll handle
       // it in the future. Also if this ever becomes multi threaded then it needs fixing.
       static int repeat_count{ 0 };
-      std::unique_ptr<KeyEvent> key_event;
       switch (action) {
       case GLFW_PRESS:
         repeat_count = 0;
-        key_event = std::make_unique<KeyPressedEvent>(key, 0);
+        DispatchEvent<KeyPressedEvent>(event_listener, key, 0);
         break;
       case GLFW_RELEASE:
         repeat_count = 0;
-        key_event = std::make_unique<KeyReleasedEvent>(key);
+        DispatchEvent<KeyReleasedEvent>(event_listener, key);
         break;
-      case GLFW_REPEAT:
+      case GLFW_REPEAT: {
         repeat_count++;
-        key_event = std::make_unique<KeyPressedEvent>(key, repeat_count);
+        DispatchEvent<KeyPressedEvent>(event_listener, key, repeat_count);
         break;
+      }
       default:
         EV_WARN("Unsupported key action {}", action);
-      }
-      if (key_event) {
-        event_listener->OnEvent(std::move(key_event));
       }
     }
   }
@@ -70,9 +76,7 @@ namespace {
   {
     auto* event_listener = GetEventListener(window);
     if (event_listener != nullptr) {
-      std::unique_ptr<MouseMovementEvent> mouse_movement_event =
-        std::make_unique<MouseMovementEvent>(MousePosition{ xpos, ypos });
-      event_listener->OnEvent(std::move(mouse_movement_event));
+      DispatchEvent<MouseMovementEvent>(event_listener, MousePosition{ xpos, ypos });
     }
   }
 
@@ -80,19 +84,15 @@ namespace {
   {
     auto* event_listener = GetEventListener(window);
     if (event_listener != nullptr) {
-      std::unique_ptr<Event> mouse_event;
       switch (action) {
       case GLFW_PRESS:
-        mouse_event = std::make_unique<MousePressedEvent>(static_cast<MouseButton>(button));
+        DispatchEvent<MousePressedEvent>(event_listener, static_cast<MouseButton>(button));
         break;
       case GLFW_RELEASE:
-        mouse_event = std::make_unique<MouseReleasedEvent>(static_cast<MouseButton>(button));
+        DispatchEvent<MouseReleasedEvent>(event_listener, static_cast<MouseButton>(button));
         break;
       default:
         EV_WARN("Unsupported mouse action {}", action);
-      }
-      if (mouse_event) {
-        event_listener->OnEvent(std::move(mouse_event));
       }
     }
   }
@@ -101,9 +101,7 @@ namespace {
   {
     auto* event_listener = GetEventListener(window);
     if (event_listener != nullptr) {
-      std::unique_ptr<MouseScrolledEvent> mouse_scroll_event =
-        std::make_unique<MouseScrolledEvent>(MouseScrollOffset{ xoffset, yoffset });
-      event_listener->OnEvent(std::move(mouse_scroll_event));
+      DispatchEvent<MouseScrolledEvent>(event_listener, MouseScrollOffset{ xoffset, yoffset });
     }
   }
 
@@ -111,13 +109,11 @@ namespace {
   {
     auto* event_listener = GetEventListener(window);
     if (event_listener != nullptr) {
-      std::unique_ptr<WindowEvent> window_event;
       if (focused == 1) {
-        window_event = std::make_unique<WindowFocusEvent>();
+        DispatchEvent<WindowFocusEvent>(event_listener);
       } else {
-        window_event = std::make_unique<WindowLostFocusEvent>();
+        DispatchEvent<WindowLostFocusEvent>(event_listener);
       }
-      event_listener->OnEvent(std::move(window_event));
     }
   }
 
@@ -125,9 +121,7 @@ namespace {
   {
     auto* event_listener = GetEventListener(window);
     if (event_listener != nullptr) {
-      std::unique_ptr<WindowResizeEvent> window_event =
-        std::make_unique<WindowResizeEvent>(WindowDimensions{ width, height });
-      event_listener->OnEvent(std::move(window_event));
+      DispatchEvent<WindowResizeEvent>(event_listener, WindowDimensions{ width, height });
     }
   }
 
@@ -135,8 +129,7 @@ namespace {
   {
     auto* event_listener = GetEventListener(window);
     if (event_listener != nullptr) {
-      std::unique_ptr<WindowCloseEvent> window_event = std::make_unique<WindowCloseEvent>();
-      event_listener->OnEvent(std::move(window_event));
+      DispatchEvent<WindowCloseEvent>(event_listener);
     }
   }
 
@@ -144,9 +137,7 @@ namespace {
   {
     auto* event_listener = GetEventListener(window);
     if (event_listener != nullptr) {
-      std::unique_ptr<WindowMovedEvent> window_moved_event =
-        std::make_unique<WindowMovedEvent>(WindowPosition{ xpos, ypos });
-      event_listener->OnEvent(std::move(window_moved_event));
+      DispatchEvent<WindowMovedEvent>(event_listener, WindowPosition{ xpos, ypos });
     }
   }
 }// namespace
@@ -154,24 +145,26 @@ namespace {
 class Window::Impl
 {
 public:
-  explicit Impl(const char* name, Window* parent_window) : window_name_(name), parent_window_ptr_(parent_window) {}
+  Impl(const WindowProperties& props, Window* parent_window) : properties_(props), parent_window_ptr_(parent_window) {}
   Error Initialise();
   void Update();
   Error RegisterEventListener(IEventListener* event_listener);
   void SetupInputCallbacks();
   IEventListener* GetEventListener() { return event_listener_; };
+  void SetVSync(bool enabled);
 
 private:
   Error DispatchEvent(std::unique_ptr<Event> event);
   GLFWwindow* window_{ nullptr };
-  const char* window_name_;
+  WindowProperties properties_;
   // This could be public if we allow people to overwrite the event listener
   IEventListener* event_listener_{ nullptr };
   // Required to set user window pointer
   Window* parent_window_ptr_{ nullptr };
+  bool vsync_enabled_{ false };
 };
 
-Window::Window(const char* window_name) : impl_(new Impl(window_name, this)) {}
+Window::Window(const WindowProperties& window_props) : impl_(new Impl(window_props, this)) {}
 
 Error Window::Initialise() { return impl_->Initialise(); }
 
@@ -184,6 +177,8 @@ Error Window::RegisterEventListener(IEventListener* event_listener)
 
 IEventListener* Window::GetEventListener() { return impl_->GetEventListener(); }
 
+void Window::SetVSyncFlag(bool enabled) { impl_->SetVSync(enabled); }
+
 Window::~Window()
 {
   glfwTerminate();
@@ -192,16 +187,18 @@ Window::~Window()
 
 Error Window::Impl::Initialise()
 {
+  // We may want more than one window so we should fix this if we do. Maybe use a static?
   if (glfwInit() == 0) {
     return Error("glfw failed to initialise");
   }
-  window_ = glfwCreateWindow(640, 480, window_name_, nullptr, nullptr);
+  window_ = glfwCreateWindow(
+    properties_.dimensions.width, properties_.dimensions.height, properties_.name.c_str(), nullptr, nullptr);
   if (window_ == nullptr) {
     return Error("glfw failed to create window");
   }
   glfwMakeContextCurrent(window_);
   // If we use glad we should init it here.
-  glfwSwapInterval(1);
+  SetVSync(true);
   // Setup the user window pointer
   glfwSetWindowUserPointer(window_, static_cast<void*>(parent_window_ptr_));
   SetupInputCallbacks();
@@ -236,5 +233,14 @@ Error Window::Impl::RegisterEventListener(IEventListener* event_listener)
   return Error::OK();
 };
 
+void Window::Impl::SetVSync(bool enabled)
+{
+  if (enabled) {
+    glfwSwapInterval(1);
+  } else {
+    glfwSwapInterval(0);
+  }
+  vsync_enabled_ = enabled;
+}
 
 }// namespace evie
