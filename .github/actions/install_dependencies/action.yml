@@ -3,15 +3,18 @@ name: 'install_dependencies'
 description: 'Install system dependencies required by the project'
 
 runs:
+  using: "composite"
   steps:
     - name: Install Ubuntu Dependencies
       if: runner.os == 'Linux'
+      shell: bash
       run: |
         sudo apt-get update
         sudo apt-get install xorg-dev
 
     - name: Install macOS Dependencies
       if: runner.os == 'macOS'
+      shell: bash
       run: |
         brew update
         brew install xorg-server
