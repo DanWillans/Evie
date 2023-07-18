@@ -118,6 +118,8 @@ jobs:
 
 
     steps:
+      - uses: actions/checkout@v3
+
       - name: Install Dependencies
         uses: ./.github/actions/install_dependencies
 
@@ -127,8 +129,6 @@ jobs:
         with:
           script: |
             core.setFailed('There is a mismatch between configured llvm compiler and clang-tidy version chosen')
-
-      - uses: actions/checkout@v3
 
       - name: Setup Cache
         uses: ./.github/actions/setup_cache
