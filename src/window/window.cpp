@@ -4,7 +4,9 @@
 #include <vector>
 
 
+#ifdef EVIE_PLATFORM_WINDOWS
 #include <Windows.h>
+#endif
 // Need this space between glfw and windows otherwise there is a macro redefinition error
 
 #include "GLFW/glfw3.h"
