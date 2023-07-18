@@ -15,6 +15,8 @@ IEventListener::~IEventListener() {}
 EventManager::EventManager() {}
 EventManager::~EventManager() {}
 
+std::unique_ptr<IEventListener> CreateEventManager() { return std::make_unique<EventManager>(); }
+
 void EventManager::OnEvent(const Event& event)
 {
   EV_INFO(event.ToString());

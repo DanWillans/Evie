@@ -32,9 +32,9 @@ public:
 class EventManager final : public IEventListener
 {
 public:
-  EVIE_API EventManager();
-  EVIE_API ~EventManager() override;
-  void EVIE_API OnEvent(const Event& event) override;
+  EventManager();
+  ~EventManager() override;
+  void OnEvent(const Event& event) override;
   /**
    * @brief Subscribe to specific event types. The user supplied callback will be called whenever the specificed
    * EventType is there.
@@ -42,14 +42,14 @@ public:
    * @param event_type The EventType to listen to
    * @param callback The callback to call when the specific event_type is found
    */
-  void EVIE_API SubscribeToEventType(EventType event_type, const std::function<void(const Event&)>& callback) override;
+  void SubscribeToEventType(EventType event_type, const std::function<void(const Event&)>& callback) override;
 
 private:
   std::unordered_map<EventType, std::vector<std::function<void(const Event&)>>> type_subscribers_;
 };
 
-// Factory method. This is so we can avoid exporting
-std::unique_ptr<IEventListener> EVIE_API CreateEventManager() { return std::make_unique<EventManager>(); }
+// Factory method. This is so we can avoid exporting EventManager as it is causing issues.
+std::unique_ptr<IEventListener> EVIE_API CreateEventManager();
 }// namespace evie
 
 #endif// !EVIE_EVENT_MANAGER_H_
