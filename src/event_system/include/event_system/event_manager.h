@@ -41,6 +41,8 @@ public:
    */
   void EVIE_API SubscribeToEventType(EventType event_type, const std::function<void(const Event&)>& callback);
 
+  ~EventManager() override = default;
+
 private:
   std::unordered_map<EventType, std::vector<std::function<void(const Event&)>>> type_subscribers_;
 };
