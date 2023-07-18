@@ -118,20 +118,9 @@ jobs:
 
 
     steps:
-      - name: Install Ubuntu Dependencies
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update
-          sudo apt-get install xorg
+      - name: Install Dependencies
+        uses: ./.github/actions/install_dependencies
 
-      - name: Install macOS Dependencies
-        if: runner.os == 'macOS'
-        run: |
-          brew update
-          brew install xorg
-
-      - name: Install MacOS Dependencies
-        if: ${{contains }}
       - name: Check for llvm version mismatches
         if: ${{ contains(matrix.compiler, 'llvm') && !contains(matrix.compiler, env.CLANG_TIDY_VERSION) }}
         uses: actions/github-script@v3
