@@ -7,6 +7,14 @@
 
 namespace evie {
 
+// Although trivial these are defined here so that they don't become inline.
+// An undefined reference to these functions will occur in the vtable if we don't
+IEventListener::IEventListener() {}
+IEventListener::~IEventListener() {}
+
+EventManager::EventManager() {}
+EventManager::~EventManager() {}
+
 void EventManager::OnEvent(const Event& event)
 {
   EV_INFO(event.ToString());

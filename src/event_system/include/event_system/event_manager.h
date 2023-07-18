@@ -13,12 +13,12 @@ namespace evie {
 class EVIE_API IEventListener
 {
 public:
-  IEventListener() = default;
+  IEventListener();
   IEventListener(const IEventListener&) = default;
   IEventListener(IEventListener&&) = default;
   IEventListener& operator=(IEventListener&&) = default;
   IEventListener& operator=(const IEventListener&) = default;
-  virtual ~IEventListener() = default;
+  virtual ~IEventListener();
 
   virtual void OnEvent(const Event& event) = 0;
   virtual void SubscribeToEventType(EventType event_type, const std::function<void(const Event&)>& callback) = 0;
@@ -32,6 +32,8 @@ public:
 class EventManager final : public IEventListener
 {
 public:
+  EVIE_API EventManager();
+  EVIE_API ~EventManager() override;
   void EVIE_API OnEvent(const Event& event) override;
   /**
    * @brief Subscribe to specific event types. The user supplied callback will be called whenever the specificed
