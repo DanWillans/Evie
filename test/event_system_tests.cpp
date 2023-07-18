@@ -178,13 +178,13 @@ TEST_CASE("WindowMovedEvent Tests")
 
 TEST_CASE("EventManager Tests")
 {
-  evie::EventManager event_manager;
+  std::unique_ptr<evie::IEventListener> event_manager = evie::CreateEventManager();
   SUBCASE("Check subscribing to event type works")
   {
     evie::WindowCloseEvent window_close_event;
     auto callback = [&](
                       const evie::Event& event) { REQUIRE(event.GetEventType() == window_close_event.GetEventType()); };
-    event_manager.SubscribeToEventType(evie::EventType::WindowClose, callback);
-    event_manager.OnEvent(window_close_event);
+    event_manager->SubscribeToEventType(evie::EventType::WindowClose, callback);
+    event_manager->OnEvent(window_close_event);
   }
 }

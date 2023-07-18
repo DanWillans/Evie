@@ -19,10 +19,10 @@ void Application::Run()
   Window window(props);
 
   // Setup event manager and register it as a listener with the window
-  EventManager event_manager;
-  event_manager.SubscribeToEventType(
+  std::unique_ptr<IEventListener> event_manager = CreateEventManager();
+  event_manager->SubscribeToEventType(
     EventType::WindowClose, [this]([[maybe_unused]] const Event& event) { CloseWindow(); });
-  Error err = window.RegisterEventListener(&event_manager);
+  Error err = window.RegisterEventListener(event_manager.get());
 
   // Initialise the window
   if (err.Good()) {
