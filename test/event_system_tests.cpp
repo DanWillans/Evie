@@ -90,7 +90,7 @@ TEST_CASE("MouseScrolledEvent Tests")
 
 TEST_CASE("MouseMovementEvent Tests")
 {
-  evie::MousePosition position{ 100.0F, 200.0F };
+  evie::MousePosition position{ 100.0, 200.0 };
   evie::MouseMovementEvent event(position);
   SUBCASE("Check EventType is correct") { REQUIRE(event.GetEventType() == evie::EventType::MouseMoved); }
   SUBCASE("Check EventCategory is correct")
