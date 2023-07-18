@@ -122,13 +122,13 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install libxrandr-dev libxinerama-dev
+          sudo apt-get install xorg
 
       - name: Install macOS Dependencies
         if: runner.os == 'macOS'
         run: |
           brew update
-          brew install libxrandr libxinerama
+          brew install xorg
 
       - name: Install MacOS Dependencies
         if: ${{contains }}
