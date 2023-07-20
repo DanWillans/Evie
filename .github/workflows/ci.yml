@@ -36,6 +36,7 @@ jobs:
           # you can specify the version after `-` like "llvm-15.0.2".
           - llvm-15.0.2
           - gcc-11
+          - g++-11
         generator:
           - "Ninja Multi-Config"
         build_type:
@@ -69,11 +70,6 @@ jobs:
 
           - os: macos-11
             enable_ipo: Off
-
-          - os: macos-11
-            enable_ipo: Off
-            compiler: g++-11
-            cxx_standard: 20
 
           # Set up preferred package generators, for given build configurations
           - build_type: Release
