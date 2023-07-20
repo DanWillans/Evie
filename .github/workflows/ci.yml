@@ -52,6 +52,10 @@ jobs:
           - os: windows-2019
             compiler: gcc-11
 
+          # gcc-11 on macos with glfw isn't compatible
+          - os: macos-11
+            compiler: gcc-11
+
         include:
           # Add appropriate variables for gcov version required. This will intentionally break
           # if you try to use a compiler that does not have gcov set
@@ -65,6 +69,11 @@ jobs:
 
           - os: macos-11
             enable_ipo: Off
+
+          - os: macos-11
+            enable_ipo: Off
+            compiler: g++-11
+            cxx_standard: 20
 
           # Set up preferred package generators, for given build configurations
           - build_type: Release
