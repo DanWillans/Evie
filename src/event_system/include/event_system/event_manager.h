@@ -48,8 +48,9 @@ private:
   std::unordered_map<EventType, std::vector<std::function<void(const Event&)>>> type_subscribers_;
 };
 
-// Factory method. This is so we can avoid exporting EventManager as it is causing issues.
+// Factory function for creating an EventManager
 std::unique_ptr<IEventListener> EVIE_API CreateEventManager();
+
 }// namespace evie
 
 #endif// !EVIE_EVENT_MANAGER_H_

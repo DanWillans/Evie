@@ -11,24 +11,16 @@
 
 namespace evie {
 
-class EVIE_API LoggingManager
+class LoggingManager
 {
 public:
-  static void Init();
-  static spdlog::logger* GetClientLogger() { return GetInternalClientLogger(); }
-  static spdlog::logger* GetEngineLogger() { return GetInternalEngineLogger(); }
+  static EVIE_API void Init();
+  static EVIE_API spdlog::logger* GetClientLogger();
+  static EVIE_API spdlog::logger* GetEngineLogger();
 
 private:
-  inline static spdlog::logger* GetInternalClientLogger()
-  {
-    static std::shared_ptr<spdlog::logger> logger_ = spdlog::stdout_color_mt("CLIENT");
-    return logger_.get();
-  }
-  inline static spdlog::logger* GetInternalEngineLogger()
-  {
-    static std::shared_ptr<spdlog::logger> logger_ = spdlog::stdout_color_mt("EVIE");
-    return logger_.get();
-  }
+  static std::shared_ptr<spdlog::logger> engine_logger_;
+  static std::shared_ptr<spdlog::logger> client_logger_;
 };
 }// namespace evie
 

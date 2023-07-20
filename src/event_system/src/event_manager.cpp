@@ -33,7 +33,7 @@ void EventManager::OnEvent(const Event& event)
 
 void EventManager::SubscribeToEventType(EventType event_type, const std::function<void(const Event&)>& callback)
 {
-  auto pair = type_subscribers_.try_emplace(event_type, std::vector<std::function<void(const Event&)>>{ callback });
+  auto pair = type_subscribers_.emplace(event_type, std::vector<std::function<void(const Event&)>>{ callback });
   if (!pair.second) {
     pair.first->second.push_back(callback);
   }
