@@ -8,14 +8,14 @@
 namespace evie {
 struct WindowDimensions
 {
-  uint16_t width{ 0 };
-  uint16_t height{ 0 };
+  int width{ 0 };
+  int height{ 0 };
 };
 
 struct WindowPosition
 {
-  uint16_t x{ 0 };
-  uint16_t y{ 0 };
+  int x{ 0 };
+  int y{ 0 };
 };
 
 class EVIE_API WindowEvent : public Event
@@ -73,7 +73,7 @@ public:
   [[nodiscard]] std::string ToString() const override
   {
     std::stringstream stream;
-    stream << "WindowCloseEvent\n";
+    stream << "WindowFocusEvent\n";
     return stream.str();
   }
 };
@@ -94,7 +94,7 @@ public:
   [[nodiscard]] std::string ToString() const override
   {
     std::stringstream stream;
-    stream << "WindowCloseEvent\n";
+    stream << "WindowLostFocusEvent\n";
     return stream.str();
   }
 };

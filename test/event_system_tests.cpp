@@ -1,5 +1,7 @@
 #include <doctest/doctest.h>
+#include <memory>
 
+#include "event_system/event_manager.h"
 #include "event_system/events.h"
 #include "event_system/key_events.h"
 #include "event_system/mouse_events.h"
@@ -69,8 +71,8 @@ TEST_CASE("MouseReleasedEvent Tests")
 
 TEST_CASE("MouseScrolledEvent Tests")
 {
-  int scroll_direction = 0;
-  evie::MouseScrolledEvent event(scroll_direction);
+  evie::MouseScrollOffset offset{ 100.0, 200.0 };
+  evie::MouseScrolledEvent event(offset);
   SUBCASE("Check EventType is correct") { REQUIRE(event.GetEventType() == evie::EventType::MouseScrolled); }
   SUBCASE("Check EventCategory is correct")
   {
@@ -78,12 +80,17 @@ TEST_CASE("MouseScrolledEvent Tests")
     REQUIRE(event.IsInCategory(ECB::Mouse));
     REQUIRE(event.GetCategoryFlags() == (ECB::Mouse | ECB::Input));
   }
-  SUBCASE("Check mouse scroll direction return is correct") { REQUIRE(event.GetScrollDirection() == scroll_direction); }
+  SUBCASE("Check mouse scroll direction return is correct")
+  {
+    auto ret_offset = event.GetScrollOffset();
+    REQUIRE(ret_offset.x_offset == offset.x_offset);
+    REQUIRE(ret_offset.y_offset == offset.y_offset);
+  }
 }
 
 TEST_CASE("MouseMovementEvent Tests")
 {
-  evie::MousePosition position{ 100.0F, 200.0F };
+  evie::MousePosition position{ 100.0, 200.0 };
   evie::MouseMovementEvent event(position);
   SUBCASE("Check EventType is correct") { REQUIRE(event.GetEventType() == evie::EventType::MouseMoved); }
   SUBCASE("Check EventCategory is correct")
@@ -166,5 +173,18 @@ TEST_CASE("WindowMovedEvent Tests")
     auto ret = event.GetWindowPosition();
     REQUIRE(ret.x == pos.x);
     REQUIRE(ret.y == pos.y);
+  }
+}
+
+TEST_CASE("EventManager Tests")
+{
+  std::unique_ptr<evie::IEventListener> event_manager = evie::CreateEventManager();
+  SUBCASE("Check subscribing to event type works")
+  {
+    evie::WindowCloseEvent window_close_event;
+    auto callback = [&](
+                      const evie::Event& event) { REQUIRE(event.GetEventType() == window_close_event.GetEventType()); };
+    event_manager->SubscribeToEventType(evie::EventType::WindowClose, callback);
+    event_manager->OnEvent(window_close_event);
   }
 }

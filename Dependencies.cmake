@@ -41,4 +41,14 @@ function(Evie_setup_dependencies)
     cpmaddpackage("gh:doctest/doctest@2.4.11")
   endif()
 
+  if(NOT TARGET glfw::glfw)
+    cpmaddpackage(
+      NAME
+      glfw
+      GIT_TAG
+      3.3.8
+      GITHUB_REPOSITORY
+      "glfw/glfw"
+      SYSTEM)
+  endif()
 endfunction()

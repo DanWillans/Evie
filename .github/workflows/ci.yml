@@ -52,6 +52,11 @@ jobs:
           - os: windows-2019
             compiler: gcc-11
 
+          # gcc-11 on macos with glfw isn't compatible. Exclude for now.
+          # Include g++-11 in the future as apparently that works - https://github.com/glfw/glfw/issues/1743
+          - os: macos-11
+            compiler: gcc-11
+
         include:
           # Add appropriate variables for gcov version required. This will intentionally break
           # if you try to use a compiler that does not have gcov set
@@ -118,14 +123,17 @@ jobs:
 
 
     steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Dependencies
+        uses: ./.github/actions/install_dependencies
+
       - name: Check for llvm version mismatches
         if: ${{ contains(matrix.compiler, 'llvm') && !contains(matrix.compiler, env.CLANG_TIDY_VERSION) }}
         uses: actions/github-script@v3
         with:
           script: |
             core.setFailed('There is a mismatch between configured llvm compiler and clang-tidy version chosen')
-
-      - uses: actions/checkout@v3
 
       - name: Setup Cache
         uses: ./.github/actions/setup_cache

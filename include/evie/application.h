@@ -14,10 +14,12 @@ public:
   Application& operator=(Application&& app) = default;
   virtual ~Application() = default;
 
-  static void Run();
+  void Run();
 
 private:
-  int placeholder_{ 0 };
+  void CloseWindow() { running_ = false; }
+
+  bool running_{ true };
 };
 }// namespace evie
 

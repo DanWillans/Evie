@@ -4,6 +4,10 @@ setlocal enabledelayedexpansion
 
 set "binaryPath=%CD%\out\install\"
 
+if not exist %binaryPath% (
+    echo "!binaryPath!" doesn't exist.
+)
+
 rem Iterate through each directory within "binaryPath"
 for /D %%D in ("%binaryPath%*") do (
     set "binaryDir=%%D\bin"

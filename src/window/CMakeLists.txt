@@ -1,11 +1,16 @@
-Evie_add_library(TARGET Application SRCS application.cpp)
+Evie_add_library(TARGET Window SRCS window.cpp)
 
 target_link_libraries(
-  Application
+  Window
   PRIVATE
   Evie::Evie_options
   Evie::Evie_warnings
   Evie::Logging
   Evie::EventSystem
-  Evie::Window
+)
+
+target_link_system_libraries(
+  Window
+  PRIVATE
+  glfw
 )
