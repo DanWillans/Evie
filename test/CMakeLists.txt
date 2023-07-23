@@ -84,6 +84,14 @@ target_link_libraries(
   Evie::Window
   doctest::doctest)
 
+if(WIN32)
+  add_custom_command(
+    TARGET layer_stack_tests
+    PRE_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:layer_stack_tests> $<TARGET_FILE_DIR:layer_stack_tests>
+    COMMAND_EXPAND_LISTS)
+endif()
+
 # automatically discover tests that are defined in catch based test files you can modify the unittests. Set TEST_PREFIX
 # to whatever you want, or use different for different binaries
 doctest_discover_tests(
