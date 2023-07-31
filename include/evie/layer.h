@@ -7,6 +7,7 @@ class Layer
 public:
   virtual ~Layer() = default;
   virtual void OnUpdate() = 0;
+  virtual void OnEvent() = 0;
 };
 }// namespace evie
 

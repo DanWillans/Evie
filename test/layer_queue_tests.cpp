@@ -14,6 +14,7 @@ class TestLayer final : public evie::Layer
 {
 public:
   void OnUpdate() override {}
+  void OnEvent() override {}
   ~TestLayer() {}
 };
 

@@ -5,6 +5,9 @@
 #include "event_system/mouse_events.h"
 #include "evie/logging.h"
 #include "window/window.h"
+#include "window/layer_queue.h"
+
+#include <ranges>
 
 namespace evie {
 void Application::Run()
@@ -24,14 +27,21 @@ void Application::Run()
     EventType::WindowClose, [this]([[maybe_unused]] const Event& event) { CloseWindow(); });
   Error err = window.RegisterEventListener(event_manager.get());
 
+  LayerQueue layer_queue;
+
   // Initialise the window
   if (err.Good()) {
     err = window.Initialise();
+    // for(const auto& layer : std::ranges::views::reverse(layer_queue)){
+      
+    // }
   }
 
   // Main run loop
   while (running_) {
     window.Update();
+
+
   }
 
   // Print error on exit if it's bad
