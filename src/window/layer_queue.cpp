@@ -1,19 +1,26 @@
 #include <algorithm>
 
-#include "window/layer_stack.h"
+#include "window/layer_queue.h"
 
 #include "evie/ids.h"
 #include "evie/layer.h"
 
 namespace evie {
-LayerID LayerStack::PushLayer(Layer& layer)
+LayerID LayerQueue::PushBack(Layer& layer)
 {
   LayerID identifier(layer_count_++);
   layers_.push_back(LayerWrapper{ identifier, &layer });
   return identifier;
 }
 
-Error LayerStack::RemoveLayer(LayerID layer_id)
+LayerID LayerQueue::PushFront(Layer& layer)
+{
+  LayerID identifier(layer_count_++);
+  layers_.push_front(LayerWrapper{ identifier, &layer });
+  return identifier;
+}
+
+Error LayerQueue::RemoveLayer(LayerID layer_id)
 {
   evie::Error err = Error::OK();
   auto layer_it = std::find_if(

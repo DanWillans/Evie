@@ -2,13 +2,14 @@
 #define EVIE_IDS_H_
 
 namespace evie {
-// A generic class that can be used to as a unique identifier
-template<typename T> class ID
+// A generic class that can be used as a unique identifier
+// Tag's are used so that different Aliased IDs cannot be compared
+template<typename T, typename Tag> class ID
 {
 public:
-  explicit ID(const T& identifier) : id_(identifier) {}
+  constexpr explicit ID(const T& identifier) : id_(identifier) {}
 
-  bool operator==(const ID& other) const { return id_ == other.Get(); }
+  constexpr bool operator==(const ID<T, Tag>& other) const { return id_ == other.Get(); }
 
   T Get() const { return id_; }
 
@@ -17,7 +18,10 @@ private:
 };
 
 // Aliases of ID
-using LayerID = ID<int>;
+struct LayerIDTag
+{
+};
+using LayerID = ID<int, LayerIDTag>;
 
 }// namespace evie
 

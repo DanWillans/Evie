@@ -1,4 +1,4 @@
-Evie_add_library(TARGET Window SRCS window.cpp layer_stack.cpp)
+Evie_add_library(TARGET Window SRCS window.cpp layer_queue.cpp)
 
 target_link_libraries(
   Window

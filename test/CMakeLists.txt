@@ -74,10 +74,10 @@ doctest_discover_tests(
   "unittests."
 )
 
-# ###### Layer Stack Tests ########
-add_executable(layer_stack_tests main.cpp layer_stack_tests.cpp)
+# ###### Layer Queue Tests ########
+add_executable(layer_queue_tests main.cpp layer_queue_tests.cpp)
 target_link_libraries(
-  layer_stack_tests
+  layer_queue_tests
   PRIVATE
   Evie::Evie_warnings
   Evie::Evie_options
@@ -86,16 +86,16 @@ target_link_libraries(
 
 if(WIN32)
   add_custom_command(
-    TARGET layer_stack_tests
+    TARGET layer_queue_tests
     PRE_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:layer_stack_tests> $<TARGET_FILE_DIR:layer_stack_tests>
+    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:layer_queue_tests> $<TARGET_FILE_DIR:layer_queue_tests>
     COMMAND_EXPAND_LISTS)
 endif()
 
 # automatically discover tests that are defined in catch based test files you can modify the unittests. Set TEST_PREFIX
 # to whatever you want, or use different for different binaries
 doctest_discover_tests(
-  layer_stack_tests
+  layer_queue_tests
   TEST_PREFIX
   "unittests."
 )
