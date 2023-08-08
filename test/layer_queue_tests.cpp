@@ -6,6 +6,7 @@
 #include "evie/ids.h"
 #include "evie/layer.h"
 
+#include "evie/events.h"
 #include "window/layer_queue.h"
 
 namespace {
@@ -14,7 +15,7 @@ class TestLayer final : public evie::Layer
 {
 public:
   void OnUpdate() override {}
-  void OnEvent() override {}
+  void OnEvent([[maybe_unused]] evie::Event& event) override {}
   ~TestLayer() {}
 };
 

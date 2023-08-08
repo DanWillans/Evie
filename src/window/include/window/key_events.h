@@ -3,13 +3,17 @@
 
 #include <sstream>
 
-#include "events.h"
+#include "evie/events.h"
 
 namespace evie {
 class EVIE_API KeyEvent : public Event
 {
 public:
-  [[nodiscard]] int GetKeyCode() const { return key_code_; };
+  [[nodiscard]] int GetKeyCode()
+  {
+    handled_ = true;
+    return key_code_;
+  };
 
   [[nodiscard]] constexpr EventCategoryBitmask GetCategoryFlags() const override
   {
@@ -40,7 +44,11 @@ public:
 
   [[nodiscard]] constexpr EventType GetEventType() const override { return KeyPressedEvent::type; }
 
-  [[nodiscard]] int GetRepeatCount() const { return repeat_count_; };
+  [[nodiscard]] int GetRepeatCount()
+  {
+    handled_ = true;
+    return repeat_count_;
+  };
 
   [[nodiscard]] std::string ToString() const override
   {

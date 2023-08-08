@@ -36,7 +36,7 @@ target_link_libraries(
   event_system_tests
   PRIVATE Evie::Evie_warnings
   Evie::Evie_options
-  Evie::EventSystem
+  Evie::Window
   doctest::doctest)
 
 if(WIN32)

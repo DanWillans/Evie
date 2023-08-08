@@ -3,7 +3,7 @@
 
 #include <sstream>
 
-#include "events.h"
+#include "evie/events.h"
 #include "evie/core.h"
 #include "evie/logging.h"
 
@@ -63,7 +63,11 @@ public:
     return stream.str();
   }
 
-  [[nodiscard]] MouseButton GetMouseButton() const { return button_; }
+  [[nodiscard]] MouseButton GetMouseButton()
+  {
+    handled_ = true;
+    return button_;
+  }
 
 private:
   MouseButton button_ = MouseButton::None;
@@ -96,7 +100,11 @@ public:
     return stream.str();
   }
 
-  [[nodiscard]] MouseButton GetMouseButton() const { return button_; }
+  [[nodiscard]] MouseButton GetMouseButton()
+  {
+    handled_ = true;
+    return button_;
+  }
 
 private:
   MouseButton button_ = MouseButton::None;
@@ -128,7 +136,11 @@ public:
     return stream.str();
   }
 
-  [[nodiscard]] const MousePosition& GetMousePosition() const { return position_; }
+  [[nodiscard]] const MousePosition& GetMousePosition()
+  {
+    handled_ = true;
+    return position_;
+  }
 
 
 private:
@@ -162,7 +174,11 @@ public:
     return stream.str();
   }
 
-  [[nodiscard]] MouseScrollOffset GetScrollOffset() const { return scroll_offset_; }
+  [[nodiscard]] MouseScrollOffset GetScrollOffset()
+  {
+    handled_ = true;
+    return scroll_offset_;
+  }
 
 private:
   MouseScrollOffset scroll_offset_{ 0, 0 };

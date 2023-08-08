@@ -6,6 +6,7 @@ target_link_libraries(
   Evie::Evie_options
   Evie::Evie_warnings
   Evie::Logging
+  Evie::Window
   PUBLIC
   Evie::Utilities
 )

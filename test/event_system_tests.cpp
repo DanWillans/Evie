@@ -1,13 +1,49 @@
 #include <doctest/doctest.h>
 #include <memory>
 
-#include "event_system/event_manager.h"
-#include "event_system/events.h"
-#include "event_system/key_events.h"
-#include "event_system/mouse_events.h"
-#include "event_system/window_events.h"
+#include "evie/events.h"
+#include "window/event_manager.h"
+#include "window/key_events.h"
+#include "window/layer_queue.h"
+#include "window/mouse_events.h"
+#include "window/window_events.h"
 
 using ECB = evie::EventCategoryBitmask;
+
+namespace {
+
+class TestLayer final : public evie::Layer
+{
+public:
+  void OnUpdate() override {}
+  void OnEvent(evie::Event& event) override
+  {
+    if (event.GetEventType() == evie::EventType::KeyPressed) {
+      auto* key_event = static_cast<evie::KeyPressedEvent*>(&event);
+      [[maybe_unused]] auto code = key_event->GetKeyCode();
+      event_count++;
+    }
+  }
+  ~TestLayer() override = default;
+  int event_count{ 0 };
+};
+
+class TestLayer2 final : public evie::Layer
+{
+public:
+  void OnUpdate() override {}
+  void OnEvent(evie::Event& event) override
+  {
+    if (event.GetEventType() == evie::EventType::MouseButtonPressed) {
+      auto* key_event = static_cast<evie::MousePressedEvent*>(&event);
+      [[maybe_unused]] auto code = key_event->GetMouseButton();
+      event_count++;
+    }
+  }
+  ~TestLayer2() override = default;
+  int event_count{ 0 };
+};
+}// namespace
 
 TEST_CASE("KeyPressedEvent tests")
 {
@@ -178,13 +214,60 @@ TEST_CASE("WindowMovedEvent Tests")
 
 TEST_CASE("EventManager Tests")
 {
-  std::unique_ptr<evie::IEventListener> event_manager = evie::CreateEventManager();
+  TestLayer layer1;
+  TestLayer2 layer2;
+  evie::LayerQueue layer_queue;
+  layer_queue.PushBack(layer1);
+  layer_queue.PushBack(layer2);
+  evie::EventManager event_manager(layer_queue);
   SUBCASE("Check subscribing to event type works")
   {
     evie::WindowCloseEvent window_close_event;
-    auto callback = [&](
-                      const evie::Event& event) { REQUIRE(event.GetEventType() == window_close_event.GetEventType()); };
-    event_manager->SubscribeToEventType(evie::EventType::WindowClose, callback);
-    event_manager->OnEvent(window_close_event);
+    auto callback = [&](const evie::Event& event) {
+      REQUIRE(event.GetEventType() == window_close_event.GetEventType());
+      return true;
+    };
+    event_manager.SubscribeToEventType(evie::EventType::WindowClose, callback);
+    event_manager.OnEvent(window_close_event);
+    REQUIRE(layer1.event_count == 0);
+    REQUIRE(layer2.event_count == 0);
+  }
+  SUBCASE("Check layer1 receives event but not layer2")
+  {
+    evie::KeyPressedEvent key_pressed_event(20, 2);
+    event_manager.OnEvent(key_pressed_event);
+    REQUIRE(layer1.event_count == 1);
+    REQUIRE(layer2.event_count == 0);
+    SUBCASE("Check layer2 now receives event but not layer1")
+    {
+      evie::MousePressedEvent mouse_pressed_event(evie::MouseButton::Left);
+      event_manager.OnEvent(mouse_pressed_event);
+      REQUIRE(layer1.event_count == 1);
+      REQUIRE(layer2.event_count == 1);
+    }
+  }
+  SUBCASE("Check layer2 receives event but not layer1")
+  {
+    evie::MousePressedEvent mouse_pressed_event(evie::MouseButton::Left);
+    event_manager.OnEvent(mouse_pressed_event);
+    REQUIRE(layer1.event_count == 0);
+    REQUIRE(layer2.event_count == 1);
+    SUBCASE("Check layer1 now receives event but layer2")
+    {
+      evie::KeyPressedEvent key_pressed_event(20, 2);
+      event_manager.OnEvent(key_pressed_event);
+      REQUIRE(layer1.event_count == 1);
+      REQUIRE(layer2.event_count == 1);
+    }
+  }
+  SUBCASE("Check that two layers wanting the same event don't both receive it")
+  {
+    TestLayer2 layer3;
+    layer_queue.PushBack(layer3);
+    evie::MousePressedEvent mouse_pressed_event(evie::MouseButton::Left);
+    event_manager.OnEvent(mouse_pressed_event);
+    REQUIRE(layer1.event_count == 0);
+    REQUIRE(layer2.event_count == 0);
+    REQUIRE(layer3.event_count == 1);
   }
 }

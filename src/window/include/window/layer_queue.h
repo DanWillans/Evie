@@ -5,7 +5,6 @@
 #include <iterator>
 #include <ranges>
 #include <stdexcept>
-#include <xutility>
 
 #include "evie/core.h"
 #include "evie/error.h"
@@ -97,7 +96,7 @@ public:
       return iter;
     }
 
-    difference_type operator-(const Iterator& offset) const { return offset.iter_ - iter_; }
+    difference_type operator-(const Iterator& other) const { return iter_ - other.iter_; }
 
     Iterator& operator+=(const difference_type offset)
     {
@@ -125,9 +124,7 @@ public:
       return lhs.iter_ <=> rhs.iter_;
     }
 
-    reference& operator[](const difference_type offset) const {
-      return iter_[offset];
-    }
+    reference& operator[](const difference_type offset) const { return iter_[offset]; }
 
   private:
     it_type iter_;
@@ -138,13 +135,16 @@ public:
   [[nodiscard]] Iterator EVIE_API rbegin() { return Iterator(layers_.end()); }
   [[nodiscard]] Iterator EVIE_API rend() { return Iterator(layers_.begin()); }
 
-  // Check the container satisfies the C++20 concepts of ranges and iterators
-  static_assert(std::ranges::range<LayerQueue>);
-  static_assert(std::random_access_iterator<LayerQueue::Iterator>);
+
 private:
   int layer_count_{ 0 };
   std::deque<LayerWrapper> layers_{};
 };
+
+// Check the container satisfies the C++20 concepts of ranges and iterators
+static_assert(std::ranges::range<LayerQueue>);
+static_assert(std::random_access_iterator<LayerQueue::Iterator>);
+
 }// namespace evie
 
 

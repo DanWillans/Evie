@@ -3,7 +3,7 @@
 
 #include <sstream>
 
-#include "events.h"
+#include "evie/events.h"
 
 namespace evie {
 struct WindowDimensions
@@ -110,13 +110,19 @@ public:
   WindowResizeEvent& operator=(WindowResizeEvent&&) = default;
   ~WindowResizeEvent() noexcept override = default;
   [[nodiscard]] constexpr EventType GetEventType() const override { return WindowResizeEvent::type; }
+
   [[nodiscard]] std::string ToString() const override
   {
     std::stringstream stream;
     stream << "WindowResizeEvent: Width - " << dimensions_.width << " Height - " << dimensions_.height << "\n";
     return stream.str();
   }
-  [[nodiscard]] const WindowDimensions& GetWindowDimensions() const { return dimensions_; }
+
+  [[nodiscard]] const WindowDimensions& GetWindowDimensions()
+  {
+    handled_ = true;
+    return dimensions_;
+  }
 
 private:
   WindowDimensions dimensions_;
@@ -140,7 +146,11 @@ public:
     return stream.str();
   }
 
-  [[nodiscard]] const WindowPosition& GetWindowPosition() const { return position_; }
+  [[nodiscard]] const WindowPosition& GetWindowPosition()
+  {
+    handled_ = true;
+    return position_;
+  }
 
 private:
   WindowPosition position_;
