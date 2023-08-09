@@ -18,10 +18,10 @@ public:
     if (event.IsInCategory(evie::EventCategoryBitmask::MouseButton)) {
       if (event.GetEventType() == evie::EventType::MouseButtonPressed) {
         EV_INFO("TestLayer_{} {}", ind_, event.ToString());
-        [[maybe_unused]] auto mouse_event = static_cast<evie::MousePressedEvent*>(&event);
+        [[maybe_unused]] const auto* mouse_event = static_cast<evie::MousePressedEvent*>(&event);
       } else {
         EV_INFO("TestLayer_{} {}", ind_, event.ToString());
-        [[maybe_unused]] auto mouse_event = static_cast<evie::MousePressedEvent*>(&event);
+        [[maybe_unused]] const auto* mouse_event = static_cast<evie::MousePressedEvent*>(&event);
       }
     }
   }
@@ -39,10 +39,10 @@ public:
     if (event.IsInCategory(evie::EventCategoryBitmask::Keyboard)) {
       if (event.GetEventType() == evie::EventType::KeyPressed) {
         EV_INFO("TestLayer_{} {}", ind_, event.ToString());
-        [[maybe_unused]] auto mouse_event = static_cast<evie::KeyPressedEvent*>(&event);
+        [[maybe_unused]] const auto* mouse_event = static_cast<evie::KeyPressedEvent*>(&event);
       } else {
         EV_INFO("TestLayer_{} {}", ind_, event.ToString());
-        [[maybe_unused]] auto mouse_event = static_cast<evie::KeyReleasedEvent*>(&event);
+        [[maybe_unused]] const auto* mouse_event = static_cast<evie::KeyReleasedEvent*>(&event);
       }
     }
   }

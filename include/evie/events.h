@@ -1,5 +1,7 @@
 #ifndef EVIE_EVENT_SYSTEM_EVENTS_H_
 #define EVIE_EVENT_SYSTEM_EVENTS_H_
+
+#include <cstdint>
 #include <string>
 
 #include "utility/bitmask_operators.h"
