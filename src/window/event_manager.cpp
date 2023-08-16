@@ -5,10 +5,8 @@
 #include "window/layer_queue.h"
 #include "window/mouse_events.h"
 #include <memory>
-#include <ranges>
 
 namespace evie {
-
 // Although trivial these are defined here so that they don't become inline.
 // An undefined reference to these functions will occur in the vtable if we don't
 EventManager::EventManager(LayerQueue& layer_queue) : layer_queue_(layer_queue) {}
@@ -30,8 +28,8 @@ void EventManager::OnEvent(Event& event)
   }
 
   // Iterate over layers in reverse and give events to the layers
-  for (auto& layer_wrapper : std::ranges::views::reverse(layer_queue_)) {
-    layer_wrapper.layer->OnEvent(event);
+  for(LayerQueue::Iterator layer_it = layer_queue_.rbegin(); layer_it != layer_queue_.rend(); ++layer_it){
+    layer_it->layer->OnEvent(event);
     if (event.handled_) {
       return;
     }
