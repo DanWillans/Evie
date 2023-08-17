@@ -119,9 +119,9 @@ public:
 
     friend bool operator==(const Iterator& lhs, const Iterator& rhs) { return lhs.iter_ == rhs.iter_; }
     friend bool operator!=(const Iterator& lhs, const Iterator& rhs) { return !(lhs == rhs); }
-    friend std::strong_ordering operator<=>(const Iterator& lhs, const Iterator& rhs)
+    std::strong_ordering operator<=>(const Iterator& rhs) const
     {
-      return lhs.iter_ <=> rhs.iter_;
+      return iter_ <=> rhs.iter_;
     }
 
     reference& operator[](const difference_type offset) const { return iter_[offset]; }
@@ -213,9 +213,9 @@ public:
 
     friend bool operator==(const ReverseIterator& lhs, const ReverseIterator& rhs) { return lhs.iter_ == rhs.iter_; }
     friend bool operator!=(const ReverseIterator& lhs, const ReverseIterator& rhs) { return !(lhs == rhs); }
-    friend std::strong_ordering operator<=>(const ReverseIterator& lhs, const ReverseIterator& rhs)
+    std::strong_ordering operator<=>(const ReverseIterator& rhs) const
     {
-      return lhs.iter_ <=> rhs.iter_;
+      return iter_ <=> rhs.iter_;
     }
 
     reference& operator[](const difference_type offset) const { return iter_[offset]; }
