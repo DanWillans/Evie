@@ -130,10 +130,106 @@ public:
     it_type iter_;
   };
 
+  struct ReverseIterator{
+    using iterator_category = std::random_access_iterator_tag;
+    using difference_type = std::ptrdiff_t;
+    using value_type = LayerWrapper;
+    using pointer = value_type*;
+    using reference = value_type&;
+    using it_type = std::deque<value_type>::reverse_iterator;
+
+    // Default constructor required to pass iterator static assert
+    ReverseIterator() { throw std::runtime_error{ "Not implemented" }; }
+    explicit ReverseIterator(const it_type& iter) : iter_(iter) {}
+
+    reference operator*() const { return *iter_; }
+    pointer operator->() { return &(*iter_); }
+
+    ReverseIterator& operator++()
+    {
+      ++iter_;
+      return *this;
+    }
+
+    ReverseIterator operator++(int)// NOLINT
+    {
+      ReverseIterator tmp = *this;
+      ++iter_;
+      return tmp;
+    }
+
+    ReverseIterator& operator--()
+    {
+      --iter_;
+      return *this;
+    }
+
+    ReverseIterator operator--(int)// NOLINT
+    {
+      ReverseIterator tmp = *this;
+      --iter_;
+      return tmp;
+    }
+
+    ReverseIterator& operator-=(const difference_type& offset)
+    {
+      iter_ -= offset;
+      return *this;
+    }
+
+    ReverseIterator operator-(const difference_type& offset) const
+    {
+      ReverseIterator tmp = *this;
+      tmp -= offset;
+      return tmp;
+    }
+
+    friend ReverseIterator operator-(const difference_type offset, ReverseIterator iter)
+    {
+      iter -= offset;
+      return iter;
+    }
+
+    difference_type operator-(const ReverseIterator& other) const { return iter_ - other.iter_; }
+
+    ReverseIterator& operator+=(const difference_type offset)
+    {
+      iter_ += offset;
+      return *this;
+    }
+
+    ReverseIterator operator+(const difference_type offset) const
+    {
+      ReverseIterator tmp = *this;
+      tmp += offset;
+      return tmp;
+    }
+
+    friend ReverseIterator operator+(const difference_type offset, ReverseIterator iter)
+    {
+      iter += offset;
+      return iter;
+    }
+
+    friend bool operator==(const ReverseIterator& lhs, const ReverseIterator& rhs) { return lhs.iter_ == rhs.iter_; }
+    friend bool operator!=(const ReverseIterator& lhs, const ReverseIterator& rhs) { return !(lhs == rhs); }
+    friend std::strong_ordering operator<=>(const ReverseIterator& lhs, const ReverseIterator& rhs)
+    {
+      return lhs.iter_ <=> rhs.iter_;
+    }
+
+    reference& operator[](const difference_type offset) const { return iter_[offset]; }
+
+    private:
+    it_type iter_;
+  };
+
   [[nodiscard]] Iterator EVIE_API begin() { return Iterator(layers_.begin()); }
   [[nodiscard]] Iterator EVIE_API end() { return Iterator(layers_.end()); }
-  [[nodiscard]] Iterator EVIE_API rbegin() { return Iterator(layers_.end()); }
-  [[nodiscard]] Iterator EVIE_API rend() { return Iterator(layers_.begin()); }
+  // [[nodiscard]] Iterator EVIE_API rbegin() { return Iterator(layers_.rend()); }
+  // [[nodiscard]] Iterator EVIE_API rend() { return Iterator(layers_.begin()); }
+  [[nodiscard]] ReverseIterator EVIE_API rbegin() { return ReverseIterator(layers_.rbegin()); }
+  [[nodiscard]] ReverseIterator EVIE_API rend() { return ReverseIterator(layers_.rend()); }
 
 
 private:
@@ -144,6 +240,7 @@ private:
 // Check the container satisfies the C++20 concepts of ranges and iterators
 static_assert(std::ranges::range<LayerQueue>);
 static_assert(std::random_access_iterator<LayerQueue::Iterator>);
+static_assert(std::random_access_iterator<LayerQueue::ReverseIterator>);
 
 }// namespace evie
 

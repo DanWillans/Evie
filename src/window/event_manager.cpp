@@ -28,7 +28,7 @@ void EventManager::OnEvent(Event& event)
   }
 
   // Iterate over layers in reverse and give events to the layers
-  for(LayerQueue::Iterator layer_it = layer_queue_.rbegin(); layer_it != layer_queue_.rend(); ++layer_it){
+  for (LayerQueue::ReverseIterator layer_it = layer_queue_.rbegin(); layer_it != layer_queue_.rend(); ++layer_it) {
     layer_it->layer->OnEvent(event);
     if (event.handled_) {
       return;
