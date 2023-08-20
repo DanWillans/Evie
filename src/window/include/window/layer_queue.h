@@ -31,198 +31,199 @@ public:
   LayerID EVIE_API PushBack(Layer& layer);
   Error EVIE_API RemoveLayer(LayerID layer_id);
 
-  // using Iterator = std::deque<LayerWrapper>::iterator;
+  using Iterator = std::deque<LayerWrapper>::iterator;
+  using ReverseIterator = std::deque<LayerWrapper>::reverse_iterator;
 
   // We could just use the `using` declaration above but I didn't want to expose the stl library interface.
   // I also wanted to write my own iterator to support ranges and static_assert concepts :)
-  struct Iterator
-  {
-    using iterator_category = std::random_access_iterator_tag;
-    using difference_type = std::ptrdiff_t;
-    using value_type = LayerWrapper;
-    using pointer = value_type*;
-    using reference = value_type&;
-    using it_type = std::deque<value_type>::iterator;
+  // struct Iterator
+  // {
+  //   using iterator_category = std::random_access_iterator_tag;
+  //   using difference_type = std::ptrdiff_t;
+  //   using value_type = LayerWrapper;
+  //   using pointer = value_type*;
+  //   using reference = value_type&;
+  //   using it_type = std::deque<value_type>::iterator;
 
-    // Default constructor required to pass iterator static assert
-    Iterator() { throw std::runtime_error{ "Not implemented" }; }
-    explicit Iterator(const it_type& iter) : iter_(iter) {}
+  //   // Default constructor required to pass iterator static assert
+  //   Iterator() { throw std::runtime_error{ "Not implemented" }; }
+  //   explicit Iterator(const it_type& iter) : iter_(iter) {}
 
-    reference operator*() const { return *iter_; }
-    pointer operator->() { return &(*iter_); }
+  //   reference operator*() const { return *iter_; }
+  //   pointer operator->() { return &(*iter_); }
 
-    Iterator& operator++()
-    {
-      ++iter_;
-      return *this;
-    }
+  //   Iterator& operator++()
+  //   {
+  //     ++iter_;
+  //     return *this;
+  //   }
 
-    Iterator operator++(int)// NOLINT
-    {
-      Iterator tmp = *this;
-      ++iter_;
-      return tmp;
-    }
+  //   Iterator operator++(int)// NOLINT
+  //   {
+  //     Iterator tmp = *this;
+  //     ++iter_;
+  //     return tmp;
+  //   }
 
-    Iterator& operator--()
-    {
-      --iter_;
-      return *this;
-    }
+  //   Iterator& operator--()
+  //   {
+  //     --iter_;
+  //     return *this;
+  //   }
 
-    Iterator operator--(int)// NOLINT
-    {
-      Iterator tmp = *this;
-      --iter_;
-      return tmp;
-    }
+  //   Iterator operator--(int)// NOLINT
+  //   {
+  //     Iterator tmp = *this;
+  //     --iter_;
+  //     return tmp;
+  //   }
 
-    Iterator& operator-=(const difference_type& offset)
-    {
-      iter_ -= offset;
-      return *this;
-    }
+  //   Iterator& operator-=(const difference_type& offset)
+  //   {
+  //     iter_ -= offset;
+  //     return *this;
+  //   }
 
-    Iterator operator-(const difference_type& offset) const
-    {
-      Iterator tmp = *this;
-      tmp -= offset;
-      return tmp;
-    }
+  //   Iterator operator-(const difference_type& offset) const
+  //   {
+  //     Iterator tmp = *this;
+  //     tmp -= offset;
+  //     return tmp;
+  //   }
 
-    friend Iterator operator-(const difference_type offset, Iterator iter)
-    {
-      iter -= offset;
-      return iter;
-    }
+  //   friend Iterator operator-(const difference_type offset, Iterator iter)
+  //   {
+  //     iter -= offset;
+  //     return iter;
+  //   }
 
-    difference_type operator-(const Iterator& other) const { return iter_ - other.iter_; }
+  //   difference_type operator-(const Iterator& other) const { return iter_ - other.iter_; }
 
-    Iterator& operator+=(const difference_type offset)
-    {
-      iter_ += offset;
-      return *this;
-    }
+  //   Iterator& operator+=(const difference_type offset)
+  //   {
+  //     iter_ += offset;
+  //     return *this;
+  //   }
 
-    Iterator operator+(const difference_type offset) const
-    {
-      Iterator tmp = *this;
-      tmp += offset;
-      return tmp;
-    }
+  //   Iterator operator+(const difference_type offset) const
+  //   {
+  //     Iterator tmp = *this;
+  //     tmp += offset;
+  //     return tmp;
+  //   }
 
-    friend Iterator operator+(const difference_type offset, Iterator iter)
-    {
-      iter += offset;
-      return iter;
-    }
+  //   friend Iterator operator+(const difference_type offset, Iterator iter)
+  //   {
+  //     iter += offset;
+  //     return iter;
+  //   }
 
-    friend bool operator==(const Iterator& lhs, const Iterator& rhs) { return lhs.iter_ == rhs.iter_; }
-    friend bool operator!=(const Iterator& lhs, const Iterator& rhs) { return !(lhs == rhs); }
-    std::strong_ordering operator<=>(const Iterator& rhs) const
-    {
-      return iter_ <=> rhs.iter_;
-    }
+  //   friend bool operator==(const Iterator& lhs, const Iterator& rhs) { return lhs.iter_ == rhs.iter_; }
+  //   friend bool operator!=(const Iterator& lhs, const Iterator& rhs) { return !(lhs == rhs); }
+  //   std::strong_ordering operator<=>(const Iterator& rhs) const
+  //   {
+  //     return iter_ <=> rhs.iter_;
+  //   }
 
-    reference& operator[](const difference_type offset) const { return iter_[offset]; }
+  //   reference& operator[](const difference_type offset) const { return iter_[offset]; }
 
-  private:
-    it_type iter_;
-  };
+  // private:
+  //   it_type iter_;
+  // };
 
-  struct ReverseIterator{
-    using iterator_category = std::random_access_iterator_tag;
-    using difference_type = std::ptrdiff_t;
-    using value_type = LayerWrapper;
-    using pointer = value_type*;
-    using reference = value_type&;
-    using it_type = std::deque<value_type>::reverse_iterator;
+  // struct ReverseIterator{
+  //   using iterator_category = std::random_access_iterator_tag;
+  //   using difference_type = std::ptrdiff_t;
+  //   using value_type = LayerWrapper;
+  //   using pointer = value_type*;
+  //   using reference = value_type&;
+  //   using it_type = std::deque<value_type>::reverse_iterator;
 
-    // Default constructor required to pass iterator static assert
-    ReverseIterator() { throw std::runtime_error{ "Not implemented" }; }
-    explicit ReverseIterator(const it_type& iter) : iter_(iter) {}
+  //   // Default constructor required to pass iterator static assert
+  //   ReverseIterator() { throw std::runtime_error{ "Not implemented" }; }
+  //   explicit ReverseIterator(const it_type& iter) : iter_(iter) {}
 
-    reference operator*() const { return *iter_; }
-    pointer operator->() { return &(*iter_); }
+  //   reference operator*() const { return *iter_; }
+  //   pointer operator->() { return &(*iter_); }
 
-    ReverseIterator& operator++()
-    {
-      ++iter_;
-      return *this;
-    }
+  //   ReverseIterator& operator++()
+  //   {
+  //     ++iter_;
+  //     return *this;
+  //   }
 
-    ReverseIterator operator++(int)// NOLINT
-    {
-      ReverseIterator tmp = *this;
-      ++iter_;
-      return tmp;
-    }
+  //   ReverseIterator operator++(int)// NOLINT
+  //   {
+  //     ReverseIterator tmp = *this;
+  //     ++iter_;
+  //     return tmp;
+  //   }
 
-    ReverseIterator& operator--()
-    {
-      --iter_;
-      return *this;
-    }
+  //   ReverseIterator& operator--()
+  //   {
+  //     --iter_;
+  //     return *this;
+  //   }
 
-    ReverseIterator operator--(int)// NOLINT
-    {
-      ReverseIterator tmp = *this;
-      --iter_;
-      return tmp;
-    }
+  //   ReverseIterator operator--(int)// NOLINT
+  //   {
+  //     ReverseIterator tmp = *this;
+  //     --iter_;
+  //     return tmp;
+  //   }
 
-    ReverseIterator& operator-=(const difference_type& offset)
-    {
-      iter_ -= offset;
-      return *this;
-    }
+  //   ReverseIterator& operator-=(const difference_type& offset)
+  //   {
+  //     iter_ -= offset;
+  //     return *this;
+  //   }
 
-    ReverseIterator operator-(const difference_type& offset) const
-    {
-      ReverseIterator tmp = *this;
-      tmp -= offset;
-      return tmp;
-    }
+  //   ReverseIterator operator-(const difference_type& offset) const
+  //   {
+  //     ReverseIterator tmp = *this;
+  //     tmp -= offset;
+  //     return tmp;
+  //   }
 
-    friend ReverseIterator operator-(const difference_type offset, ReverseIterator iter)
-    {
-      iter -= offset;
-      return iter;
-    }
+  //   friend ReverseIterator operator-(const difference_type offset, ReverseIterator iter)
+  //   {
+  //     iter -= offset;
+  //     return iter;
+  //   }
 
-    difference_type operator-(const ReverseIterator& other) const { return iter_ - other.iter_; }
+  //   difference_type operator-(const ReverseIterator& other) const { return iter_ - other.iter_; }
 
-    ReverseIterator& operator+=(const difference_type offset)
-    {
-      iter_ += offset;
-      return *this;
-    }
+  //   ReverseIterator& operator+=(const difference_type offset)
+  //   {
+  //     iter_ += offset;
+  //     return *this;
+  //   }
 
-    ReverseIterator operator+(const difference_type offset) const
-    {
-      ReverseIterator tmp = *this;
-      tmp += offset;
-      return tmp;
-    }
+  //   ReverseIterator operator+(const difference_type offset) const
+  //   {
+  //     ReverseIterator tmp = *this;
+  //     tmp += offset;
+  //     return tmp;
+  //   }
 
-    friend ReverseIterator operator+(const difference_type offset, ReverseIterator iter)
-    {
-      iter += offset;
-      return iter;
-    }
+  //   friend ReverseIterator operator+(const difference_type offset, ReverseIterator iter)
+  //   {
+  //     iter += offset;
+  //     return iter;
+  //   }
 
-    friend bool operator==(const ReverseIterator& lhs, const ReverseIterator& rhs) { return lhs.iter_ == rhs.iter_; }
-    friend bool operator!=(const ReverseIterator& lhs, const ReverseIterator& rhs) { return !(lhs == rhs); }
-    std::strong_ordering operator<=>(const ReverseIterator& rhs) const
-    {
-      return iter_ <=> rhs.iter_;
-    }
+  //   friend bool operator==(const ReverseIterator& lhs, const ReverseIterator& rhs) { return lhs.iter_ == rhs.iter_; }
+  //   friend bool operator!=(const ReverseIterator& lhs, const ReverseIterator& rhs) { return !(lhs == rhs); }
+  //   std::strong_ordering operator<=>(const ReverseIterator& rhs) const
+  //   {
+  //     return iter_ <=> rhs.iter_;
+  //   }
 
-    reference& operator[](const difference_type offset) const { return iter_[offset]; }
+  //   reference& operator[](const difference_type offset) const { return iter_[offset]; }
 
-    private:
-    it_type iter_;
-  };
+  //   private:
+  //   it_type iter_;
+  // };
 
   [[nodiscard]] Iterator EVIE_API begin() { return Iterator(layers_.begin()); }
   [[nodiscard]] Iterator EVIE_API end() { return Iterator(layers_.end()); }
