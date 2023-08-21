@@ -224,14 +224,9 @@ public:
     private:
     it_type iter_;
   };
-  #if _LIBCPP_STD_VER >= 20
-  "NOPE"
-  #endif
 
   [[nodiscard]] Iterator EVIE_API begin() { return Iterator(layers_.begin()); }
   [[nodiscard]] Iterator EVIE_API end() { return Iterator(layers_.end()); }
-  // [[nodiscard]] Iterator EVIE_API rbegin() { return Iterator(layers_.rend()); }
-  // [[nodiscard]] Iterator EVIE_API rend() { return Iterator(layers_.begin()); }
   [[nodiscard]] ReverseIterator EVIE_API rbegin() { return ReverseIterator(layers_.rbegin()); }
   [[nodiscard]] ReverseIterator EVIE_API rend() { return ReverseIterator(layers_.rend()); }
 
