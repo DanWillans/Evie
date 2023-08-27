@@ -21,6 +21,7 @@ public:
     if (event.GetEventType() == evie::EventType::KeyPressed) {
       auto* key_event = static_cast<evie::KeyPressedEvent*>(&event);
       [[maybe_unused]] auto code = key_event->GetKeyCode();
+      (void)code;
       event_count++;
     }
   }
