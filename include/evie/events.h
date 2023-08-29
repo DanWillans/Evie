@@ -1,5 +1,7 @@
 #ifndef EVIE_EVENT_SYSTEM_EVENTS_H_
 #define EVIE_EVENT_SYSTEM_EVENTS_H_
+
+#include <cstdint>
 #include <string>
 
 #include "utility/bitmask_operators.h"
@@ -38,6 +40,8 @@ template<> struct enable_bitmask_operators<EventCategoryBitmask>
   static constexpr bool enable = true;
 };
 
+class EventManager;
+
 class EVIE_API Event
 {
 public:
@@ -52,6 +56,7 @@ public:
   }
 
 protected:
+  friend EventManager;
   Event() = default;
   // A flag that says whether this event has been handled.
   bool handled_{ false };

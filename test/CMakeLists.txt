@@ -36,7 +36,7 @@ target_link_libraries(
   event_system_tests
   PRIVATE Evie::Evie_warnings
   Evie::Evie_options
-  Evie::EventSystem
+  Evie::Window
   doctest::doctest)
 
 if(WIN32)
@@ -70,6 +70,32 @@ target_include_directories(error_tests PUBLIC $<BUILD_INTERFACE:${EVIE_PROJECT_R
 # to whatever you want, or use different for different binaries
 doctest_discover_tests(
   error_tests
+  TEST_PREFIX
+  "unittests."
+)
+
+# ###### Layer Queue Tests ########
+add_executable(layer_queue_tests main.cpp layer_queue_tests.cpp)
+target_link_libraries(
+  layer_queue_tests
+  PRIVATE
+  Evie::Evie_warnings
+  Evie::Evie_options
+  Evie::Window
+  doctest::doctest)
+
+if(WIN32)
+  add_custom_command(
+    TARGET layer_queue_tests
+    PRE_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:layer_queue_tests> $<TARGET_FILE_DIR:layer_queue_tests>
+    COMMAND_EXPAND_LISTS)
+endif()
+
+# automatically discover tests that are defined in catch based test files you can modify the unittests. Set TEST_PREFIX
+# to whatever you want, or use different for different binaries
+doctest_discover_tests(
+  layer_queue_tests
   TEST_PREFIX
   "unittests."
 )

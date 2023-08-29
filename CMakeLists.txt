@@ -106,7 +106,6 @@ Evie_package_project(
   Logging
   Application
   Utilities
-  EventSystem
   Window
   Evie_options
   Evie_warnings

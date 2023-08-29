@@ -33,7 +33,6 @@ jobs:
           - macos-11
           - windows-2019
         compiler:
-          # you can specify the version after `-` like "llvm-15.0.2".
           - llvm-15.0.2
           - gcc-11
         generator:

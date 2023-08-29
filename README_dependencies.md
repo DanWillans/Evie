@@ -30,7 +30,7 @@ RefreshEnv.cmd # reload the environment
 
 Example command installing required llvm dependencies for windows
 ```
-./setup-cpp-x64-windows --compiler llvm --cmake true --ninja true --ccache true --vcpkg false --cppcheck true --gcovr true --opencppcoverage true --clangtidy 15.0.2 --vcvarsall true
+./setup-cpp-x64-windows --compiler llvm --cmake true --ninja true --ccache true --vcpkg false --cppcheck true --gcovr true --opencppcoverage true --clangtidy 16 --vcvarsall true
 ```
 
 ### Necessary Dependencies

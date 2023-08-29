@@ -4,12 +4,10 @@
 #include <memory>
 #include <spdlog/common.h>
 
-#include "event_system/event_manager.h"
-#include "event_system/window_events.h"
+#include "window/event_manager.h"
+#include "window/window_events.h"
 #include "evie/core.h"
 #include "evie/error.h"
-
-
 namespace evie {
 struct WindowProperties
 {
@@ -32,8 +30,8 @@ public:
 
   Error Initialise();
   void Update();
-  Error RegisterEventListener(IEventListener* event_listener);
-  IEventListener* GetEventListener();
+  Error RegisterEventManager(EventManager& event_manager);
+  EventManager* GetEventManager();
   void SetVSyncFlag(bool enabled);
 
 private:
