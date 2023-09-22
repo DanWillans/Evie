@@ -11,7 +11,7 @@ class EVIE_API KeyEvent : public Event
 public:
   [[nodiscard]] int GetKeyCode()
   {
-    handled_ = true;
+    handled = true;
     return key_code_;
   };
 
@@ -46,7 +46,7 @@ public:
 
   [[nodiscard]] int GetRepeatCount()
   {
-    handled_ = true;
+    handled = true;
     return repeat_count_;
   };
 

@@ -55,11 +55,12 @@ public:
     return static_cast<bool>(GetCategoryFlags() & category);
   }
 
+  bool handled{ false };
+
 protected:
   friend EventManager;
   Event() = default;
   // A flag that says whether this event has been handled.
-  bool handled_{ false };
 };
 
 

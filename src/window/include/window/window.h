@@ -8,6 +8,8 @@
 #include "window/window_events.h"
 #include "evie/core.h"
 #include "evie/error.h"
+#include "GLFW/glfw3.h"
+
 namespace evie {
 struct WindowProperties
 {
@@ -29,10 +31,12 @@ public:
   Window& operator=(Window&&) = delete;
 
   Error Initialise();
-  void Update();
+  void PollEvents();
+  void SwapBuffers();
   Error RegisterEventManager(EventManager& event_manager);
   EventManager* GetEventManager();
   void SetVSyncFlag(bool enabled);
+  GLFWwindow* GetGLFWWindow();
 
 private:
   // Impl at the minute to avoid leaking the implementation to the user

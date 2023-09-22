@@ -4,7 +4,7 @@
 #include "evie/events.h"
 
 namespace evie {
-class Layer
+class EVIE_API Layer
 {
 public:
   virtual ~Layer() = default;
