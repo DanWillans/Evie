@@ -15,11 +15,6 @@ Evie_add_library(
   STATIC
 )
 
-target_link_libraries(
-  ImGui
-  PRIVATE
-  Evie::Evie_options
-  Evie::Evie_warnings
-)
+set_target_properties(ImGui PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 target_link_system_libraries(ImGui PUBLIC glfw OpenGL::GL)
