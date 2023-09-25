@@ -1,3 +1,4 @@
+find_package(OpenGL REQUIRED)
 # Maybe don't do this. It's not an Evie library just issue an ImGui instance for users to use alongside Evie.
 Evie_add_library(
   TARGET
@@ -11,6 +12,14 @@ Evie_add_library(
     imgui_widgets.cpp
     imgui.cpp
     imgui_demo.cpp
+  STATIC
 )
 
-target_link_system_libraries(ImGui PRIVATE glfw)
+target_link_libraries(
+  ImGui
+  PRIVATE
+  Evie::Evie_options
+  Evie::Evie_warnings
+)
+
+target_link_system_libraries(ImGui PUBLIC glfw OpenGL::GL)
