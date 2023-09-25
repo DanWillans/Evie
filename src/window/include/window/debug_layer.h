@@ -6,6 +6,10 @@
 
 #include "GLFW/glfw3.h"
 
+#ifdef EVIE_PLATFORM_APPLE
+#defin GL_SILENCE_DEPRECATION 1
+#endif
+
 namespace evie {
 
 class EVIE_API DebugLayer final : public Layer

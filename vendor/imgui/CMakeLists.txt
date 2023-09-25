@@ -1,4 +1,4 @@
-# Don't do this. It's not an Evie library just issue an ImGui instance for users
+# Maybe don't do this. It's not an Evie library just issue an ImGui instance for users to use alongside Evie.
 Evie_add_library(
   TARGET
     ImGui
@@ -11,7 +11,6 @@ Evie_add_library(
     imgui_widgets.cpp
     imgui.cpp
     imgui_demo.cpp
-  STATIC
 )
 
 target_link_system_libraries(ImGui PRIVATE glfw)

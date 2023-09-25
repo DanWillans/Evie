@@ -175,20 +175,13 @@ private:
 };
 
 Window::Window(const WindowProperties& window_props) : impl_(new Impl(window_props, this)) {}
-
 Error Window::Initialise() { return impl_->Initialise(); }
-
 void Window::PollEvents() { return impl_->PollEvents(); }
 void Window::SwapBuffers() { return impl_->SwapBuffers(); }
-
 Error Window::RegisterEventManager(EventManager& event_manager) { return impl_->RegisterEventManager(event_manager); }
-
-EventManager* Window::GetEventManager() { return impl_->GetEventManager(); }
-
+EventManager* Window::GetEventManager(){ return impl_->GetEventManager(); }
 void Window::SetVSyncFlag(bool enabled) { impl_->SetVSync(enabled); }
-
 GLFWwindow* Window::GetGLFWWindow() { return impl_->GetGLFWWindow(); }
-
 Window::~Window() { delete impl_; }
 
 Window::Impl::~Impl() { glfwTerminate(); }

@@ -14,4 +14,11 @@ project(Sandbox
 
 add_executable(sandbox src/main.cpp)
 
-target_link_libraries(sandbox PRIVATE Evie::Evie_options Evie::Evie_warnings Evie::Application Evie::Logging)
+target_link_libraries(
+  sandbox
+  PRIVATE
+  Evie::Evie_options
+  Evie::Evie_warnings
+  Evie::Application
+  Evie::Logging
+)

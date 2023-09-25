@@ -39,7 +39,7 @@ public:
   GLFWwindow* GetGLFWWindow();
 
 private:
-  // Impl at the minute to avoid leaking the implementation to the user
+  // Use Impl pattern so that we fix EventManager stl export.
   class Impl;
   Impl* impl_;
 };
