@@ -2,13 +2,13 @@
 #define EVIE_DEBUG_LAYER_H_
 
 #include "evie/layer.h"
-#include "imgui.h"
-
-#include "GLFW/glfw3.h"
 
 #ifdef EVIE_PLATFORM_APPLE
 #defin GL_SILENCE_DEPRECATION 1
 #endif
+
+#include "imgui.h"
+#include "GLFW/glfw3.h"
 
 namespace evie {
 
