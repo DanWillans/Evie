@@ -4,7 +4,7 @@
 #include "evie/layer.h"
 
 #ifdef EVIE_PLATFORM_APPLE
-#defin GL_SILENCE_DEPRECATION 1
+#define GL_SILENCE_DEPRECATION 1
 #endif
 
 #include "imgui.h"
