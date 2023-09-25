@@ -31,6 +31,7 @@ Evie_global_options()
 
 include(Dependencies.cmake)
 Evie_setup_dependencies()
+add_subdirectory(vendor/imgui)
 
 Evie_local_options()
 
@@ -69,7 +70,6 @@ endif()
 include(CTest)
 
 if(BUILD_TESTING)
-  message(AUTHOR_WARNING "Building Tests. Be sure to check out test/constexpr_tests.cpp for constexpr testing")
   add_subdirectory(test)
 endif()
 
@@ -109,6 +109,8 @@ Evie_package_project(
   Window
   Evie_options
   Evie_warnings
+  ImGui
+  glfw
 
   # Package up examples
   sandbox

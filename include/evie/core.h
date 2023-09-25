@@ -5,7 +5,7 @@
 // Check gcc.gnu.org/wiki/Visibility for more details
 
 #ifdef EVIE_PLATFORM_WINDOWS
-  #ifdef EVIE_BUILD_DLL
+  #ifdef EVIE_BUILD_SHARED_LIBRARY
     #define EVIE_API __declspec(dllexport)
   #else
     #define EVIE_API __declspec(dllimport)

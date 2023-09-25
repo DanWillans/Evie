@@ -11,18 +11,23 @@
 
 #include "GLFW/glfw3.h"
 
-#include "window/event_manager.h"
+#include "evie/error.h"
 #include "evie/events.h"
+#include "evie/logging.h"
+#include "window/event_manager.h"
 #include "window/key_events.h"
 #include "window/mouse_events.h"
-#include "window/window_events.h"
-#include "evie/error.h"
-#include "evie/logging.h"
 #include "window/window.h"
+#include "window/window_events.h"
 
 
 namespace evie {
 namespace {
+
+  static void glfw_error_callback(int error, const char* description)
+  {
+    EV_ERROR("GLFW Error {}: {}", error, description);
+  }
 
   EventManager* GetEventManager(GLFWwindow* window)
   {
@@ -149,11 +154,14 @@ class Window::Impl
 public:
   Impl(const WindowProperties& props, Window* parent_window) : properties_(props), parent_window_ptr_(parent_window) {}
   Error Initialise();
-  void Update();
+  static void PollEvents();
+  void SwapBuffers();
   Error RegisterEventManager(EventManager& event_manager);
   void SetupInputCallbacks();
   EventManager* GetEventManager() { return event_manager_; };
   void SetVSync(bool enabled);
+  GLFWwindow* GetGLFWWindow() { return window_; };
+  ~Impl();
 
 private:
   Error DispatchEvent(std::unique_ptr<Event> event);
@@ -167,30 +175,22 @@ private:
 };
 
 Window::Window(const WindowProperties& window_props) : impl_(new Impl(window_props, this)) {}
-
 Error Window::Initialise() { return impl_->Initialise(); }
-
-void Window::Update() { return impl_->Update(); }
-
-Error Window::RegisterEventManager(EventManager& event_manager)
-{
-  return impl_->RegisterEventManager(event_manager);
-}
-
-EventManager* Window::GetEventManager() { return impl_->GetEventManager(); }
-
+void Window::PollEvents() { return impl_->PollEvents(); }
+void Window::SwapBuffers() { return impl_->SwapBuffers(); }
+Error Window::RegisterEventManager(EventManager& event_manager) { return impl_->RegisterEventManager(event_manager); }
+EventManager* Window::GetEventManager(){ return impl_->GetEventManager(); }
 void Window::SetVSyncFlag(bool enabled) { impl_->SetVSync(enabled); }
+GLFWwindow* Window::GetGLFWWindow() { return impl_->GetGLFWWindow(); }
+Window::~Window() { delete impl_; }
 
-Window::~Window()
-{
-  glfwTerminate();
-  delete impl_;
-}
+Window::Impl::~Impl() { glfwTerminate(); }
 
 Error Window::Impl::Initialise()
 {
+  glfwSetErrorCallback(glfw_error_callback);
   // We may want more than one window so we should fix this if we do. Maybe use a static?
-  if (glfwInit() == 0) {
+  if (glfwInit() == GLFW_FALSE) {
     return Error("glfw failed to initialise");
   }
   window_ = glfwCreateWindow(
@@ -219,11 +219,9 @@ void Window::Impl::SetupInputCallbacks()
   glfwSetWindowPosCallback(window_, WindowPositionCallback);
 }
 
-void Window::Impl::Update()
-{
-  glfwSwapBuffers(window_);
-  glfwPollEvents();
-}
+void Window::Impl::PollEvents() { glfwPollEvents(); }
+
+void Window::Impl::SwapBuffers() { glfwSwapBuffers(window_); }
 
 Error Window::Impl::RegisterEventManager(EventManager& event_manager)
 {

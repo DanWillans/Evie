@@ -120,7 +120,7 @@ public:
 
   [[nodiscard]] const WindowDimensions& GetWindowDimensions()
   {
-    handled_ = true;
+    handled = true;
     return dimensions_;
   }
 
@@ -148,7 +148,7 @@ public:
 
   [[nodiscard]] const WindowPosition& GetWindowPosition()
   {
-    handled_ = true;
+    handled = true;
     return position_;
   }
 

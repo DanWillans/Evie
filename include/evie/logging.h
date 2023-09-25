@@ -32,8 +32,8 @@ private:
 
 #define EV_INFO(...) evie::LoggingManager::GetEngineLogger()->info(__VA_ARGS__)// NOLINT
 #define EV_WARN(...) evie::LoggingManager::GetEngineLogger()->warn(__VA_ARGS__)// NOLINT
-#define EV_TRACE(...) evie::LoggingManager::GetEnginelogger()->trace(__VA_ARGS__)// NOLINT
-#define EV_ERROR(...) evie::LoggingManager::GetEnginelogger()->error(__VA_ARGS__)// NOLINT
-#define EV_DEBUG(...) evie::LoggingManager::GetEnginelogger()->debug(__VA_ARGS__)// NOLINT
+#define EV_TRACE(...) evie::LoggingManager::GetEngineLogger()->trace(__VA_ARGS__)// NOLINT
+#define EV_ERROR(...) evie::LoggingManager::GetEngineLogger()->error(__VA_ARGS__)// NOLINT
+#define EV_DEBUG(...) evie::LoggingManager::GetEngineLogger()->debug(__VA_ARGS__)// NOLINT
 
 #endif// EVIE_LOGGING_H_
