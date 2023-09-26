@@ -1,7 +1,11 @@
-#include <memory>
-#include <stdio.h>
-#include <string>
-#include <vector>
+#include "window/glfw_window.h"
+#include "evie/error.h"
+#include "evie/logging.h"
+#include "window/event_manager.h"
+#include "window/key_events.h"
+#include "window/mouse_events.h"
+#include "window/window.h"
+#include "window/window_events.h"
 
 
 #ifdef EVIE_PLATFORM_WINDOWS
@@ -11,19 +15,8 @@
 
 #include "GLFW/glfw3.h"
 
-#include "evie/error.h"
-#include "evie/events.h"
-#include "evie/logging.h"
-#include "window/event_manager.h"
-#include "window/key_events.h"
-#include "window/mouse_events.h"
-#include "window/window.h"
-#include "window/window_events.h"
-
-
 namespace evie {
 namespace {
-
   static void glfw_error_callback(int error, const char* description)
   {
     EV_ERROR("GLFW Error {}: {}", error, description);
@@ -31,7 +24,7 @@ namespace {
 
   EventManager* GetEventManager(GLFWwindow* window)
   {
-    auto* user_window = static_cast<Window*>(glfwGetWindowUserPointer(window));
+    auto* user_window = static_cast<GLFWWindow*>(glfwGetWindowUserPointer(window));
     if (user_window != nullptr) {
       auto* event_manager = user_window->GetEventManager();
       if (event_manager != nullptr) {
@@ -50,7 +43,6 @@ namespace {
     T event(args...);
     listener->OnEvent(event);
   }
-
 
   void KeyCallback(GLFWwindow* window, int key, [[maybe_unused]] int scancode, int action, [[maybe_unused]] int mods)
   {
@@ -149,45 +141,9 @@ namespace {
   }
 }// namespace
 
-class Window::Impl
+Error GLFWWindow::Initialise(const WindowProperties& props)
 {
-public:
-  Impl(const WindowProperties& props, Window* parent_window) : properties_(props), parent_window_ptr_(parent_window) {}
-  Error Initialise();
-  static void PollEvents();
-  void SwapBuffers();
-  Error RegisterEventManager(EventManager& event_manager);
-  void SetupInputCallbacks();
-  EventManager* GetEventManager() { return event_manager_; };
-  void SetVSync(bool enabled);
-  GLFWwindow* GetGLFWWindow() { return window_; };
-  ~Impl();
-
-private:
-  Error DispatchEvent(std::unique_ptr<Event> event);
-  GLFWwindow* window_{ nullptr };
-  WindowProperties properties_;
-  // This could be public if we allow people to overwrite the event manager
-  EventManager* event_manager_{ nullptr };
-  // Required to set user window pointer
-  Window* parent_window_ptr_{ nullptr };
-  bool vsync_enabled_{ false };
-};
-
-Window::Window(const WindowProperties& window_props) : impl_(new Impl(window_props, this)) {}
-Error Window::Initialise() { return impl_->Initialise(); }
-void Window::PollEvents() { return impl_->PollEvents(); }
-void Window::SwapBuffers() { return impl_->SwapBuffers(); }
-Error Window::RegisterEventManager(EventManager& event_manager) { return impl_->RegisterEventManager(event_manager); }
-EventManager* Window::GetEventManager(){ return impl_->GetEventManager(); }
-void Window::SetVSyncFlag(bool enabled) { impl_->SetVSync(enabled); }
-GLFWwindow* Window::GetGLFWWindow() { return impl_->GetGLFWWindow(); }
-Window::~Window() { delete impl_; }
-
-Window::Impl::~Impl() { glfwTerminate(); }
-
-Error Window::Impl::Initialise()
-{
+  properties_ = props;
   glfwSetErrorCallback(glfw_error_callback);
   // We may want more than one window so we should fix this if we do. Maybe use a static?
   if (glfwInit() == GLFW_FALSE) {
@@ -202,12 +158,12 @@ Error Window::Impl::Initialise()
   // If we use glad we should init it here.
   SetVSync(true);
   // Setup the user window pointer
-  glfwSetWindowUserPointer(window_, static_cast<void*>(parent_window_ptr_));
+  glfwSetWindowUserPointer(window_, static_cast<void*>(this));
   SetupInputCallbacks();
   return Error::OK();
 }
 
-void Window::Impl::SetupInputCallbacks()
+void GLFWWindow::SetupInputCallbacks()
 {
   glfwSetKeyCallback(window_, KeyCallback);
   glfwSetCursorPosCallback(window_, CursorPositionCallback);
@@ -219,11 +175,11 @@ void Window::Impl::SetupInputCallbacks()
   glfwSetWindowPosCallback(window_, WindowPositionCallback);
 }
 
-void Window::Impl::PollEvents() { glfwPollEvents(); }
+void GLFWWindow::PollEvents() { glfwPollEvents(); }
 
-void Window::Impl::SwapBuffers() { glfwSwapBuffers(window_); }
+void GLFWWindow::SwapBuffers() { glfwSwapBuffers(window_); }
 
-Error Window::Impl::RegisterEventManager(EventManager& event_manager)
+Error GLFWWindow::RegisterEventManager(EventManager& event_manager)
 {
   if (event_manager_ == nullptr) {
     event_manager_ = &event_manager;
@@ -233,7 +189,7 @@ Error Window::Impl::RegisterEventManager(EventManager& event_manager)
   return Error::OK();
 };
 
-void Window::Impl::SetVSync(bool enabled)
+void GLFWWindow::SetVSync(bool enabled)
 {
   if (enabled) {
     glfwSwapInterval(1);
@@ -242,5 +198,16 @@ void Window::Impl::SetVSync(bool enabled)
   }
   vsync_enabled_ = enabled;
 }
+
+void* GLFWWindow::GetNativeWindow() { return static_cast<void*>(window_); }
+
+void GLFWWindow::Destroy()
+{
+  glfwDestroyWindow(window_);
+  glfwTerminate();
+}
+
+EventManager* GLFWWindow::GetEventManager() { return event_manager_; }
+
 
 }// namespace evie

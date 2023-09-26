@@ -1,3 +1,8 @@
+#ifdef EVIE_PLATFORM_APPLE
+// This is required because Apple has deprecated OpenGL
+#define GL_SILENCE_DEPRECATION 1
+#endif
+
 #include "window/debug_layer.h"
 #include "GLFW/glfw3.h"
 #include "evie/events.h"
@@ -9,15 +14,16 @@
 
 namespace evie {
 
-DebugLayer::DebugLayer(GLFWwindow* window)
+DebugLayer::DebugLayer(void* window)
 {
+  GLFWwindow* glfw_window = static_cast<GLFWwindow*>(window);
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
   ImGuiIO& imgui_io = ImGui::GetIO();
   imgui_io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;// Enable Keyboard Controls
   // Setup Platform/Renderer backends
   ImGui_ImplGlfw_InitForOpenGL(
-    window, true);// Second param install_callback=true will install GLFW callbacks and chain to existing ones.
+    glfw_window, true);// Second param install_callback=true will install GLFW callbacks and chain to existing ones.
   ImGui_ImplOpenGL3_Init();
   EV_INFO("Initialised debug layer");
 }

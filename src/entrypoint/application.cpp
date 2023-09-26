@@ -12,6 +12,10 @@
 #include "window/window.h"
 #include <GLFW/glfw3.h>
 
+#if defined EVIE_PLATFORM_WINDOWS || defined EVIE_PLATFORM_APPLE || defined EVIE_PLATFORM_UNIX
+#include "window/glfw_window.h"
+#endif
+
 namespace {
 class TestLayer final : public evie::Layer
 {
@@ -60,23 +64,29 @@ void Application::Run()
   props.name = "Evie";
   props.dimensions.width = 640;
   props.dimensions.height = 480;
-  Window window(props);
-  Error err = window.Initialise();
+  // At the minute we only build for these platforms but a different window impementation will be needed for android
+  // etc.
+#if defined EVIE_PLATFORM_WINDOWS || defined EVIE_PLATFORM_APPLE || defined EVIE_PLATFORM_UNIX
+  GLFWWindow window;
+  Error err = window.Initialise(props);
+  DebugLayer debug_layer(window.GetNativeWindow());
+#endif
 
   // Layers
-  DebugLayer debug_layer(window.GetGLFWWindow());
   TestLayer layer(1);
   TestLayer2 layer_2(2);
   LayerQueue layer_queue;
   layer_queue.PushBack(layer);
   layer_queue.PushBack(layer_2);
+
+#if defined EVIE_PLATFORM_WINDOWS || defined EVIE_PLATFORM_APPLE || defined EVIE_PLATFORM_UNIX
   layer_queue.PushBack(debug_layer);
+#endif
 
   // Event System
   EventManager event_manager(layer_queue);
-  event_manager.SubscribeToEventType(EventType::WindowClose, [this]([[maybe_unused]] const Event& event) {
-    CloseWindow();
-  });
+  event_manager.SubscribeToEventType(
+    EventType::WindowClose, [this]([[maybe_unused]] const Event& event) { CloseWindow(); });
 
   // TODO: Get rid of this and just construct window with the Event Manager
   if (err.Good()) {
