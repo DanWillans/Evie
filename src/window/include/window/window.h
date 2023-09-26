@@ -16,33 +16,19 @@ struct WindowProperties
   WindowDimensions dimensions;
   std::string name;
 };
-// Currently this class handles initialising glfw and creating a window.
-// It might make sure sense to just handle window creation and something else
-// handle the init.
-class EVIE_API Window
-{
-public:
-  explicit Window(const WindowProperties& window_props);
-  ~Window();
-  // For now the Window class shouldn't be allowed to be copied or moved.
-  Window(const Window&) = delete;
-  Window(Window&&) = delete;
-  Window& operator=(const Window&) = delete;
-  Window& operator=(Window&&) = delete;
 
-  Error Initialise();
-  void PollEvents();
-  void SwapBuffers();
-  Error RegisterEventManager(EventManager& event_manager);
-  EventManager* GetEventManager();
-  void SetVSyncFlag(bool enabled);
-  GLFWwindow* GetGLFWWindow();
-
-private:
-  // Use Impl pattern so that we fix EventManager stl export.
-  class Impl;
-  Impl* impl_;
+class EVIE_API IWindow {
+  public:
+    virtual ~IWindow() = default;
+    virtual Error Initialise(const WindowProperties& props) = 0;
+    virtual void Destroy() = 0;
+    virtual void PollEvents() = 0;
+    virtual void SwapBuffers() = 0;
+    virtual Error RegisterEventManager(EventManager& event_manager) = 0;
+    virtual void* GetNativeWindow() = 0;
 };
+
+
 }// namespace evie
 
 #endif// EVIE_WINDOW_H_

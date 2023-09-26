@@ -1,8 +1,14 @@
 find_package(OpenGL REQUIRED)
 
 Evie_add_library(
-  TARGET Window 
-  SRCS window.cpp layer_queue.cpp event_manager.cpp debug_layer.cpp)
+  TARGET
+    Window
+  SRCS
+    layer_queue.cpp
+    event_manager.cpp
+    debug_layer.cpp
+    glfw_window.cpp
+)
 
 target_link_libraries(
   Window

@@ -3,19 +3,15 @@
 
 #include "evie/layer.h"
 
-#ifdef EVIE_PLATFORM_APPLE
-#define GL_SILENCE_DEPRECATION 1
-#endif
-
-#include "imgui.h"
-#include "GLFW/glfw3.h"
-
 namespace evie {
 
 class EVIE_API DebugLayer final : public Layer
 {
-  public:
-  explicit DebugLayer(GLFWwindow* window);
+public:
+  // void* window is a pointer to the native GLFW window.
+  // If we don't like this not being explicit without looking at the declaration then let's just change it to
+  // GLFWwindow* and get the caller to cast it.
+  explicit DebugLayer(void* window);
   ~DebugLayer() override;
   void OnUpdate() override;
   void OnEvent(Event& event) override;
