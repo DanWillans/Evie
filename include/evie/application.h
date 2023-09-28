@@ -10,7 +10,7 @@
 #include "evie/types.h"
 
 namespace evie {
-class EVIE_API Application
+class Application
 {
 public:
   EVIE_API Application();

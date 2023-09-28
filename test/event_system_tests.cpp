@@ -26,6 +26,7 @@ public:
       [[maybe_unused]] auto code = key_event->GetKeyCode();
       (void)code;
       event_count++;
+      event.handled = true;
     }
   }
   ~TestLayer() override = default;
@@ -43,6 +44,7 @@ public:
       [[maybe_unused]] auto code = key_event->GetMouseButton();
       (void)code;
       event_count++;
+      event.handled = true;
     }
   }
   ~TestLayer2() override = default;
