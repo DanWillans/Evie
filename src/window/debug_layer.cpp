@@ -49,7 +49,7 @@ void DebugLayer::OnEvent([[maybe_unused]] Event& event)
   }
 }
 
-DebugLayer::~DebugLayer()
+void DebugLayer::Shutdown()
 {
   ImGui_ImplOpenGL3_Shutdown();
   ImGui_ImplGlfw_Shutdown();

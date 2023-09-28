@@ -9,9 +9,8 @@ namespace evie {
 class EVIE_API KeyEvent : public Event
 {
 public:
-  [[nodiscard]] int GetKeyCode()
+  [[nodiscard]] int GetKeyCode() const
   {
-    handled = true;
     return key_code_;
   };
 
@@ -46,7 +45,6 @@ public:
 
   [[nodiscard]] int GetRepeatCount()
   {
-    handled = true;
     return repeat_count_;
   };
 

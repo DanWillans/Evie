@@ -1,6 +1,7 @@
 #include "window/event_manager.h"
 #include "evie/events.h"
 #include "evie/logging.h"
+#include "evie/input_manager.h"
 #include "window/key_events.h"
 #include "window/layer_queue.h"
 #include "window/mouse_events.h"
@@ -9,11 +10,17 @@
 namespace evie {
 // Although trivial these are defined here so that they don't become inline.
 // An undefined reference to these functions will occur in the vtable if we don't
-EventManager::EventManager(LayerQueue& layer_queue) : layer_queue_(layer_queue) {}
+EventManager::EventManager(LayerQueue& layer_queue, IInputManager* input_manager)
+  : layer_queue_(layer_queue), input_manager_(input_manager)
+{}
 EventManager::~EventManager() {}
 
 void EventManager::OnEvent(Event& event)
 {
+  // The input manager needs visibility on all events to store the state of the event.
+  input_manager_->RegisterInput(event);
+
+
   // Is this unnecessary? Currently used to prioritise individual event captures like closing the window.
   auto type_sub_it = type_subscribers_.find(event.GetEventType());
   if (type_sub_it != type_subscribers_.end()) {

@@ -13,23 +13,22 @@ namespace evie {
 // We could have separate concrete classes for Windows, macOS and Linux but for each of these platforms we'll be using
 // GLFW. When it comes to other platforms like android and ios we can make a new implementation.
 // The name might be slightly confusing considering GLFW has a GLFWwindow type.
-class EVIE_API GLFWWindow final : IWindow
+class EVIE_API GLFWWindow final : public IWindow
 {
 public:
   ~GLFWWindow() override = default;
-  // For now the Window class shouldn't be allowed to be copied or moved.
 
-  Error Initialise(const WindowProperties& props) override;
+  [[nodiscard]] Error Initialise(const WindowProperties& props) override;
   void Destroy() override;
   void PollEvents() override;
   void SwapBuffers() override;
-  Error RegisterEventManager(EventManager& event_manager) override;
-  EventManager* GetEventManager();
+  [[nodiscard]] Error RegisterEventManager(EventManager& event_manager) override;
   void* GetNativeWindow() override;
+  EventManager* GetEventManager();
   void SetVSync(bool enabled);
 
 private:
-  Error DispatchEvent(std::unique_ptr<Event> event);
+  [[nodiscard]] Error DispatchEvent(std::unique_ptr<Event> event);
   void SetupInputCallbacks();
   GLFWwindow* window_{ nullptr };
   WindowProperties properties_;

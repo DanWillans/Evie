@@ -65,7 +65,6 @@ public:
 
   [[nodiscard]] MouseButton GetMouseButton()
   {
-    handled = true;
     return button_;
   }
 
@@ -102,7 +101,6 @@ public:
 
   [[nodiscard]] MouseButton GetMouseButton()
   {
-    handled = true;
     return button_;
   }
 
@@ -138,7 +136,6 @@ public:
 
   [[nodiscard]] const MousePosition& GetMousePosition()
   {
-    handled = true;
     return position_;
   }
 
@@ -176,7 +173,6 @@ public:
 
   [[nodiscard]] MouseScrollOffset GetScrollOffset()
   {
-    handled = true;
     return scroll_offset_;
   }
 

@@ -34,5 +34,12 @@ Error LayerQueue::RemoveLayer(LayerID layer_id)
   return err;
 }
 
+void LayerQueue::Shutdown()
+{
+  for (auto& layer_wrapper : layers_) {
+    layer_wrapper.layer->Shutdown();
+  }
+}
+
 
 }// namespace evie

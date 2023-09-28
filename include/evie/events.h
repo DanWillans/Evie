@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <string>
 
-#include "utility/bitmask_operators.h"
+#include "evie/bitmask_operators.h"
 
 #include "evie/core.h"
 
