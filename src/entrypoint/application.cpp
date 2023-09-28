@@ -8,14 +8,13 @@
 #include "imgui_impl_opengl3.h"
 #include "window/debug_layer.h"
 #include "window/event_manager.h"
-#include "window/glfw_input_manager.h"
+#include "window/input_manager_impl.h"
 #include "window/key_events.h"
 #include "window/layer_queue.h"
 #include "window/mouse_events.h"
 #include "window/window.h"
 #include <GLFW/glfw3.h>
 #include <evie/error.h>
-#include <evie/input_manager.h>
 
 #if defined EVIE_PLATFORM_WINDOWS || defined EVIE_PLATFORM_APPLE || defined EVIE_PLATFORM_UNIX
 #include "window/glfw_window.h"
@@ -23,6 +22,8 @@
 
 namespace evie {
 
+// =========================
+// Impl
 class Application::Impl
 {
 public:
@@ -39,6 +40,7 @@ private:
 
 void Application::Impl::PushLayerFront(Layer& layer) { layer_queue_.PushFront(layer); }
 void Application::Impl::PushLayerBack(Layer& layer) { layer_queue_.PushBack(layer); }
+// =========================
 
 Application::Application() : impl_(new Impl()) {}
 Application::~Application() { delete impl_; }
@@ -55,7 +57,7 @@ Error Application::Initialise(const WindowProperties& props)
   // At the minute we only build for these platforms but a different window impementation will be needed for android
   // etc.
 #if defined EVIE_PLATFORM_WINDOWS || defined EVIE_PLATFORM_APPLE || defined EVIE_PLATFORM_UNIX
-  input_manager_ = std::make_unique<GLFWInputManager>();
+  input_manager_ = std::make_unique<InputManager>();
 #endif
 
   // Window
@@ -64,8 +66,8 @@ Error Application::Initialise(const WindowProperties& props)
 #if defined EVIE_PLATFORM_WINDOWS || defined EVIE_PLATFORM_APPLE || defined EVIE_PLATFORM_UNIX
   impl_->window_ = std::make_unique<GLFWWindow>();
   evie::Error err = impl_->window_->Initialise(props);
-  // impl_->debug_layer_ = std::make_unique<DebugLayer>(impl_->window_->GetNativeWindow());
-  // impl_->PushLayerBack(*impl_->debug_layer_);
+  impl_->debug_layer_ = std::make_unique<DebugLayer>(impl_->window_->GetNativeWindow());
+  impl_->PushLayerBack(*impl_->debug_layer_);
 #endif
 
   // Event System
@@ -106,7 +108,7 @@ void Application::Run()
 
 void Application::Shutdown()
 {
-  // Shutdown layers first as they'll be using contexts from the window
+  // Shutdown layers first as they'll be using contexts from the window like glfw, opengl etc.
   impl_->layer_queue_.Shutdown();
   impl_->window_->Destroy();
 }

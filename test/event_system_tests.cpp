@@ -2,6 +2,8 @@
 #include <memory>
 
 #include "evie/events.h"
+#include "evie/input.h"
+#include "evie/input_manager.h"
 #include "evie/types.h"
 #include "window/event_manager.h"
 #include "window/key_events.h"
@@ -46,6 +48,22 @@ public:
   ~TestLayer2() override = default;
   int event_count{ 0 };
 };
+class TestInputManager final : public evie::IInputManager
+{
+public:
+  void RegisterInput(const evie::Event& event) override { (void)event; }
+  [[nodiscard]] bool IsKeyPressed(const evie::KeyCode code) const override
+  {
+    (void)code;
+    return true;
+  }
+  [[nodiscard]] bool IsMousePressed(const evie::MouseCode code) const override
+  {
+    (void)code;
+    return true;
+  }
+  ~TestInputManager() override = default;
+};
 }// namespace
 
 TEST_CASE("KeyPressedEvent tests")
@@ -80,7 +98,7 @@ TEST_CASE("KeyReleasedEvent tests")
 
 TEST_CASE("MousePressedEvent Tests")
 {
-  evie::MouseButton button = evie::MouseButton::Left;
+  int button = evie::MouseCode::ButtonLeft;
   evie::MousePressedEvent event(button);
   SUBCASE("Check EventType is correct") { REQUIRE(event.GetEventType() == evie::EventType::MouseButtonPressed); }
   SUBCASE("Check EventCategory is correct")
@@ -95,7 +113,7 @@ TEST_CASE("MousePressedEvent Tests")
 
 TEST_CASE("MouseReleasedEvent Tests")
 {
-  evie::MouseButton button = evie::MouseButton::Left;
+  int button = evie::MouseCode::ButtonLeft;
   evie::MouseReleasedEvent event(button);
   SUBCASE("Check EventType is correct") { REQUIRE(event.GetEventType() == evie::EventType::MouseButtonReleased); }
   SUBCASE("Check EventCategory is correct")
@@ -215,62 +233,63 @@ TEST_CASE("WindowMovedEvent Tests")
   }
 }
 
-// TEST_CASE("EventManager Tests")
-// {
-//   TestLayer layer1;
-//   TestLayer2 layer2;
-//   evie::LayerQueue layer_queue;
-//   layer_queue.PushBack(layer1);
-//   layer_queue.PushBack(layer2);
-//   evie::EventManager event_manager(layer_queue);
-//   SUBCASE("Check subscribing to event type works")
-//   {
-//     evie::WindowCloseEvent window_close_event;
-//     auto callback = [&](const evie::Event& event) {
-//       REQUIRE(event.GetEventType() == window_close_event.GetEventType());
-//       return true;
-//     };
-//     event_manager.SubscribeToEventType(evie::EventType::WindowClose, callback);
-//     event_manager.OnEvent(window_close_event);
-//     REQUIRE(layer1.event_count == 0);
-//     REQUIRE(layer2.event_count == 0);
-//   }
-//   SUBCASE("Check layer1 receives event but not layer2")
-//   {
-//     evie::KeyPressedEvent key_pressed_event(20, 2);
-//     event_manager.OnEvent(key_pressed_event);
-//     REQUIRE(layer1.event_count == 1);
-//     REQUIRE(layer2.event_count == 0);
-//     SUBCASE("Check layer2 now receives event but not layer1")
-//     {
-//       evie::MousePressedEvent mouse_pressed_event(evie::MouseButton::Left);
-//       event_manager.OnEvent(mouse_pressed_event);
-//       REQUIRE(layer1.event_count == 1);
-//       REQUIRE(layer2.event_count == 1);
-//     }
-//   }
-//   SUBCASE("Check layer2 receives event but not layer1")
-//   {
-//     evie::MousePressedEvent mouse_pressed_event(evie::MouseButton::Left);
-//     event_manager.OnEvent(mouse_pressed_event);
-//     REQUIRE(layer1.event_count == 0);
-//     REQUIRE(layer2.event_count == 1);
-//     SUBCASE("Check layer1 now receives event but layer2")
-//     {
-//       evie::KeyPressedEvent key_pressed_event(20, 2);
-//       event_manager.OnEvent(key_pressed_event);
-//       REQUIRE(layer1.event_count == 1);
-//       REQUIRE(layer2.event_count == 1);
-//     }
-//   }
-//   SUBCASE("Check that two layers wanting the same event don't both receive it")
-//   {
-//     TestLayer2 layer3;
-//     layer_queue.PushBack(layer3);
-//     evie::MousePressedEvent mouse_pressed_event(evie::MouseButton::Left);
-//     event_manager.OnEvent(mouse_pressed_event);
-//     REQUIRE(layer1.event_count == 0);
-//     REQUIRE(layer2.event_count == 0);
-//     REQUIRE(layer3.event_count == 1);
-//   }
-// }
+TEST_CASE("EventManager Tests")
+{
+  TestLayer layer1;
+  TestLayer2 layer2;
+  evie::LayerQueue layer_queue;
+  layer_queue.PushBack(layer1);
+  layer_queue.PushBack(layer2);
+  TestInputManager input_manager;
+  evie::EventManager event_manager(layer_queue, &input_manager);
+  SUBCASE("Check subscribing to event type works")
+  {
+    evie::WindowCloseEvent window_close_event;
+    auto callback = [&](const evie::Event& event) {
+      REQUIRE(event.GetEventType() == window_close_event.GetEventType());
+      return true;
+    };
+    event_manager.SubscribeToEventType(evie::EventType::WindowClose, callback);
+    event_manager.OnEvent(window_close_event);
+    REQUIRE(layer1.event_count == 0);
+    REQUIRE(layer2.event_count == 0);
+  }
+  SUBCASE("Check layer1 receives event but not layer2")
+  {
+    evie::KeyPressedEvent key_pressed_event(20, 2);
+    event_manager.OnEvent(key_pressed_event);
+    REQUIRE(layer1.event_count == 1);
+    REQUIRE(layer2.event_count == 0);
+    SUBCASE("Check layer2 now receives event but not layer1")
+    {
+      evie::MousePressedEvent mouse_pressed_event(evie::MouseCode::ButtonLeft);
+      event_manager.OnEvent(mouse_pressed_event);
+      REQUIRE(layer1.event_count == 1);
+      REQUIRE(layer2.event_count == 1);
+    }
+  }
+  SUBCASE("Check layer2 receives event but not layer1")
+  {
+    evie::MousePressedEvent mouse_pressed_event(evie::MouseCode::ButtonLeft);
+    event_manager.OnEvent(mouse_pressed_event);
+    REQUIRE(layer1.event_count == 0);
+    REQUIRE(layer2.event_count == 1);
+    SUBCASE("Check layer1 now receives event but layer2")
+    {
+      evie::KeyPressedEvent key_pressed_event(20, 2);
+      event_manager.OnEvent(key_pressed_event);
+      REQUIRE(layer1.event_count == 1);
+      REQUIRE(layer2.event_count == 1);
+    }
+  }
+  SUBCASE("Check that two layers wanting the same event don't both receive it")
+  {
+    TestLayer2 layer3;
+    layer_queue.PushBack(layer3);
+    evie::MousePressedEvent mouse_pressed_event(evie::MouseCode::ButtonLeft);
+    event_manager.OnEvent(mouse_pressed_event);
+    REQUIRE(layer1.event_count == 0);
+    REQUIRE(layer2.event_count == 0);
+    REQUIRE(layer3.event_count == 1);
+  }
+}

@@ -21,8 +21,14 @@ public:
   ~TestLayer() override = default;
   void OnUpdate() override
   {
-    if (input_manager_ && input_manager_->IsKeyPressed(evie::EvieKey::Space)) {
+    if (input_manager_->IsKeyPressed(evie::KeyCode::Space)) {
       APP_INFO("Space bar pressed");
+    }
+    if (input_manager_->IsMousePressed(evie::MouseCode::ButtonLeft)) {
+      APP_INFO("Button left pressed");
+    }
+    if (input_manager_->IsMousePressed(evie::MouseCode::ButtonRight)) {
+      APP_INFO("Button right pressed");
     }
   }
   void OnEvent([[maybe_unused]] evie::Event& event) override {}

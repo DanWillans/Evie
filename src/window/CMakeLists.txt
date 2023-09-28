@@ -8,7 +8,7 @@ Evie_add_library(
     event_manager.cpp
     debug_layer.cpp
     glfw_window.cpp
-    input_manager.cpp
+    input_manager_impl.cpp
 )
 
 target_link_libraries(

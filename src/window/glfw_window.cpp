@@ -85,10 +85,10 @@ namespace {
     if (event_manager != nullptr) {
       switch (action) {
       case GLFW_PRESS:
-        DispatchEvent<MousePressedEvent>(event_manager, static_cast<MouseButton>(button));
+        DispatchEvent<MousePressedEvent>(event_manager, button);
         break;
       case GLFW_RELEASE:
-        DispatchEvent<MouseReleasedEvent>(event_manager, static_cast<MouseButton>(button));
+        DispatchEvent<MouseReleasedEvent>(event_manager, button);
         break;
       default:
         EV_WARN("Unsupported mouse action {}", action);
