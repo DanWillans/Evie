@@ -21,6 +21,8 @@ DebugLayer::DebugLayer([[maybe_unused]] void* window)
   ImGui::CreateContext();
   ImGuiIO& imgui_io = ImGui::GetIO();
   imgui_io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;// Enable Keyboard Controls
+  imgui_io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+  imgui_io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
   // Setup Platform/Renderer backends
   ImGui_ImplGlfw_InitForOpenGL(
     glfw_window, true);// Second param install_callback=true will install GLFW callbacks and chain to existing ones.
@@ -39,6 +41,13 @@ void DebugLayer::OnUpdate()
   ImGui::ShowDemoWindow();// Show demo window! :)
   ImGui::Render();
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+  const ImGuiIO& imgui_io = ImGui::GetIO();
+  if (imgui_io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+    GLFWwindow* backup_current_context = glfwGetCurrentContext();
+    ImGui::UpdatePlatformWindows();
+    ImGui::RenderPlatformWindowsDefault();
+    glfwMakeContextCurrent(backup_current_context);
+  }
 }
 
 void DebugLayer::OnEvent([[maybe_unused]] Event& event)
