@@ -7,6 +7,7 @@
 #include "evie/core.h"
 #include "evie/error.h"
 #include "evie/events.h"
+#include "evie/input_manager.h"
 #include "window/layer_queue.h"
 
 namespace evie {
@@ -18,7 +19,7 @@ namespace evie {
 class EventManager
 {
 public:
-  EVIE_API explicit EventManager(LayerQueue& layer_queue);
+  EVIE_API explicit EventManager(LayerQueue& layer_queue, IInputManager* input_manager);
   EVIE_API ~EventManager();
   void EVIE_API OnEvent(Event& event);
   /**
@@ -33,6 +34,7 @@ public:
 private:
   std::unordered_map<EventType, std::vector<std::function<void(const Event&)>>> type_subscribers_;
   LayerQueue& layer_queue_;
+  IInputManager* input_manager_{ nullptr };
 };
 
 }// namespace evie

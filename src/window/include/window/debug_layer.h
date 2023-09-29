@@ -1,6 +1,7 @@
 #ifndef EVIE_DEBUG_LAYER_H_
 #define EVIE_DEBUG_LAYER_H_
 
+#include "evie/error.h"
 #include "evie/layer.h"
 
 namespace evie {
@@ -12,9 +13,10 @@ public:
   // If we don't like this not being explicit without looking at the declaration then let's just change it to
   // GLFWwindow* and get the caller to cast it.
   explicit DebugLayer(void* window);
-  ~DebugLayer() override;
+  ~DebugLayer() override = default;
   void OnUpdate() override;
   void OnEvent(Event& event) override;
+  void Shutdown() override;
 };
 
 }// namespace evie

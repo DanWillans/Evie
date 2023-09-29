@@ -30,6 +30,7 @@ public:
   LayerID EVIE_API PushFront(Layer& layer);
   LayerID EVIE_API PushBack(Layer& layer);
   Error EVIE_API RemoveLayer(LayerID layer_id);
+  void EVIE_API Shutdown();
 
   using Iterator = std::deque<LayerWrapper>::iterator;
   using ReverseIterator = std::deque<LayerWrapper>::reverse_iterator;

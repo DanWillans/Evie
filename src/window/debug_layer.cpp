@@ -14,7 +14,7 @@
 
 namespace evie {
 
-DebugLayer::DebugLayer(void* window)
+DebugLayer::DebugLayer([[maybe_unused]] void* window)
 {
   GLFWwindow* glfw_window = static_cast<GLFWwindow*>(window);
   IMGUI_CHECKVERSION();
@@ -30,13 +30,14 @@ DebugLayer::DebugLayer(void* window)
 
 void DebugLayer::OnUpdate()
 {
+  // I don't think this should be here. I imagine the render should handle clearing the buffer.
+  glClear(GL_COLOR_BUFFER_BIT);
+
   ImGui_ImplOpenGL3_NewFrame();
   ImGui_ImplGlfw_NewFrame();
   ImGui::NewFrame();
   ImGui::ShowDemoWindow();// Show demo window! :)
   ImGui::Render();
-  // I don't think this should be here. I imagine the render should handle clearing the buffer.
-  glClear(GL_COLOR_BUFFER_BIT);
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
@@ -49,7 +50,7 @@ void DebugLayer::OnEvent([[maybe_unused]] Event& event)
   }
 }
 
-DebugLayer::~DebugLayer()
+void DebugLayer::Shutdown()
 {
   ImGui_ImplOpenGL3_Shutdown();
   ImGui_ImplGlfw_Shutdown();

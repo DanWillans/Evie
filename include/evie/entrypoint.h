@@ -13,7 +13,10 @@ extern std::unique_ptr<evie::Application> CreateApplication();
 int main([[maybe_unused]] int argc, [[maybe_unused]] const char** argv)
 {
   auto app = CreateApplication();
-  app->Run();
+  if (app) {
+    app->Run();
+  }
+  app->Shutdown();
   return 0;
 }
 
@@ -24,7 +27,10 @@ extern std::unique_ptr<evie::Application> CreateApplication();
 int main([[maybe_unused]] int argc, [[maybe_unused]] const char** argv)
 {
   auto app = CreateApplication();
-  app->Run();
+  if (app) {
+    app->Run();
+  }
+  app->Shutdown();
   return 0;
 }
 

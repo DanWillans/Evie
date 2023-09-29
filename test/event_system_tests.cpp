@@ -2,6 +2,9 @@
 #include <memory>
 
 #include "evie/events.h"
+#include "evie/input.h"
+#include "evie/input_manager.h"
+#include "evie/types.h"
 #include "window/event_manager.h"
 #include "window/key_events.h"
 #include "window/layer_queue.h"
@@ -19,10 +22,11 @@ public:
   void OnEvent(evie::Event& event) override
   {
     if (event.GetEventType() == evie::EventType::KeyPressed) {
-      auto* key_event = static_cast<evie::KeyPressedEvent*>(&event);
+      const auto* key_event = static_cast<evie::KeyPressedEvent*>(&event);
       [[maybe_unused]] auto code = key_event->GetKeyCode();
       (void)code;
       event_count++;
+      event.handled = true;
     }
   }
   ~TestLayer() override = default;
@@ -36,14 +40,31 @@ public:
   void OnEvent(evie::Event& event) override
   {
     if (event.GetEventType() == evie::EventType::MouseButtonPressed) {
-      auto* key_event = static_cast<evie::MousePressedEvent*>(&event);
+      const auto* key_event = static_cast<evie::MousePressedEvent*>(&event);
       [[maybe_unused]] auto code = key_event->GetMouseButton();
       (void)code;
       event_count++;
+      event.handled = true;
     }
   }
   ~TestLayer2() override = default;
   int event_count{ 0 };
+};
+class TestInputManager final : public evie::IInputManager
+{
+public:
+  void RegisterInput(const evie::Event& event) override { (void)event; }
+  [[nodiscard]] bool IsKeyPressed(const evie::KeyCode code) const override
+  {
+    (void)code;
+    return true;
+  }
+  [[nodiscard]] bool IsMousePressed(const evie::MouseCode code) const override
+  {
+    (void)code;
+    return true;
+  }
+  ~TestInputManager() override = default;
 };
 }// namespace
 
@@ -79,7 +100,7 @@ TEST_CASE("KeyReleasedEvent tests")
 
 TEST_CASE("MousePressedEvent Tests")
 {
-  evie::MouseButton button = evie::MouseButton::Left;
+  int button = evie::MouseCode::ButtonLeft;
   evie::MousePressedEvent event(button);
   SUBCASE("Check EventType is correct") { REQUIRE(event.GetEventType() == evie::EventType::MouseButtonPressed); }
   SUBCASE("Check EventCategory is correct")
@@ -94,7 +115,7 @@ TEST_CASE("MousePressedEvent Tests")
 
 TEST_CASE("MouseReleasedEvent Tests")
 {
-  evie::MouseButton button = evie::MouseButton::Left;
+  int button = evie::MouseCode::ButtonLeft;
   evie::MouseReleasedEvent event(button);
   SUBCASE("Check EventType is correct") { REQUIRE(event.GetEventType() == evie::EventType::MouseButtonReleased); }
   SUBCASE("Check EventCategory is correct")
@@ -221,7 +242,8 @@ TEST_CASE("EventManager Tests")
   evie::LayerQueue layer_queue;
   layer_queue.PushBack(layer1);
   layer_queue.PushBack(layer2);
-  evie::EventManager event_manager(layer_queue);
+  TestInputManager input_manager;
+  evie::EventManager event_manager(layer_queue, &input_manager);
   SUBCASE("Check subscribing to event type works")
   {
     evie::WindowCloseEvent window_close_event;
@@ -242,7 +264,7 @@ TEST_CASE("EventManager Tests")
     REQUIRE(layer2.event_count == 0);
     SUBCASE("Check layer2 now receives event but not layer1")
     {
-      evie::MousePressedEvent mouse_pressed_event(evie::MouseButton::Left);
+      evie::MousePressedEvent mouse_pressed_event(evie::MouseCode::ButtonLeft);
       event_manager.OnEvent(mouse_pressed_event);
       REQUIRE(layer1.event_count == 1);
       REQUIRE(layer2.event_count == 1);
@@ -250,7 +272,7 @@ TEST_CASE("EventManager Tests")
   }
   SUBCASE("Check layer2 receives event but not layer1")
   {
-    evie::MousePressedEvent mouse_pressed_event(evie::MouseButton::Left);
+    evie::MousePressedEvent mouse_pressed_event(evie::MouseCode::ButtonLeft);
     event_manager.OnEvent(mouse_pressed_event);
     REQUIRE(layer1.event_count == 0);
     REQUIRE(layer2.event_count == 1);
@@ -266,7 +288,7 @@ TEST_CASE("EventManager Tests")
   {
     TestLayer2 layer3;
     layer_queue.PushBack(layer3);
-    evie::MousePressedEvent mouse_pressed_event(evie::MouseButton::Left);
+    evie::MousePressedEvent mouse_pressed_event(evie::MouseCode::ButtonLeft);
     event_manager.OnEvent(mouse_pressed_event);
     REQUIRE(layer1.event_count == 0);
     REQUIRE(layer2.event_count == 0);

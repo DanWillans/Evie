@@ -99,3 +99,29 @@ doctest_discover_tests(
   TEST_PREFIX
   "unittests."
 )
+
+# ###### Input Manager Tests ########
+add_executable(input_manager_tests main.cpp input_manager_tests.cpp)
+target_link_libraries(
+  input_manager_tests
+  PRIVATE
+  Evie::Evie_warnings
+  Evie::Evie_options
+  Evie::Window
+  doctest::doctest)
+
+if(WIN32)
+  add_custom_command(
+    TARGET input_manager_tests
+    PRE_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:layer_queue_tests> $<TARGET_FILE_DIR:layer_queue_tests>
+    COMMAND_EXPAND_LISTS)
+endif()
+
+# automatically discover tests that are defined in catch based test files you can modify the unittests. Set TEST_PREFIX
+# to whatever you want, or use different for different binaries
+doctest_discover_tests(
+  input_manager_tests
+  TEST_PREFIX
+  "unittests."
+)

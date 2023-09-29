@@ -4,14 +4,9 @@
 #include <sstream>
 
 #include "evie/events.h"
+#include "evie/types.h"
 
 namespace evie {
-struct WindowDimensions
-{
-  int width{ 0 };
-  int height{ 0 };
-};
-
 struct WindowPosition
 {
   int x{ 0 };
@@ -118,11 +113,7 @@ public:
     return stream.str();
   }
 
-  [[nodiscard]] const WindowDimensions& GetWindowDimensions()
-  {
-    handled = true;
-    return dimensions_;
-  }
+  [[nodiscard]] const WindowDimensions& GetWindowDimensions() { return dimensions_; }
 
 private:
   WindowDimensions dimensions_;
@@ -146,11 +137,7 @@ public:
     return stream.str();
   }
 
-  [[nodiscard]] const WindowPosition& GetWindowPosition()
-  {
-    handled = true;
-    return position_;
-  }
+  [[nodiscard]] const WindowPosition& GetWindowPosition() { return position_; }
 
 private:
   WindowPosition position_;
