@@ -40,7 +40,7 @@ public:
   void OnEvent(evie::Event& event) override
   {
     if (event.GetEventType() == evie::EventType::MouseButtonPressed) {
-      auto* key_event = static_cast<evie::MousePressedEvent*>(&event);
+      const oauto* key_event = static_cast<evie::MousePressedEvent*>(&event);
       [[maybe_unused]] auto code = key_event->GetMouseButton();
       (void)code;
       event_count++;
