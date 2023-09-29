@@ -10,22 +10,22 @@
 #include "evie/types.h"
 
 namespace evie {
-class Application
+class EVIE_API Application
 {
 public:
-  EVIE_API Application();
+  Application();
   Application(const Application&) = delete;
   Application(Application&& app) = delete;
   Application& operator=(const Application& app) = delete;
   Application& operator=(Application&& app) = delete;
-  virtual EVIE_API ~Application();
+  virtual ~Application();
 
-  void EVIE_API Run();
-  [[nodiscard]] Error EVIE_API Initialise(const WindowProperties& props);
-  [[nodiscard]] const EVIE_API IInputManager* GetInputManager() const;
-  void EVIE_API PushLayerFront(Layer& layer);
-  void EVIE_API PushLayerBack(Layer& layer);
-  void EVIE_API Shutdown();
+  void Run();
+  [[nodiscard]] Error Initialise(const WindowProperties& props);
+  [[nodiscard]] const IInputManager* GetInputManager() const;
+  void PushLayerFront(Layer& layer);
+  void PushLayerBack(Layer& layer);
+  void Shutdown();
 
 private:
   // Use impl so that we don't have to export types and implementation to the user.
@@ -35,8 +35,6 @@ private:
   // Let's revisit this later because I'm not the biggest fan of Impl - It bloats the code.
   class Impl;
   Impl* impl_;
-
-  std::unique_ptr<IInputManager> input_manager_;
 
   // These are fine to expose
   void CloseWindow() { running_ = false; }

@@ -2,6 +2,7 @@
 
 #include "evie/application.h"
 #include "evie/events.h"
+#include "evie/input_manager.h"
 #include "evie/logging.h"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
@@ -35,6 +36,7 @@ private:
   std::unique_ptr<IWindow> window_;
   std::unique_ptr<EventManager> event_manager_;
   std::unique_ptr<Layer> debug_layer_;
+  std::unique_ptr<IInputManager> input_manager_;
   LayerQueue layer_queue_;
 };
 
@@ -45,7 +47,7 @@ void Application::Impl::PushLayerBack(Layer& layer) { layer_queue_.PushBack(laye
 Application::Application() : impl_(new Impl()) {}
 Application::~Application() { delete impl_; }
 
-const IInputManager* Application::GetInputManager() const { return input_manager_.get(); }
+const IInputManager* Application::GetInputManager() const { return impl_->input_manager_.get(); }
 
 Error Application::Initialise(const WindowProperties& props)
 {
@@ -57,7 +59,7 @@ Error Application::Initialise(const WindowProperties& props)
   // At the minute we only build for these platforms but a different window impementation will be needed for android
   // etc.
 #if defined EVIE_PLATFORM_WINDOWS || defined EVIE_PLATFORM_APPLE || defined EVIE_PLATFORM_UNIX
-  input_manager_ = std::make_unique<InputManager>();
+  impl_->input_manager_ = std::make_unique<InputManager>();
 #endif
 
   // Window
@@ -71,7 +73,7 @@ Error Application::Initialise(const WindowProperties& props)
 #endif
 
   // Event System
-  impl_->event_manager_ = std::make_unique<EventManager>(impl_->layer_queue_, input_manager_.get());
+  impl_->event_manager_ = std::make_unique<EventManager>(impl_->layer_queue_, impl_->input_manager_.get());
   // Register CloseWindow so that we can shut the game down.
   impl_->event_manager_->SubscribeToEventType(
     EventType::WindowClose, [this]([[maybe_unused]] const Event& event) { this->CloseWindow(); });
