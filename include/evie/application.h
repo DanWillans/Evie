@@ -31,7 +31,6 @@ private:
   // Use impl so that we don't have to export types and implementation to the user.
   // For example there is no need to export the LayerQueue header file as the Application layer API should expose to the
   // game developer what they can do.
-  // Alternatively, we could make everything an interface and export the interfaces like IInputManager.
   // Let's revisit this later because I'm not the biggest fan of Impl - It bloats the code.
   class Impl;
   Impl* impl_;
