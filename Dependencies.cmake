@@ -4,10 +4,8 @@ include(cmake/CPM.cmake)
 # CMAKE_CXX_FLAGS don't propagate out to other
 # targets
 function(Evie_setup_dependencies)
-
   # For each dependency, see if it's
   # already been provided to us by a parent project
-
   if(NOT TARGET fmtlib::fmtlib)
     cpmaddpackage(
       NAME
@@ -33,6 +31,7 @@ function(Evie_setup_dependencies)
       "SPDLOG_FMT_EXTERNAL ON"
       "CMAKE_POSITION_INDEPENDENT_CODE ON"
       SYSTEM)
+
     # This include is needed for global logging access
     include_directories(SYSTEM ${spdlog_SOURCE_DIR}/include)
   endif()
@@ -53,4 +52,16 @@ function(Evie_setup_dependencies)
       "BUILD_SHARED_LIBS ON"
       SYSTEM)
   endif()
+
+  if(NOT TARGET glm::glm)
+    cpmaddpackage(
+      NAME
+      glm
+      GIT_TAG
+      0.9.9.8
+      GITHUB_REPOSITORY
+      "g-truc/glm"
+      SYSTEM)
+  endif()
+
 endfunction()

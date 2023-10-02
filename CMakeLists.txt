@@ -31,7 +31,7 @@ Evie_global_options()
 
 include(Dependencies.cmake)
 Evie_setup_dependencies()
-add_subdirectory(vendor/imgui)
+add_subdirectory(vendor)
 
 Evie_local_options()
 
@@ -111,6 +111,7 @@ Evie_package_project(
   Evie_warnings
   ImGui
   glfw
+  Glad
 
   # Package up examples
   sandbox
