@@ -23,6 +23,14 @@ struct LayerIDTag
 };
 using LayerID = ID<int, LayerIDTag>;
 
+struct ShaderIdTag
+{};
+using ShaderID = ID<unsigned int, ShaderIdTag>;
+
+struct ShaderProgramTag
+{};
+using ShaderProgramID = ID<unsigned int, ShaderProgramTag>;
+
 }// namespace evie
 
 #endif// EVIE_IDS_H_

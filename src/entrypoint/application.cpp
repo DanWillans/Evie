@@ -1,13 +1,17 @@
 #include <memory>
+#include <thread>
 
 #include "evie/application.h"
 #include "evie/error.h"
 #include "evie/events.h"
+#include "evie/ids.h"
 #include "evie/input_manager.h"
 #include "evie/logging.h"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
+#include "rendering/shader.h"
+#include "rendering/shader_program.h"
 #include "window/debug_layer.h"
 #include "window/event_manager.h"
 #include "window/input_manager_impl.h"
@@ -129,116 +133,26 @@ void Application::Run()
   }
 
   // ------------ SHADERS ---------------
-  // Vertex shader
-  const char* vertexShaderSource =
-    "#version 330 core\n"
-    "layout (location = 0) in vec3 aPos;\n"
-    "layout (location = 1) in vec3 aColor;\n"
-    "out vec3 ourColor;\n"
-    "void main()\n"
-    "{\n"
-    "   gl_Position = vec4(aPos, 1.0);\n"
-    "   ourColor = aColor;\n"
-    "}\0";
-  unsigned int vertexShader;
-  // Create the shader
-  vertexShader = glCreateShader(GL_VERTEX_SHADER);
-  // Set the shader source code
-  glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-  // Compile the shader
-  glCompileShader(vertexShader);
-  // Check if compilation succeeded
-  int success;
-  glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-  if (!success) {
-    char infoLog[512];
-    glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-    EV_ERROR("ERROR::SHADER::VERTEX::COMPILATION_FAILED");
-    EV_ERROR("{}", infoLog);
-    return;
+  VertexShader vertex_shader;
+  Error err = vertex_shader.Initialise("C:\\Users\\willa\\devel\\Evie\\shaders\\vertex_shader.vs");
+  glCheckError();
+  FragmentShader fragment_shader;
+  if (err.Good()) {
+    err = fragment_shader.Initialise("C:\\Users\\willa\\devel\\Evie\\shaders\\fragment_shader.fs");
+    glCheckError();
   }
 
-  // Fragment shader
-  const char* fragmentShaderSource =
-    "#version 330 core\n"
-    "out vec4 FragColor;\n"
-    "in vec3 ourColor;\n"
-    "void main()\n"
-    "{\n"
-    "   FragColor = vec4(ourColor, 1.0);\n"
-    "}\0";
-  unsigned int fragmentShader;
-  fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-  glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-  glCompileShader(fragmentShader);
-  // Check if compilation succeeded
-  glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-  if (!success) {
-    char infoLog[512];
-    glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-    EV_ERROR("ERROR::SHADER::FRAGMENT::COMPILATION_FAILED");
-    EV_ERROR("{}", infoLog);
-    return;
-  }
-  // Fragment shader_2
-  const char* fragmentShaderSource_2 =
-    "#version 330 core\n"
-    "out vec4 FragColor;\n"
-    "in vec3 ourColor;\n"
-    "void main()\n"
-    "{\n"
-    "   FragColor = vec4(ourColor, 1.0);\n"
-    "}\0";
-  unsigned int fragmentShader_2;
-  fragmentShader_2 = glCreateShader(GL_FRAGMENT_SHADER);
-  glShaderSource(fragmentShader_2, 1, &fragmentShaderSource_2, NULL);
-  glCompileShader(fragmentShader_2);
-  // Check if compilation succeeded
-  glGetShaderiv(fragmentShader_2, GL_COMPILE_STATUS, &success);
-  if (!success) {
-    char infoLog[512];
-    glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-    EV_ERROR("ERROR::SHADER::FRAGMENT::COMPILATION_FAILED");
-    EV_ERROR("{}", infoLog);
-    return;
+  ShaderProgram shader_program;
+  if (err.Good()) {
+    err = shader_program.Initialise(&vertex_shader, &fragment_shader);
+    glCheckError();
   }
 
-  // Create a shader program
-  unsigned int shaderProgram;
-  shaderProgram = glCreateProgram();
-  glAttachShader(shaderProgram, vertexShader);
-  glAttachShader(shaderProgram, fragmentShader);
-  glLinkProgram(shaderProgram);
-  // Check if linking failed
-  glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-  if (!success) {
-    char infoLog[512];
-    glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-    EV_ERROR("ERROR::SHADER::FRAGMENT::COMPILATION_FAILED");
-    EV_ERROR("{}", infoLog);
-    return;
+  ShaderProgram shader_program_2;
+  if (err.Good()) {
+    err = shader_program_2.Initialise(&vertex_shader, &fragment_shader);
+    glCheckError();
   }
-
-  // Create a shader program
-  unsigned int shaderProgram_2;
-  shaderProgram_2 = glCreateProgram();
-  glAttachShader(shaderProgram_2, vertexShader);
-  glAttachShader(shaderProgram_2, fragmentShader_2);
-  glLinkProgram(shaderProgram_2);
-  // Check if linking failed
-  glGetProgramiv(shaderProgram_2, GL_LINK_STATUS, &success);
-  if (!success) {
-    char infoLog[512];
-    glGetProgramInfoLog(shaderProgram_2, 512, NULL, infoLog);
-    EV_ERROR("ERROR::SHADER::FRAGMENT::COMPILATION_FAILED");
-    EV_ERROR("{}", infoLog);
-    return;
-  }
-  glDeleteShader(vertexShader);
-  glDeleteShader(fragmentShader);
-  glDeleteShader(fragmentShader_2);
-  // ------------ SHADERS ---------------
-
 
   // --------- Vertex Data -------------
   float vertices[] = {
@@ -268,13 +182,13 @@ void Application::Run()
     0.0f,// Bottom right
     1.0f,
     0.0f,
-    0.0f, // color
+    0.0f,// color
     0.5f,
     0.5f,
     0.0f,// Top Middle
     0.0f,
     1.0f,
-    0.0f, // color
+    0.0f,// color
     1.0f,
     -0.5f,
     0.0f,// Bottom right
@@ -359,7 +273,7 @@ void Application::Run()
   // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
   // Game loop
-  while (running_) {
+  while (running_ && err.Good()) {
     impl_->window_->PollEvents();
     // Set the color to clear the screen with
     glClearColor(0.2F, 0.3F, 0.3F, 1.0F);
@@ -367,17 +281,23 @@ void Application::Run()
     glClear(GL_COLOR_BUFFER_BIT);
     float timeValue = static_cast<float>(glfwGetTime());
     float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
-    int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
-    glUseProgram(shaderProgram);
-    glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
-    glBindVertexArray(VAO);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
-    vertexColorLocation = glGetUniformLocation(shaderProgram_2, "ourColor");
-    glUseProgram(shaderProgram_2);
-    glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
-    glBindVertexArray(VAO_2);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
-
+    ShaderProgramID id{ 0 };
+    err = shader_program.GetID(id);
+    if (err.Good()) {
+      glUseProgram(id.Get());
+      shader_program.SetFloat("ourColor", greenValue);
+      glBindVertexArray(VAO);
+      glDrawArrays(GL_TRIANGLES, 0, 3);
+    }
+    if (err.Good()) {
+      err = shader_program_2.GetID(id);
+      if (err.Good()) {
+        glUseProgram(id.Get());
+        shader_program_2.SetFloat("ourColor", greenValue);
+        glBindVertexArray(VAO_2);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+      }
+    }
     for (const auto& layer_wrapper : impl_->layer_queue_) {
       layer_wrapper.layer->OnUpdate();
     }
@@ -387,7 +307,12 @@ void Application::Run()
   glDeleteVertexArrays(1, &VAO);
   glDeleteBuffers(1, &VBO);
   glDeleteBuffers(1, &EBO);
-  glDeleteProgram(shaderProgram);
+  shader_program.Delete();
+  shader_program_2.Delete();
+  if (err.Bad()) {
+    EV_ERROR("{}", err.Message());
+    std::this_thread::sleep_for(std::chrono::duration(std::chrono::seconds(5)));
+  }
 }
 
 void Application::Shutdown()

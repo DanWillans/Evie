@@ -13,12 +13,6 @@ Evie_add_library(
 
 target_link_libraries(
   Window
-  PUBLIC
-  Evie::Utilities
-)
-
-target_link_libraries(
-  Window
   PRIVATE
   Evie::Evie_options
   Evie::Evie_warnings

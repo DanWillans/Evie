@@ -105,8 +105,8 @@ Evie_package_project(
   TARGETS
   Logging
   Application
-  Utilities
   Window
+  Rendering
   Evie_options
   Evie_warnings
   ImGui
