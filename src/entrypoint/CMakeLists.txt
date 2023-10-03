@@ -1,3 +1,4 @@
+find_package(OpenGL REQUIRED)
 Evie_add_library(TARGET Application SRCS application.cpp)
 
 target_link_libraries(
@@ -7,4 +8,12 @@ target_link_libraries(
   Evie::Evie_warnings
   Evie::Logging
   Evie::Window
+)
+
+target_link_libraries(
+  Application
+  PUBLIC
+  # Renderig here at the minute whilt we test. Remove in future.
+  Evie::Glad
+  OpenGL::GL
 )

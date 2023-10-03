@@ -13,6 +13,8 @@
 #endif
 // Need this space between glfw and windows otherwise there is a macro redefinition error
 
+#include "glad/glad.h"
+
 #include "GLFW/glfw3.h"
 
 namespace evie {
@@ -20,6 +22,12 @@ namespace {
   static void glfw_error_callback(int error, const char* description)
   {
     EV_ERROR("GLFW Error {}: {}", error, description);
+  }
+
+
+  void framebuffer_size_callback([[maybe_unused]] GLFWwindow* window, int width, int height)
+  {
+    glViewport(0, 0, width, height);
   }
 
   EventManager* GetEventManager(GLFWwindow* window)
@@ -149,13 +157,31 @@ Error GLFWWindow::Initialise(const WindowProperties& props)
   if (glfwInit() == GLFW_FALSE) {
     return Error("glfw failed to initialise");
   }
+
+  // Set window hints
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#ifdef EVIE_PLATFORM_APPLE
+  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+#endif
+
   window_ = glfwCreateWindow(
     properties_.dimensions.width, properties_.dimensions.height, properties_.name.c_str(), nullptr, nullptr);
   if (window_ == nullptr) {
     return Error("glfw failed to create window");
   }
   glfwMakeContextCurrent(window_);
-  // If we use glad we should init it here.
+
+  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+    std::cout << "Failed to initialize GLAD" << std::endl;
+    EV_ERROR("Failed to initialise GLAD");
+    return Error("Failed to initaie GLAD");
+  }
+
+  glViewport(0, 0, properties_.dimensions.width, properties_.dimensions.height);
+  glfwSetFramebufferSizeCallback(window_, framebuffer_size_callback);
+
   SetVSync(true);
   // Setup the user window pointer
   glfwSetWindowUserPointer(window_, static_cast<void*>(this));

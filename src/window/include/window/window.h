@@ -2,9 +2,8 @@
 #define EVIE_WINDOW_H_
 
 #include <memory>
-#include <spdlog/common.h>
 
-#include "GLFW/glfw3.h"
+#include <spdlog/common.h>
 
 #include "evie/core.h"
 #include "evie/error.h"

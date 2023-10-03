@@ -31,4 +31,5 @@ target_link_system_libraries(
   glfw
   Evie::ImGui
   OpenGL::GL
+  Evie::Glad
 )
