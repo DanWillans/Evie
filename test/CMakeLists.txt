@@ -125,3 +125,22 @@ doctest_discover_tests(
   TEST_PREFIX
   "unittests."
 )
+
+# ###### Result Tests ########
+add_executable(result_tests main.cpp result_tests.cpp)
+target_link_libraries(
+  result_tests
+  PRIVATE
+  Evie::Evie_warnings
+  Evie::Evie_options
+  doctest::doctest)
+cmake_path(GET PROJECT_SOURCE_DIR PARENT_PATH EVIE_PROJECT_ROOT)
+target_include_directories(result_tests PUBLIC $<BUILD_INTERFACE:${EVIE_PROJECT_ROOT}/include>)
+
+# automatically discover tests that are defined in catch based test files you can modify the unittests. Set TEST_PREFIX
+# to whatever you want, or use different for different binaries
+doctest_discover_tests(
+  result_tests
+  TEST_PREFIX
+  "unittests."
+)
