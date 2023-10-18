@@ -21,8 +21,8 @@ public:
 class TestClassList
 {
 public:
-  TestClassList(std::initializer_list<int>&& list) : list(list) {}
-  TestClassList(const std::initializer_list<int>& list) : list(list) {}
+  explicit TestClassList(std::initializer_list<int>&& list) : list(list) {}
+  explicit TestClassList(const std::initializer_list<int>& list) : list(list) {}
   std::vector<int> list;
 };
 
@@ -90,7 +90,7 @@ TEST_CASE("Check result construction with ResultType&& argument")
 
 TEST_CASE("Check result construction with initializer list construction for ResultType ")
 {
-  evie::Result<TestClassList> result{ { 0, 1, 2, 3, 4 } };
+  evie::Result<TestClassList> result{ std::initializer_list<int>{ 0, 1, 2, 3, 4 } };
   REQUIRE(result.Good());
   REQUIRE(result->list == std::vector{ 0, 1, 2, 3, 4 });
 }
