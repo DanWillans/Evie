@@ -202,6 +202,8 @@ jobs:
 
 
       - name: Publish to codecov
+        # Only publish CI to codecov if building in debug as we don't enable coverage for release builds
+        if: matrix.build_type == 'Debug'
         uses: codecov/codecov-action@v3
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
