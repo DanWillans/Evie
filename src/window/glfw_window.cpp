@@ -173,7 +173,7 @@ Error GLFWWindow::Initialise(const WindowProperties& props)
   }
   glfwMakeContextCurrent(window_);
 
-  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+  if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress))) {// NOLINT
     std::cout << "Failed to initialize GLAD" << std::endl;
     EV_ERROR("Failed to initialise GLAD");
     return Error("Failed to initaie GLAD");
