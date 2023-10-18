@@ -114,7 +114,7 @@ if(WIN32)
   add_custom_command(
     TARGET input_manager_tests
     PRE_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:layer_queue_tests> $<TARGET_FILE_DIR:layer_queue_tests>
+    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:input_manager_tests> $<TARGET_FILE_DIR:input_manager_tests>
     COMMAND_EXPAND_LISTS)
 endif()
 
@@ -122,6 +122,25 @@ endif()
 # to whatever you want, or use different for different binaries
 doctest_discover_tests(
   input_manager_tests
+  TEST_PREFIX
+  "unittests."
+)
+
+# ###### Result Tests ########
+add_executable(result_tests main.cpp result_tests.cpp)
+target_link_libraries(
+  result_tests
+  PRIVATE
+  Evie::Evie_warnings
+  Evie::Evie_options
+  doctest::doctest)
+cmake_path(GET PROJECT_SOURCE_DIR PARENT_PATH EVIE_PROJECT_ROOT)
+target_include_directories(result_tests PUBLIC $<BUILD_INTERFACE:${EVIE_PROJECT_ROOT}/include>)
+
+# automatically discover tests that are defined in catch based test files you can modify the unittests. Set TEST_PREFIX
+# to whatever you want, or use different for different binaries
+doctest_discover_tests(
+  result_tests
   TEST_PREFIX
   "unittests."
 )

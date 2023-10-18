@@ -1,6 +1,7 @@
 #ifndef EVIE_ERROR_H_
 #define EVIE_ERROR_H_
 
+#include <compare>
 namespace evie {
 class Error
 {
@@ -22,6 +23,9 @@ public:
   // Get the error message
   // Consider putting __FILE__  __LINE__ stuff into this maybe?
   [[nodiscard]] constexpr const char* Message() const noexcept { return msg_; }
+
+  // Default the spaceship operator for all the generated comparisons in c++20
+  auto operator<=>(const Error&) const = default;
 
 private:
   // No one should be able to construct a raw Error message unless using OK
