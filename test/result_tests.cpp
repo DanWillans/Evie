@@ -10,7 +10,7 @@ namespace {
 class TestClass
 {
 public:
-  TestClass(int a, double b, const char* c) : a(a), b(b), c(c) {}
+  TestClass(int a_in, double b_in, const char* c_in) : a(a_in), b(b_in), c(c_in) {}
   auto operator<=>(const TestClass&) const = default;
   int a;
   double b;
@@ -21,8 +21,8 @@ public:
 class TestClassList
 {
 public:
-  explicit TestClassList(std::initializer_list<int>&& list) : list(list) {}
-  explicit TestClassList(const std::initializer_list<int>& list) : list(list) {}
+  explicit TestClassList(std::initializer_list<int>&& list_in) : list(list_in) {}
+  explicit TestClassList(const std::initializer_list<int>& list_in) : list(list_in) {}
   std::vector<int> list;
 };
 
