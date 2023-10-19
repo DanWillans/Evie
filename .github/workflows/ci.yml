@@ -190,7 +190,7 @@ jobs:
         if: runner.os == 'Windows'
         working-directory: ./build
         run: |
-          ctest -c ${{matric.build_type}}
+          ctest -c ${{matrix.build_type}}
 
       # Turn off windows test and coverage at the moment as OpenCppCoverage doesn't do what I want
       # - name: Windows - Test and coverage
