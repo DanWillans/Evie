@@ -209,4 +209,4 @@ jobs:
         with:
           flags: ${{ runner.os }}
           name: ${{ runner.os }}-coverage
-          files: ./build/coverage.xml
+          files: ./coverage.xml
