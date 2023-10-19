@@ -171,16 +171,28 @@ jobs:
         # Execute the build.  You can specify a specific target with "--target <NAME>"
         run: |
           cmake --build ./build --config ${{matrix.build_type}}
-
-      - name: Unix - Test and coverage
+        
+      - name: Unix - Test
         if: runner.os != 'Windows'
         # Execute tests defined by the CMake configuration.
         # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
         run: |
           ctest -C ${{matrix.build_type}} --test-dir ./build
+
+      - name: Unix - Coverage
+        if: runner.os != 'Windows'
+        # Execute tests defined by the CMake configuration.
+        # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
+        run: |
           gcovr -j ${{env.nproc}} --gcov-executable '${{ matrix.gcov_executable }}' ./build --filter src/ --filter include/ --print-summary --xml-pretty --xml coverage.xml --delete --print-summary --txt
 
-      # Turn off windows coverage atm as OpenCppCoverage doesn't do what I want
+      - name: Windows - Test
+        if: runner.os == 'Windows'
+        working-directory: ./build
+        run: |
+          ctest -c ${{matric.build_type}}
+
+      # Turn off windows test and coverage at the moment as OpenCppCoverage doesn't do what I want
       # - name: Windows - Test and coverage
       #   if: runner.os == 'Windows'
       #   working-directory: ./build
