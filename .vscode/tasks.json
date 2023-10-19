@@ -1,0 +1,44 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Run tests and coverage",
+			"type": "shell",
+			"command": "gcovr --gcov-executable gcov-11 out/build/unixlike-gcc-debug/ --filter src/ --filter include/ --print-summary --txt",
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+		},
+		{
+			"label": "Delete build directories",
+			"type": "shell",
+			"command": "rm -rf ${workspaceFolder}/out",
+			"windows": {
+				"command": "Remove-Item ./out -Force -Recurse"
+			},
+			"problemMatcher": [],
+			"detail": "CMake template clean task. Removes build dir."
+		},
+		{
+			"label": "Copy compile commands",
+			"type": "shell",
+			"command": "cp ./out/build/unixlike-clang-debug/compile_commands.json .",
+			"windows": {
+				"command": "copy ./out/build/*/compile_commands.json"
+			},
+			"problemMatcher": [],
+			"detail": "Copy compile commands from build dir."
+		},
+		{
+			"label": "Run Sandbox App",
+			"type": "shell",
+			"windows": {
+				"command": ".\\scripts\\run_sandbox.bat"
+			},
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": []
+		}
+	]
+}

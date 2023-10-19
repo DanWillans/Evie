@@ -12,11 +12,11 @@ compile_commands.json
 # IDE files
 .vs/
 .idea/
-.vscode/
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
+.vscode
+!.vscode\settings.json
+!.vscode\tasks.json
+!.vscode\launch.json
+!.vscode\extensions.json
 *.swp
 *~
 _ReSharper*
