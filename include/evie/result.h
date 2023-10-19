@@ -66,12 +66,14 @@ public:
   // ----------------------------------------
   // Variadic template constructors
   template<typename... Args>
+  // cppcheck-suppress noExplicitConstructor
   constexpr Result(Args&&... args)// NOLINT
     requires exclude_result_type<ResultType, Args...>
     : result_{ std::forward<Args>(args)... }
   {}
 
   template<typename... Args>
+  // cppcheck-suppress noExplicitConstructor
   constexpr Result(Args&&... args)// NOLINT
     requires exclude_error_type<ErrorType, Args...>
     : error_{ std::forward<Args>(args)... }, error_state_(true)
