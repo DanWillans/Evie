@@ -180,11 +180,12 @@ jobs:
           ctest -C ${{matrix.build_type}} --test-dir ./build
           gcovr -j ${{env.nproc}} --gcov-executable '${{ matrix.gcov_executable }}' ./build --filter src/ --filter include/ --print-summary --xml-pretty --xml coverage.xml --delete --print-summary --txt
 
-      - name: Windows - Test and coverage
-        if: runner.os == 'Windows'
-        working-directory: ./build
-        run: |
-          OpenCppCoverage.exe --export_type cobertura:coverage.xml --cover_children --excluded_modules *\vendor\* --excluded_modules *\examples\* --excluded_modules *\fuzz_test\* --modules Evie -- ctest -C ${{matrix.build_type}}
+      # Turn off windows coverage atm as OpenCppCoverage doesn't do what I want
+      # - name: Windows - Test and coverage
+      #   if: runner.os == 'Windows'
+      #   working-directory: ./build
+      #   run: |
+      #     OpenCppCoverage.exe --export_type cobertura:coverage.xml --cover_children --excluded_modules *\vendor\* --excluded_modules *\examples\* --excluded_modules *\fuzz_test\* --modules Evie -- ctest -C ${{matrix.build_type}}
 
       - name: CPack
         if: matrix.package_generator != ''

@@ -8,6 +8,7 @@
 			"options": {
 				"cwd": "${workspaceFolder}"
 			},
+			"problemMatcher": []
 		},
 		{
 			"label": "Delete build directories",
