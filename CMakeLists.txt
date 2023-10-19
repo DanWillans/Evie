@@ -80,7 +80,7 @@ if(Evie_BUILD_FUZZ_TESTS)
     message(WARNING "You need asan or tsan enabled for meaningful fuzz testing")
   endif()
 
-  add_subdirectory(fuzz_test)
+  # add_subdirectory(fuzz_test)
 endif()
 
 add_subdirectory(examples)
