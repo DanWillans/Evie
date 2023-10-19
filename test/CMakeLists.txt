@@ -34,7 +34,8 @@ include(${doctest_SOURCE_DIR}/scripts/cmake/doctest.cmake)
 add_executable(event_system_tests main.cpp event_system_tests.cpp)
 target_link_libraries(
   event_system_tests
-  PRIVATE Evie::Evie_warnings
+  PRIVATE 
+  Evie::Evie_warnings
   Evie::Evie_options
   Evie::Window
   doctest::doctest)

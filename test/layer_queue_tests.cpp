@@ -17,6 +17,8 @@ public:
   void OnUpdate() override {}
   void OnEvent([[maybe_unused]] evie::Event& event) override {}
   ~TestLayer() {}
+  void Shutdown() override { shutdown = true; }
+  bool shutdown = 0;
 };
 
 }// namespace
@@ -79,6 +81,10 @@ TEST_CASE("LayerQueue Tests")
         });
         REQUIRE(id_vec == std::vector<int>{ 0, 1, 3 });
       }
+    }
+    layer_queue.Shutdown();
+    for (const auto& lay : layer_queue) {
+      REQUIRE(static_cast<TestLayer*>(lay.layer)->shutdown == true);
     }
   }
 }

@@ -76,7 +76,7 @@ Error Application::Initialise(const WindowProperties& props)
   impl_->event_manager_ = std::make_unique<EventManager>(impl_->layer_queue_, impl_->input_manager_.get());
   // Register CloseWindow so that we can shut the game down.
   impl_->event_manager_->SubscribeToEventType(
-    EventType::WindowClose, [this]([[maybe_unused]] const Event& event) { this->CloseWindow(); });
+    EventType::WindowClose, [this]([[maybe_unused]] Event& event) { this->CloseWindow(); });
 
   // TODO: Get rid of this and just construct window with the Event Manager
   if (err.Good()) {
