@@ -123,6 +123,7 @@ doctest_discover_tests(
   "unittests."
 )
 
+# Install the runtime dependencies into the test folder so that all tests can run on windows
 if(WIN32)
   add_custom_command(
     TARGET layer_queue_tests
