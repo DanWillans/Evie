@@ -43,7 +43,7 @@ target_link_libraries(
 if(WIN32)
   add_custom_command(
     TARGET event_system_tests
-    PRE_BUILD
+    POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:event_system_tests> $<TARGET_FILE_DIR:event_system_tests>
     COMMAND_EXPAND_LISTS)
 endif()
@@ -88,7 +88,7 @@ target_link_libraries(
 if(WIN32)
   add_custom_command(
     TARGET layer_queue_tests
-    PRE_BUILD
+    POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:layer_queue_tests> $<TARGET_FILE_DIR:layer_queue_tests>
     COMMAND_EXPAND_LISTS)
 endif()
@@ -114,7 +114,7 @@ target_link_libraries(
 if(WIN32)
   add_custom_command(
     TARGET input_manager_tests
-    PRE_BUILD
+    POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:input_manager_tests> $<TARGET_FILE_DIR:input_manager_tests>
     COMMAND_EXPAND_LISTS)
 endif()
