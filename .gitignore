@@ -12,7 +12,7 @@ compile_commands.json
 # IDE files
 .vs/
 .idea/
-.vscode/
+.vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json

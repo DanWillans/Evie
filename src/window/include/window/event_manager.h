@@ -29,10 +29,10 @@ public:
    * @param event_type The EventType to listen to
    * @param callback The callback to call when the specific event_type is found
    */
-  void EVIE_API SubscribeToEventType(EventType event_type, const std::function<void(const Event&)>& callback);
+  void EVIE_API SubscribeToEventType(EventType event_type, const std::function<void(Event&)>& callback);
 
 private:
-  std::unordered_map<EventType, std::vector<std::function<void(const Event&)>>> type_subscribers_;
+  std::unordered_map<EventType, std::vector<std::function<void(Event&)>>> type_subscribers_;
   LayerQueue& layer_queue_;
   IInputManager* input_manager_{ nullptr };
 };

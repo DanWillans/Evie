@@ -1,6 +1,5 @@
 #include "window/event_manager.h"
 #include "evie/events.h"
-#include "evie/logging.h"
 #include "evie/input_manager.h"
 #include "window/key_events.h"
 #include "window/layer_queue.h"
@@ -41,9 +40,9 @@ void EventManager::OnEvent(Event& event)
   }
 }
 
-void EventManager::SubscribeToEventType(EventType event_type, const std::function<void(const Event&)>& callback)
+void EventManager::SubscribeToEventType(EventType event_type, const std::function<void(Event&)>& callback)
 {
-  auto pair = type_subscribers_.emplace(event_type, std::vector<std::function<void(const Event&)>>{ callback });
+  auto pair = type_subscribers_.emplace(event_type, std::vector<std::function<void(Event&)>>{ callback });
   if (!pair.second) {
     pair.first->second.push_back(callback);
   }

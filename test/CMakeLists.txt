@@ -34,18 +34,11 @@ include(${doctest_SOURCE_DIR}/scripts/cmake/doctest.cmake)
 add_executable(event_system_tests main.cpp event_system_tests.cpp)
 target_link_libraries(
   event_system_tests
-  PRIVATE Evie::Evie_warnings
+  PRIVATE
+  Evie::Evie_warnings
   Evie::Evie_options
   Evie::Window
   doctest::doctest)
-
-if(WIN32)
-  add_custom_command(
-    TARGET event_system_tests
-    PRE_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:event_system_tests> $<TARGET_FILE_DIR:event_system_tests>
-    COMMAND_EXPAND_LISTS)
-endif()
 
 # automatically discover tests that are defined in catch based test files you can modify the unittests. Set TEST_PREFIX
 # to whatever you want, or use different for different binaries
@@ -54,6 +47,14 @@ doctest_discover_tests(
   TEST_PREFIX
   "unittests."
 )
+
+if(WIN32)
+  add_custom_command(
+    TARGET event_system_tests
+    PRE_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:event_system_tests> $<TARGET_FILE_DIR:event_system_tests>
+    COMMAND_EXPAND_LISTS)
+endif()
 
 # ###### Error Tests ########
 add_executable(error_tests main.cpp error_tests.cpp)
@@ -91,6 +92,7 @@ if(WIN32)
     COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:layer_queue_tests> $<TARGET_FILE_DIR:layer_queue_tests>
     COMMAND_EXPAND_LISTS)
 endif()
+
 
 # automatically discover tests that are defined in catch based test files you can modify the unittests. Set TEST_PREFIX
 # to whatever you want, or use different for different binaries

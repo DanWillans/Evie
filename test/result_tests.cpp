@@ -165,3 +165,12 @@ TEST_CASE("Check Valid() returns true with error")
     REQUIRE(!test_class_obj);
   }
 }
+
+TEST_CASE("Check operator == between valid Result and Error")
+{
+  evie::Result<TestClass> error_result{ "Uh oh, error!" };
+  evie::Result<TestClass> result{ 0, 1.0, "TEST"};
+  REQUIRE(error_result.Bad());
+  REQUIRE(result.Good());
+  REQUIRE_EQ(error_result == result, false);
+}

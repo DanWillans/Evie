@@ -247,14 +247,36 @@ TEST_CASE("EventManager Tests")
   SUBCASE("Check subscribing to event type works")
   {
     evie::WindowCloseEvent window_close_event;
-    auto callback = [&](const evie::Event& event) {
+    auto callback = [&](evie::Event& event) {
       REQUIRE(event.GetEventType() == window_close_event.GetEventType());
+      event.handled = true;
       return true;
     };
     event_manager.SubscribeToEventType(evie::EventType::WindowClose, callback);
     event_manager.OnEvent(window_close_event);
     REQUIRE(layer1.event_count == 0);
     REQUIRE(layer2.event_count == 0);
+  }
+  SUBCASE("Check two callbacks subscribing to event type works")
+  {
+    evie::WindowCloseEvent window_close_event;
+    bool event_handled_by_callback2 = false;
+    auto callback = [&](evie::Event& event) {
+      REQUIRE(event.GetEventType() == window_close_event.GetEventType());
+      return true;
+    };
+    auto callback2 = [&](evie::Event& event) {
+      REQUIRE(event.GetEventType() == window_close_event.GetEventType());
+      event_handled_by_callback2 = true;
+      event.handled = true;
+      return true;
+    };
+    event_manager.SubscribeToEventType(evie::EventType::WindowClose, callback);
+    event_manager.SubscribeToEventType(evie::EventType::WindowClose, callback2);
+    event_manager.OnEvent(window_close_event);
+    REQUIRE(layer1.event_count == 0);
+    REQUIRE(layer2.event_count == 0);
+    REQUIRE(event_handled_by_callback2);
   }
   SUBCASE("Check layer1 receives event but not layer2")
   {
