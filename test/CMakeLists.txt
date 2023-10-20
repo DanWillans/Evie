@@ -48,6 +48,14 @@ doctest_discover_tests(
   "unittests."
 )
 
+if(WIN32)
+  add_custom_command(
+    TARGET event_system_tests
+    PRE_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:event_system_tests> $<TARGET_FILE_DIR:event_system_tests>
+    COMMAND_EXPAND_LISTS)
+endif()
+
 # ###### Error Tests ########
 add_executable(error_tests main.cpp error_tests.cpp)
 target_link_libraries(
@@ -77,6 +85,14 @@ target_link_libraries(
   Evie::Window
   doctest::doctest)
 
+if(WIN32)
+  add_custom_command(
+    TARGET layer_queue_tests
+    PRE_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:layer_queue_tests> $<TARGET_FILE_DIR:layer_queue_tests>
+    COMMAND_EXPAND_LISTS)
+endif()
+
 
 # automatically discover tests that are defined in catch based test files you can modify the unittests. Set TEST_PREFIX
 # to whatever you want, or use different for different binaries
@@ -95,6 +111,14 @@ target_link_libraries(
   Evie::Evie_options
   Evie::Window
   doctest::doctest)
+
+if(WIN32)
+  add_custom_command(
+    TARGET input_manager_tests
+    PRE_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:input_manager_tests> $<TARGET_FILE_DIR:input_manager_tests>
+    COMMAND_EXPAND_LISTS)
+endif()
 
 # automatically discover tests that are defined in catch based test files you can modify the unittests. Set TEST_PREFIX
 # to whatever you want, or use different for different binaries
@@ -122,12 +146,3 @@ doctest_discover_tests(
   TEST_PREFIX
   "unittests."
 )
-
-# Install the runtime dependencies into the test folder so that all tests can run on windows
-if(WIN32)
-  add_custom_command(
-    TARGET layer_queue_tests
-    PRE_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:layer_queue_tests> $<TARGET_FILE_DIR:layer_queue_tests>
-    COMMAND_EXPAND_LISTS)
-endif()
