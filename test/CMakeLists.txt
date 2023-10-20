@@ -128,6 +128,6 @@ if(WIN32)
   add_custom_command(
     TARGET layer_queue_tests
     PRE_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:layer_queue_tests> $<TARGET_RUNTIME_DLLS:input_manager_tests> $<TARGET_RUNTIME_DLLS:event_system_tests> $<TARGET_FILE_DIR:layer_queue_tests>
+    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:layer_queue_tests> $<TARGET_FILE_DIR:layer_queue_tests>
     COMMAND_EXPAND_LISTS)
 endif()
