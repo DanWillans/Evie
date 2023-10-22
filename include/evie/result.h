@@ -5,13 +5,12 @@
 
 #include <cassert>
 #include <initializer_list>
-#include <optional>
-#include <string>
 #include <type_traits>
+
+namespace evie {
 
 #define assertm(exp, msg) assert(((void)msg, exp))
 
-namespace evie {
 template<typename ResultType, typename ErrorType>
 concept move_assignable = std::is_move_assignable_v<ResultType> && std::is_move_assignable_v<ErrorType>;
 
