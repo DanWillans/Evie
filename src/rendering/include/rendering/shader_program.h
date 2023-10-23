@@ -16,17 +16,17 @@ public:
   void SetInt(const std::string& name, int value) const;
   void SetFloat(const std::string& name, float value) const;
   void Delete() const;
-  Error GetID(ShaderProgramID& identifier)
+  Result<ShaderProgramID> GetID()
   {
-    if (Error err = CheckIfInitialised(); err) {
-      identifier = ShaderProgramID(id_);
-      return err;
-    } else {
-      return err;
+    Error err = CheckIfInitialised();
+    if (err) {
+      return ShaderProgramID(id_);
     }
+    // cppcheck-suppress identicalConditionAfterEarlyExit
+    return err;
   }
 
-  [[nodiscard]] Error CheckIfInitialised() const 
+  [[nodiscard]] Error CheckIfInitialised() const
   {
     Error err = Error::OK();
     if (!initialised_) {
@@ -36,8 +36,8 @@ public:
   }
 
 private:
-  VertexShader* vertex_shader_{nullptr};
-  FragmentShader* fragment_shader_{nullptr};
+  VertexShader* vertex_shader_{ nullptr };
+  FragmentShader* fragment_shader_{ nullptr };
   bool initialised_{ false };
   unsigned int id_{ 0 };
 };

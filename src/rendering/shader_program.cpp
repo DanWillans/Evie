@@ -36,55 +36,55 @@ namespace {
   }
 #define glCheckError() glCheckError_(__FILE__, __LINE__)
 }// namespace
+
 Error ShaderProgram::Initialise(VertexShader* vertex_shader, FragmentShader* fragment_shader)
 {
-  Error err = Error::OK();
   vertex_shader_ = vertex_shader;
   fragment_shader_ = fragment_shader;
   id_ = glCreateProgram();
   glCheckError();
-  ShaderID vertex_shader_id{ 0 };
-  ShaderID fragment_shader_id{ 0 };
-  if (err.Good()) {
-    if (err = vertex_shader_->GetID(vertex_shader_id); err) {
-      glAttachShader(id_, vertex_shader_id.Get());
-      glCheckError();
-    }
-  }
-  if (err.Good()) {
-    if (err = fragment_shader->GetID(fragment_shader_id); err) {
-      glAttachShader(id_, fragment_shader_id.Get());
-      glCheckError();
-    }
-  }
-  if (err.Good()) {
-    glLinkProgram(id_);
+
+  // Attach the vertex shader
+  Result<ShaderID> vertex_id = vertex_shader_->GetID();
+  if (vertex_id.Good()) {
+    glAttachShader(id_, vertex_id->Get());
     glCheckError();
-    int success{ 0 };
-    glGetProgramiv(id_, GL_LINK_STATUS, &success);
-    glCheckError();
-    if (success == 0) {
-      const int log_length = 512;
-      std::array<char, log_length> infoLog{};
-      glGetProgramInfoLog(id_, log_length, nullptr, infoLog.data());
-      glCheckError();
-      EV_ERROR("ERROR::SHADER::FRAGMENT::COMPILATION_FAILED");
-      EV_ERROR("{}", infoLog.data());
-      err = Error("Failed to link shader program");
-    }
-  }
-  // Should we always delete the shader program even if there's not an error.
-  if (err.Good()) {
-    glDeleteShader(vertex_shader_id.Get());
-    glCheckError();
-    glDeleteShader(fragment_shader_id.Get());
-    glCheckError();
+  } else {
+    return vertex_id.Error();
   }
 
-  if(err.Good()){
-    initialised_ = true;
+  // Attach the fragement shader
+  Result<ShaderID> fragment_id = fragment_shader_->GetID();
+  if (fragment_id.Good()) {
+    glAttachShader(id_, fragment_id->Get());
+    glCheckError();
+  } else {
+    return fragment_id.Error();
   }
-  return err;
+
+  // Link the shaders to the program
+  glLinkProgram(id_);
+  glCheckError();
+  int success{ 0 };
+  glGetProgramiv(id_, GL_LINK_STATUS, &success);
+  glCheckError();
+  if (success == 0) {
+    const int log_length = 512;
+    std::array<char, log_length> infoLog{};
+    glGetProgramInfoLog(id_, log_length, nullptr, infoLog.data());
+    glCheckError();
+    EV_ERROR("ERROR::SHADER::FRAGMENT::COMPILATION_FAILED");
+    EV_ERROR("{}", infoLog.data());
+    return Error{ "Failed to link shader program" };
+  }
+
+  glDeleteShader(vertex_id->Get());
+  glCheckError();
+  glDeleteShader(fragment_id->Get());
+  glCheckError();
+
+  initialised_ = true;
+  return Error::OK();
 }
 
 void ShaderProgram::Use() const { glUseProgram(id_); }

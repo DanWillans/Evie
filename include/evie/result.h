@@ -46,20 +46,24 @@ public:
   // !! Construct a Result based on the ErrorType
 
   // R-value reference construction
-  constexpr explicit Result(ErrorType&& error) : error_{ std::move(error) }, error_state_(true) {}
+  // cppcheck-suppress noExplicitConstructor
+  constexpr Result(ErrorType&& error) : error_{ std::move(error) }, error_state_(true) {}
 
   // L-value reference construction
-  constexpr explicit Result(const ErrorType& error) : error_{ error }, error_state_(true) {}
+  // cppcheck-suppress noExplicitConstructor
+  constexpr Result(const ErrorType& error) : error_{ error }, error_state_(true) {}
   // ----------------------------------------
 
   // ----------------------------------------
   // !! Construct a valid Result based on the ResultType
 
   // R-value reference construction
-  constexpr explicit Result(ResultType&& result) : result_{ std::move(result) } {}
+  // cppcheck-suppress noExplicitConstructor
+  constexpr Result(ResultType&& result) : result_{ std::move(result) } {}
 
   // L-value reference construction
-  constexpr explicit Result(const ResultType& result) : result_{ result } {}
+  // cppcheck-suppress noExplicitConstructor
+  constexpr Result(const ResultType& result) : result_{ result } {}
   // ----------------------------------------
 
   // ----------------------------------------

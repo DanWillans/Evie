@@ -142,6 +142,17 @@ void Application::Run()
     glCheckError();
   }
 
+  VertexShader vertex_shader_2;
+  if (err.Good()) {
+    err = vertex_shader_2.Initialise("C:\\Users\\willa\\devel\\Evie\\shaders\\vertex_shader.vs");
+  }
+
+  FragmentShader fragment_shader_2;
+  if (err.Good()) {
+    err = fragment_shader_2.Initialise("C:\\Users\\willa\\devel\\Evie\\shaders\\fragment_shader.fs");
+    glCheckError();
+  }
+
   ShaderProgram shader_program;
   if (err.Good()) {
     err = shader_program.Initialise(&vertex_shader, &fragment_shader);
@@ -150,7 +161,7 @@ void Application::Run()
 
   ShaderProgram shader_program_2;
   if (err.Good()) {
-    err = shader_program_2.Initialise(&vertex_shader, &fragment_shader);
+    err = shader_program_2.Initialise(&vertex_shader_2, &fragment_shader_2);
     glCheckError();
   }
 
@@ -195,6 +206,15 @@ void Application::Run()
     0.0f,
     0.0f,
     1.0f,
+  };
+
+  float texCoords[] = {
+    0.0f,
+    0.0f,// lower-left corner
+    1.0f,
+    0.0f,// lower-right corner
+    0.5f,
+    1.0f// top-center corner
   };
 
   // unsigned int indices[] = {
@@ -279,24 +299,17 @@ void Application::Run()
     glClearColor(0.2F, 0.3F, 0.3F, 1.0F);
     // Clear the screen color buffer
     glClear(GL_COLOR_BUFFER_BIT);
-    float timeValue = static_cast<float>(glfwGetTime());
-    float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
-    ShaderProgramID id{ 0 };
-    err = shader_program.GetID(id);
-    if (err.Good()) {
-      glUseProgram(id.Get());
-      shader_program.SetFloat("ourColor", greenValue);
+    Result<ShaderProgramID> program_id = shader_program.GetID();
+    if (program_id.Good()) {
+      glUseProgram(program_id->Get());
       glBindVertexArray(VAO);
       glDrawArrays(GL_TRIANGLES, 0, 3);
     }
-    if (err.Good()) {
-      err = shader_program_2.GetID(id);
-      if (err.Good()) {
-        glUseProgram(id.Get());
-        shader_program_2.SetFloat("ourColor", greenValue);
-        glBindVertexArray(VAO_2);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-      }
+    program_id = shader_program_2.GetID();
+    if (program_id.Good()) {
+      glUseProgram(program_id->Get());
+      glBindVertexArray(VAO_2);
+      glDrawArrays(GL_TRIANGLES, 0, 3);
     }
     for (const auto& layer_wrapper : impl_->layer_queue_) {
       layer_wrapper.layer->OnUpdate();
