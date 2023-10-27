@@ -9,6 +9,13 @@ target_link_libraries(
   Evie::Logging
   Evie::Window
   Evie::Rendering
+  Evie::StbImage
+)
+
+target_link_system_libraries(
+  Application
+  PRIVATE
+  glm::glm
 )
 
 target_link_libraries(

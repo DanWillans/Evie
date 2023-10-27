@@ -91,7 +91,7 @@ void ShaderProgram::Use() const { glUseProgram(id_); }
 
 void ShaderProgram::SetBool(const std::string& name, bool value) const
 {
-  glUniform1i(glGetUniformLocation(id_, name.c_str()), static_cast<int>(value));
+  glUniform1i(glad_glGetUniformLocation(id_, name.c_str()), static_cast<int>(value));
 }
 
 void ShaderProgram::SetInt(const std::string& name, int value) const
@@ -102,6 +102,11 @@ void ShaderProgram::SetInt(const std::string& name, int value) const
 void ShaderProgram::SetFloat(const std::string& name, float value) const
 {
   glUniform1f(glad_glGetUniformLocation(id_, name.c_str()), value);
+}
+
+void ShaderProgram::SetMat4(const std::string& name, float* first_element) const
+{
+  glUniformMatrix4fv(glad_glGetUniformLocation(id_, name.c_str()), 1, GL_FALSE, first_element);
 }
 
 void ShaderProgram::Delete() const { glDeleteProgram(id_); }

@@ -34,7 +34,7 @@ public:
         const int log_length = 512;
         std::array<char, log_length> infoLog{};
         glGetShaderInfoLog(id_, log_length, nullptr, infoLog.data());
-        EV_ERROR("ERROR::SHADER::VERTEX::COMPILATION_FAILED");
+        EV_ERROR("ERROR::SHADER::COMPILATION_FAILED");
         EV_ERROR("{}", infoLog.data());
         return Error("Vertex shader failed to compile");
       }

@@ -5,6 +5,7 @@ Evie_add_library(
   Rendering
   SRCS
   shader_program.cpp
+  texture.cpp
 )
 
 target_link_libraries(
@@ -17,6 +18,7 @@ target_link_libraries(
 target_link_system_libraries(
   Rendering
   PRIVATE
+  Evie::StbImage
   Evie::Glad
   Evie::Logging
   OpenGL::GL
