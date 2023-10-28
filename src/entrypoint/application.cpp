@@ -257,12 +257,55 @@ void Application::Run()
   // };
 
   // clang-format off
-  float vertices[] = {
-    // positions          // colors           // texture coords
-     0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
-     0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
-    -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
-    -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
+//   float vertices[] = {
+//     // positions          // colors           // texture coords
+//      0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
+//      0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
+//     -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
+//     -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
+// };
+float vertices[] = {
+    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+     0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+    -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
 };
   // clang-format on
 
@@ -321,20 +364,20 @@ void Application::Run()
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
   glCheckError();
 
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), reinterpret_cast<void*>(0));
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), reinterpret_cast<void*>(0));
   glCheckError();
   glEnableVertexAttribArray(0);
   glCheckError();
 
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), reinterpret_cast<void*>(3 * sizeof(float)));
+  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), reinterpret_cast<void*>(3 * sizeof(float)));
   glCheckError();
   glEnableVertexAttribArray(1);
   glCheckError();
 
-  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), reinterpret_cast<void*>(6 * sizeof(float)));
-  glCheckError();
-  glEnableVertexAttribArray(2);
-  glCheckError();
+  // glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), reinterpret_cast<void*>(6 * sizeof(float)));
+  // glCheckError();
+  // glEnableVertexAttribArray(2);
+  // glCheckError();
 
   // glBindVertexArray(VAO_2);
   // glCheckError();
@@ -354,48 +397,110 @@ void Application::Run()
   // glCheckError();
 
   // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  glEnable(GL_DEPTH_TEST);
+  glm::vec3 cubePositions[] = { glm::vec3(0.0f, 0.0f, 0.0f),
+    glm::vec3(2.0f, 5.0f, -15.0f),
+    glm::vec3(-1.5f, -2.2f, -2.5f),
+    glm::vec3(-3.8f, -2.0f, -12.3f),
+    glm::vec3(2.4f, -0.4f, -3.5f),
+    glm::vec3(-1.7f, 3.0f, -7.5f),
+    glm::vec3(1.3f, -2.0f, -2.5f),
+    glm::vec3(1.5f, 2.0f, -2.5f),
+    glm::vec3(1.5f, 0.2f, -1.5f),
+    glm::vec3(-1.3f, 1.0f, -1.5f) };
 
   // Game loop
   shader_program.Use();
   shader_program.SetInt("ourTexture1", 0);
   shader_program.SetInt("ourTexture2", 1);
   float mixer{ 0.2f };
+  float camera_x{ 0.0f };
+  float camera_y{ 0.0f };
+  float camera_z{ -3.0f };
+  float camera_yaw{ 0.0f };
+  float camera_pitch{ 0.0f };
   shader_program.SetFloat("mixer", mixer);
   while (running_ && err.Good()) {
     impl_->window_->PollEvents();
     // Set the color to clear the screen with
     glClearColor(0.2F, 0.3F, 0.3F, 1.0F);
-    if (GetInputManager()->IsKeyPressed(KeyCode::Up)) {
+    if (GetInputManager()->IsKeyPressed(KeyCode::K)) {
       mixer += 0.01f;
       if (mixer > 1.0f) {
         mixer = 1.0f;
       }
       shader_program.SetFloat("mixer", mixer);
-    } else if (GetInputManager()->IsKeyPressed(KeyCode::Down)) {
+    } else if (GetInputManager()->IsKeyPressed(KeyCode::J)) {
       mixer -= 0.01f;
       if (mixer < 0.0f) {
         mixer = 0.0f;
       }
       shader_program.SetFloat("mixer", mixer);
     }
-    glm::mat4 trans_1 = glm::mat4(1.0f);
-    trans_1 = glm::translate(trans_1, glm::vec3(0.5f, -0.5f, 0.0f));
-    trans_1 = glm::rotate(trans_1, static_cast<float>(glfwGetTime()), glm::vec3(0.0f, 0.0f, 1.0f));
-    shader_program.SetMat4("transform", glm::value_ptr(trans_1));
     // Clear the screen color buffer
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture_id);
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, texture_id_2);
     glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-    glm::mat4 trans_2 = glm::mat4(1.0f);
-    float size = fabs(static_cast<float>(sin(glfwGetTime())));
-    trans_2 = glm::translate(trans_2, glm::vec3(-0.5f, 0.5f, 0.0f));
-    trans_2 = glm::scale(trans_2, glm::vec3(size, size, 1.0f));
-    shader_program.SetMat4("transform", glm::value_ptr(trans_2));
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    for (unsigned int i = 0; i < 10; ++i) {
+      glm::mat4 model = glm::mat4(1.0f);
+      // This translates the object to the position in the world that we want it.
+      model = glm::translate(model, cubePositions[i]);
+      float angle = 20.0f * static_cast<float>(i);
+      // This rotates the object to where we want it in the world space.
+      if (i % 3 == 0) {
+        model =
+          glm::rotate(model, static_cast<float>(glfwGetTime()) * glm::radians(50.0f), glm::vec3(1.0f, 0.3f, 0.5f));
+      } else {
+        model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+      }
+      shader_program.SetMat4("model", glm::value_ptr(model));
+
+      glm::mat4 view = glm::mat4(1.0f);
+      // note that we're translating the scene in the reverse direction of where we want to move
+      // This translates the camera/view to where we want it to be
+      if (GetInputManager()->IsKeyPressed(KeyCode::S)) {
+        camera_y += 0.05f;
+      }
+      if (GetInputManager()->IsKeyPressed(KeyCode::W)) {
+        camera_y -= 0.05f;
+      }
+      if (GetInputManager()->IsKeyPressed(KeyCode::D)) {
+        camera_x -= 0.05f;
+      }
+      if (GetInputManager()->IsKeyPressed(KeyCode::A)) {
+        camera_x += 0.05f;
+      }
+      if(GetInputManager()->IsKeyPressed(KeyCode::Q)){
+        camera_z += 0.05f;
+      }
+      if(GetInputManager()->IsKeyPressed(KeyCode::E)){
+        camera_z -= 0.05f;
+      }
+      view = glm::translate(view, glm::vec3(camera_x, camera_y, camera_z));
+      if (GetInputManager()->IsKeyPressed(KeyCode::Left)) {
+        camera_yaw += 0.05f;
+      }
+      if (GetInputManager()->IsKeyPressed(KeyCode::Right)) {
+        camera_yaw -= 0.05f;
+      }
+      view = glm::rotate(view, glm::radians(camera_yaw), glm::vec3(0.0f, 1.0f, 0.0f));
+      if (GetInputManager()->IsKeyPressed(KeyCode::Up)) {
+        camera_pitch += 0.05f;
+      }
+      if (GetInputManager()->IsKeyPressed(KeyCode::Down)) {
+        camera_pitch -= 0.05f;
+      }
+      view = glm::rotate(view, glm::radians(camera_pitch), glm::vec3(1.0f, 0.0f, 0.0f));
+      shader_program.SetMat4("view", glm::value_ptr(view));
+      // This sets up the projection. What's our FoV? What's our aspect ratio?
+      glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+      shader_program.SetMat4("projection", glm::value_ptr(projection));
+      glDrawArrays(GL_TRIANGLES, 0, 36);
+    }
+    // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     for (const auto& layer_wrapper : impl_->layer_queue_) {
       layer_wrapper.layer->OnUpdate();
     }
