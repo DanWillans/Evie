@@ -62,6 +62,8 @@ GLenum glCheckError_(const char* file, int line)
   }
   return errorCode;
 }
+
+
 #define glCheckError() glCheckError_(__FILE__, __LINE__)
 
 // =========================
@@ -79,6 +81,12 @@ private:
   std::unique_ptr<Layer> debug_layer_;
   std::unique_ptr<IInputManager> input_manager_;
   LayerQueue layer_queue_;
+  float last_x = 400;
+  float last_y = 300;
+  float camera_pitch = 0.0f;
+  float camera_yaw = -90.0f;
+  glm::vec3 camera_front;
+  float fov = 45.0f;
 };
 
 void Application::Impl::PushLayerFront(Layer& layer) { layer_queue_.PushFront(layer); }
@@ -118,6 +126,44 @@ Error Application::Initialise(const WindowProperties& props)
   // Register CloseWindow so that we can shut the game down.
   impl_->event_manager_->SubscribeToEventType(
     EventType::WindowClose, [this]([[maybe_unused]] Event& event) { this->CloseWindow(); });
+
+  impl_->event_manager_->SubscribeToEventType(EventType::MouseMoved, [this](Event& event) {
+    MouseMovementEvent* e = static_cast<MouseMovementEvent*>(&event);
+    auto& pitch = this->impl_->camera_pitch;
+    auto& yaw = this->impl_->camera_yaw;
+    float x_offset = static_cast<float>(e->GetMousePosition().x) - this->impl_->last_x;
+    float y_offset = this->impl_->last_y - static_cast<float>(e->GetMousePosition().y);
+    this->impl_->last_x = static_cast<float>(e->GetMousePosition().x);
+    this->impl_->last_y = static_cast<float>(e->GetMousePosition().y);
+    const float sensitivity = 0.1f;
+    x_offset *= sensitivity;
+    y_offset *= sensitivity;
+    yaw += x_offset;
+    pitch += y_offset;
+    if (pitch > 89.0f) {
+      pitch = 89.0f;
+    }
+    if (pitch < -89.0f) {
+      pitch = -89.0f;
+    }
+    glm::vec3 direction;
+    direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+    direction.y = sin(glm::radians(pitch));
+    direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+    this->impl_->camera_front = glm::normalize(direction);
+  });
+
+  impl_->event_manager_->SubscribeToEventType(EventType::MouseScrolled, [this](Event& event){
+    MouseScrolledEvent* e = static_cast<MouseScrolledEvent*>(&event);
+    auto& fov = this->impl_->fov;
+    fov -= static_cast<float>(e->GetScrollOffset().y_offset);
+    if(fov < 1.0f){
+      fov = 1.0f;
+    }
+    if(fov > 45.0f){
+      fov = 45.0f;
+    }
+  });
 
   // TODO: Get rid of this and just construct window with the Event Manager
   if (err.Good()) {
@@ -414,16 +460,23 @@ float vertices[] = {
   shader_program.SetInt("ourTexture1", 0);
   shader_program.SetInt("ourTexture2", 1);
   float mixer{ 0.2f };
-  float camera_x{ 0.0f };
-  float camera_y{ 0.0f };
-  float camera_z{ -3.0f };
-  float camera_yaw{ 0.0f };
-  float camera_pitch{ 0.0f };
+  glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+  glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+  glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
   shader_program.SetFloat("mixer", mixer);
+  float lastFrame = 0.0f;// Time of last frame
   while (running_ && err.Good()) {
+    float currentFrame = static_cast<float>(glfwGetTime());
+    float deltaTime = currentFrame - lastFrame;
+    lastFrame = currentFrame;
     impl_->window_->PollEvents();
     // Set the color to clear the screen with
     glClearColor(0.2F, 0.3F, 0.3F, 1.0F);
+    if (GetInputManager()->IsKeyPressed(KeyCode::Escape)) {
+      static_cast<GLFWWindow*>(impl_->window_.get())->EnableCursor();
+    } else {
+      static_cast<GLFWWindow*>(impl_->window_.get())->DisableCursor();
+    }
     if (GetInputManager()->IsKeyPressed(KeyCode::K)) {
       mixer += 0.01f;
       if (mixer > 1.0f) {
@@ -457,46 +510,35 @@ float vertices[] = {
         model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
       }
       shader_program.SetMat4("model", glm::value_ptr(model));
-
-      glm::mat4 view = glm::mat4(1.0f);
-      // note that we're translating the scene in the reverse direction of where we want to move
-      // This translates the camera/view to where we want it to be
-      if (GetInputManager()->IsKeyPressed(KeyCode::S)) {
-        camera_y += 0.05f;
-      }
+      const float cameraSpeed = 2.5f * deltaTime;
+      cameraFront = this->impl_->camera_front;
       if (GetInputManager()->IsKeyPressed(KeyCode::W)) {
-        camera_y -= 0.05f;
+        // If W is pressed then update the camera position
+        // The camera position is updated by multiplying a cameraSpeed with the cameraFront vector.
+        // The cameraFront vector is the target/direction vector of where we want to look or what we want to look at.
+        // To simulate the camera moving forwards when we press W we move the world forwards along the positive Z axis.
+        // We do this by changing making the cameras view position more and more negative which pushes it along the
+        // negative z axis.
+        cameraPos += cameraSpeed * cameraFront;
       }
-      if (GetInputManager()->IsKeyPressed(KeyCode::D)) {
-        camera_x -= 0.05f;
+      if (GetInputManager()->IsKeyPressed(KeyCode::S)) {
+        // We move the camera position along the positive Z axis.
+        cameraPos -= cameraSpeed * cameraFront;
       }
       if (GetInputManager()->IsKeyPressed(KeyCode::A)) {
-        camera_x += 0.05f;
+        // To strafe left we do a cross product. The cross product creates a perpendicular vector to the plane of the
+        // two vectors. If you cross product the Front and Up vectors you'll get a right vector. If we want the camera
+        // to go left we move the world right. So we negate the right vector from the camera position. This move the
+        // camera along the negative x axis.
+        cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
       }
-      if(GetInputManager()->IsKeyPressed(KeyCode::Q)){
-        camera_z += 0.05f;
+      if (GetInputManager()->IsKeyPressed(KeyCode::D)) {
+        cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
       }
-      if(GetInputManager()->IsKeyPressed(KeyCode::E)){
-        camera_z -= 0.05f;
-      }
-      view = glm::translate(view, glm::vec3(camera_x, camera_y, camera_z));
-      if (GetInputManager()->IsKeyPressed(KeyCode::Left)) {
-        camera_yaw += 0.05f;
-      }
-      if (GetInputManager()->IsKeyPressed(KeyCode::Right)) {
-        camera_yaw -= 0.05f;
-      }
-      view = glm::rotate(view, glm::radians(camera_yaw), glm::vec3(0.0f, 1.0f, 0.0f));
-      if (GetInputManager()->IsKeyPressed(KeyCode::Up)) {
-        camera_pitch += 0.05f;
-      }
-      if (GetInputManager()->IsKeyPressed(KeyCode::Down)) {
-        camera_pitch -= 0.05f;
-      }
-      view = glm::rotate(view, glm::radians(camera_pitch), glm::vec3(1.0f, 0.0f, 0.0f));
+      glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
       shader_program.SetMat4("view", glm::value_ptr(view));
       // This sets up the projection. What's our FoV? What's our aspect ratio?
-      glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+      glm::mat4 projection = glm::perspective(glm::radians(this->impl_->fov), 800.0f / 600.0f, 0.1f, 100.0f);
       shader_program.SetMat4("projection", glm::value_ptr(projection));
       glDrawArrays(GL_TRIANGLES, 0, 36);
     }

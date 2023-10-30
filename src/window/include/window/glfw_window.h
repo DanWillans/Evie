@@ -28,6 +28,8 @@ public:
   void* GetNativeWindow() override;
   EventManager* GetEventManager();
   void SetVSync(bool enabled);
+  void DisableCursor();
+  void EnableCursor();
 
 private:
   [[nodiscard]] Error DispatchEvent(std::unique_ptr<Event> event);

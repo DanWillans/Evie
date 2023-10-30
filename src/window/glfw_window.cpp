@@ -235,5 +235,12 @@ void GLFWWindow::Destroy()
 
 EventManager* GLFWWindow::GetEventManager() { return event_manager_; }
 
+void GLFWWindow::EnableCursor() {
+  glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+}
+
+void GLFWWindow::DisableCursor() {
+  glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+}
 
 }// namespace evie
