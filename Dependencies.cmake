@@ -62,6 +62,8 @@ function(Evie_setup_dependencies)
       GITHUB_REPOSITORY
       "g-truc/glm"
       SYSTEM)
+  # This include is needed for global logging access
+  include_directories(SYSTEM ${glm_SOURCE_DIR})
   endif()
 
 endfunction()
