@@ -1,12 +1,10 @@
 #ifndef EVIE_INCLUDE_RENDERING_CAMERA_H_
 #define EVIE_INCLUDE_RENDERING_CAMERA_H_
 
-#include "rendering/camera.h"
-
 #include "evie/core.h"
 #include "evie/types.h"
-#include "window/mouse_events.h"
 
+#include "glm/glm.hpp"
 
 namespace evie {
 class EVIE_API Camera

@@ -11,7 +11,7 @@ public:
 
   constexpr bool operator==(const ID<T, Tag>& other) const { return id_ == other.Get(); }
 
-  T Get() const { return id_; }
+  const T& Get() const { return id_; }
 
 private:
   T id_;
@@ -24,12 +24,19 @@ struct LayerIDTag
 using LayerID = ID<int, LayerIDTag>;
 
 struct ShaderIdTag
-{};
+{
+};
 using ShaderID = ID<unsigned int, ShaderIdTag>;
 
 struct ShaderProgramTag
-{};
+{
+};
 using ShaderProgramID = ID<unsigned int, ShaderProgramTag>;
+
+struct TextureTag
+{
+};
+using TextureID = ID<unsigned int, TextureTag>;
 
 }// namespace evie
 

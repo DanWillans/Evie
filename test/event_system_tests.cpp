@@ -4,12 +4,12 @@
 #include "evie/events.h"
 #include "evie/input.h"
 #include "evie/input_manager.h"
+#include "evie/key_events.h"
+#include "evie/mouse_events.h"
 #include "evie/types.h"
+#include "evie/window_events.h"
 #include "window/event_manager.h"
-#include "window/key_events.h"
 #include "window/layer_queue.h"
-#include "window/mouse_events.h"
-#include "window/window_events.h"
 
 using ECB = evie::EventCategoryBitmask;
 

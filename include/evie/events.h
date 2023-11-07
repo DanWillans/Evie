@@ -1,6 +1,7 @@
 #ifndef EVIE_EVENT_SYSTEM_EVENTS_H_
 #define EVIE_EVENT_SYSTEM_EVENTS_H_
 
+#include <concepts>
 #include <cstdint>
 #include <string>
 
@@ -53,6 +54,13 @@ public:
   [[nodiscard]] bool IsInCategory(EventCategoryBitmask category) const
   {
     return static_cast<bool>(GetCategoryFlags() & category);
+  }
+
+  template<typename EventType>
+  [[nodiscard]] const EventType* Cast() noexcept
+    requires std::derived_from<EventType, Event>
+  {
+    return static_cast<EventType*>(this);
   }
 
   bool handled{ false };

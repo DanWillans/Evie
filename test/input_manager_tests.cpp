@@ -2,8 +2,8 @@
 
 #include "evie/input.h"
 #include "window/input_manager_impl.h"
-#include "window/key_events.h"
-#include "window/mouse_events.h"
+#include "evie/key_events.h"
+#include "evie/mouse_events.h"
 
 TEST_CASE("InputManager IsKeyPressed Tests")
 {

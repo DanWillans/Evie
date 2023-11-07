@@ -1,11 +1,11 @@
 #include "window/glfw_window.h"
 #include "evie/error.h"
+#include "evie/key_events.h"
 #include "evie/logging.h"
+#include "evie/mouse_events.h"
+#include "evie/window_events.h"
 #include "window/event_manager.h"
-#include "window/key_events.h"
-#include "window/mouse_events.h"
 #include "window/window.h"
-#include "window/window_events.h"
 
 
 #ifdef EVIE_PLATFORM_WINDOWS
@@ -235,12 +235,8 @@ void GLFWWindow::Destroy()
 
 EventManager* GLFWWindow::GetEventManager() { return event_manager_; }
 
-void GLFWWindow::EnableCursor() {
-  glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-}
+void GLFWWindow::EnableCursor() { glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_NORMAL); }
 
-void GLFWWindow::DisableCursor() {
-  glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-}
+void GLFWWindow::DisableCursor() { glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_DISABLED); }
 
 }// namespace evie

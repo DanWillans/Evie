@@ -1,4 +1,4 @@
-#include "rendering/camera.h"
+#include "evie/camera.h"
 #include "evie/types.h"
 
 #include "glm/gtc/matrix_transform.hpp"

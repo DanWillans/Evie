@@ -2,27 +2,25 @@
 #include <thread>
 
 #include "evie/application.h"
+#include "evie/camera.h"
 #include "evie/error.h"
 #include "evie/events.h"
 #include "evie/ids.h"
 #include "evie/input_manager.h"
+#include "evie/key_events.h"
 #include "evie/logging.h"
+#include "evie/mouse_events.h"
+#include "evie/texture.h"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
-#include "rendering/camera.h"
 #include "rendering/shader.h"
 #include "rendering/shader_program.h"
 #include "window/debug_layer.h"
 #include "window/event_manager.h"
 #include "window/input_manager_impl.h"
-#include "window/key_events.h"
 #include "window/layer_queue.h"
-#include "window/mouse_events.h"
 #include "window/window.h"
-
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb/stb_image.h"
 
 #include "glad/glad.h"
 
@@ -123,24 +121,6 @@ Error Application::Initialise(const WindowProperties& props)
   impl_->event_manager_->SubscribeToEventType(
     EventType::WindowClose, [this]([[maybe_unused]] Event& event) { this->CloseWindow(); });
 
-  impl_->event_manager_->SubscribeToEventType(EventType::MouseMoved, [this](Event& event) {
-    MouseMovementEvent* e = static_cast<MouseMovementEvent*>(&event);
-    this->impl_->camera_.Rotate(e->GetMousePosition());
-    return;
-  });
-
-  impl_->event_manager_->SubscribeToEventType(EventType::MouseScrolled, [this](Event& event) {
-    MouseScrolledEvent* e = static_cast<MouseScrolledEvent*>(&event);
-    auto& fov = this->impl_->camera_.field_of_view;
-    fov -= static_cast<float>(e->GetScrollOffset().y_offset);
-    if (fov < 1.0f) {
-      fov = 1.0f;
-    }
-    if (fov > 45.0f) {
-      fov = 45.0f;
-    }
-  });
-
   // TODO: Get rid of this and just construct window with the Event Manager
   if (err.Good()) {
     err = impl_->window_->RegisterEventManager(*impl_->event_manager_);
@@ -155,56 +135,28 @@ Error Application::Initialise(const WindowProperties& props)
 
 void Application::Run()
 {
+  Error err = Error::OK();
   if (!initialised_) {
     EV_ERROR("Application isn't initialised. Please run Initialise() before Run(). Exiting.");
     return;
   }
-  // ---- GLM ----
-  glm::vec4 vec(1.0f, 0.0f, 0.0f, 1.0f);
-  glm::mat4 trans = glm::mat4(1.0f);
-  trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
-  vec = trans * vec;
-  EV_INFO("x: {}, y: {}, z: {}", vec.x, vec.y, vec.z);
 
   // ------- Textures ---------
   // set the texture wrapping/filtering options (on the currently bound texture object)
   // load and generate the texture
-  int width, height, nrChannels;
-  unsigned char* data =
-    stbi_load("C:\\Users\\willa\\devel\\Evie\\textures\\container.jpg", &width, &height, &nrChannels, 0);
-  unsigned int texture_id;
-  glGenTextures(1, &texture_id);
-  glBindTexture(GL_TEXTURE_2D, texture_id);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  if (data) {
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-    glGenerateMipmap(GL_TEXTURE_2D);
-  } else {
-    std::cout << "Dead texture\n";
+  Texture2D tex_1;
+  if (err.Good()) {
+    err = tex_1.Initialise("C:\\Users\\willa\\devel\\Evie\\textures\\container.jpg");
   }
-  stbi_image_free(data);
-  stbi_set_flip_vertically_on_load(true);
-  data = stbi_load("C:\\Users\\willa\\devel\\Evie\\textures\\awesomeface.png", &width, &height, &nrChannels, 0);
-  unsigned int texture_id_2;
-  glGenTextures(1, &texture_id_2);
-  glBindTexture(GL_TEXTURE_2D, texture_id_2);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  if (data) {
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-    glGenerateMipmap(GL_TEXTURE_2D);
-  } else {
-    std::cout << "Dead texture\n";
+  Texture2D tex_2;
+  if (err.Good()) {
+    err = tex_1.Initialise("C:\\Users\\willa\\devel\\Evie\\textures\\awesomeface.png", true);
   }
-  stbi_image_free(data);
   // ------------ SHADERS ---------------
   VertexShader vertex_shader;
-  Error err = vertex_shader.Initialise("C:\\Users\\willa\\devel\\Evie\\shaders\\vertex_shader.vs");
+  if(err.Good()){
+    err = vertex_shader.Initialise("C:\\Users\\willa\\devel\\Evie\\shaders\\vertex_shader.vs");
+  }
   glCheckError();
   FragmentShader fragment_shader;
   if (err.Good()) {
@@ -466,10 +418,8 @@ float vertices[] = {
     }
     // Clear the screen color buffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture_id);
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, texture_id_2);
+    tex_1.SetSlot(0);
+    tex_2.SetSlot(1);
     glBindVertexArray(VAO);
     for (unsigned int i = 0; i < 10; ++i) {
       glm::mat4 model = glm::mat4(1.0f);
@@ -525,7 +475,9 @@ void Application::Shutdown()
 {
   // Shutdown layers first as they'll be using contexts from the window like glfw, opengl etc.
   impl_->layer_queue_.Shutdown();
-  impl_->window_->Destroy();
+  if(impl_->window_){
+    impl_->window_->Destroy();
+  }
 }
 
 void Application::PushLayerFront(Layer& layer) { impl_->layer_queue_.PushFront(layer); }

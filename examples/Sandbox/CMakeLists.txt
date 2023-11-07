@@ -21,4 +21,7 @@ target_link_libraries(
   Evie::Evie_warnings
   Evie::Application
   Evie::Logging
+  Evie::Rendering
 )
+
+install(DIRECTORY textures DESTINATION ${CMAKE_INSTALL_PREFIX})

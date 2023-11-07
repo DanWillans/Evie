@@ -1,6 +1,7 @@
 #include <memory>
 
 #include "evie/application.h"
+#include "evie/camera.h"
 #include "evie/error.h"
 #include "evie/events.h"
 #include "evie/evie.h"
@@ -8,32 +9,54 @@
 #include "evie/input_manager.h"
 #include "evie/layer.h"
 #include "evie/logging.h"
+#include "evie/mouse_events.h"
+#include "evie/texture.h"
 #include "evie/types.h"
 
-class TestLayer : public evie::Layer
+
+class GameLayer : public evie::Layer
 {
 public:
-  TestLayer() = default;
-  explicit TestLayer(const evie::IInputManager* input_manager) : input_manager_(input_manager) {}
-  TestLayer(const TestLayer&) = default;
-  TestLayer& operator=(const TestLayer&) = default;
-  TestLayer(TestLayer&&) = delete;
-  ~TestLayer() override = default;
-  void OnUpdate() override
+  GameLayer() = default;
+  explicit GameLayer(const evie::IInputManager* input_manager) : input_manager_(input_manager) {}
+
+  evie::Error Initialise()
   {
-    if (input_manager_->IsKeyPressed(evie::KeyCode::Space)) {
-      APP_INFO("Space bar pressed");
+    evie::Error err = face_texture_.Initialise("..\\textures\\container.jpg");
+    if (err.Good()) {
+      err = container_texture_.Initialise("..\\textures\\awesomeface.png");
     }
-    if (input_manager_->IsMousePressed(evie::MouseCode::ButtonLeft)) {
-      APP_INFO("Button left pressed");
+    return err;
+  }
+
+  void OnUpdate() override {}
+
+  void OnEvent([[maybe_unused]] evie::Event& event) override
+  {
+    // Process mouse move events for camera rotation
+    if (event.GetEventType() == evie::EventType::MouseMoved) {
+      const auto* const mouse_event = event.Cast<evie::MouseMovementEvent>();
+      camera_.Rotate(mouse_event->GetMousePosition());
     }
-    if (input_manager_->IsMousePressed(evie::MouseCode::ButtonRight)) {
-      APP_INFO("Button right pressed");
+
+    // Process mouse scrolled events for camera fov
+    if (event.GetEventType() == evie::EventType::MouseScrolled) {
+      const auto* const scrolled_event = event.Cast<evie::MouseScrolledEvent>();
+      auto& fov = camera_.field_of_view;
+      fov -= static_cast<float>(scrolled_event->GetScrollOffset().y_offset);
+      if (fov < 1.0f) {
+        fov = 1.0f;
+      }
+      if (fov > 45.0f) {
+        fov = 45.0f;
+      }
     }
   }
-  void OnEvent([[maybe_unused]] evie::Event& event) override {}
 
 private:
+  evie::Camera camera_;
+  evie::Texture2D face_texture_;
+  evie::Texture2D container_texture_;
   const evie::IInputManager* input_manager_{ nullptr };
 };
 
@@ -50,15 +73,21 @@ public:
     // Always Initialise the engine before doing anything with it.
     evie::Error err = Initialise(props);
     if (err.Good()) {
-      t_layer_ = TestLayer(GetInputManager());
-      PushLayerFront(t_layer_);
+      APP_INFO("Creating GameLayer");
+      t_layer_ = GameLayer(GetInputManager());
+      APP_INFO("Initialising layer");
+      err = t_layer_.Initialise();
+      if(err.Good()){
+        APP_INFO("Pushing layer");
+        PushLayerFront(t_layer_);
+      }
     }
     return err;
   }
   ~Sandbox() override = default;
 
 private:
-  TestLayer t_layer_;
+  GameLayer t_layer_;
 };
 
 std::unique_ptr<evie::Application> CreateApplication()
@@ -68,6 +97,7 @@ std::unique_ptr<evie::Application> CreateApplication()
   if (err.Good()) {
     return app;
   } else {
+    APP_INFO("App failed to initialise. Reason: {}", err.Message());
     return nullptr;
   }
 }

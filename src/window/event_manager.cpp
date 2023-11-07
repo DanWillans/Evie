@@ -1,9 +1,9 @@
 #include "window/event_manager.h"
 #include "evie/events.h"
 #include "evie/input_manager.h"
-#include "window/key_events.h"
+#include "evie/key_events.h"
+#include "evie/mouse_events.h"
 #include "window/layer_queue.h"
-#include "window/mouse_events.h"
 #include <memory>
 
 namespace evie {

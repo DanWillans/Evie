@@ -16,6 +16,17 @@ struct WindowProperties
   WindowDimensions dimensions;
   std::string name;
 };
+struct MousePosition
+{
+  double x{ 0 };
+  double y{ 0 };
+};
+
+struct MouseScrollOffset
+{
+  double x_offset{ 0 };
+  double y_offset{ 0 };
+};
 
 // Vector types
 using vec2 = glm::vec2;

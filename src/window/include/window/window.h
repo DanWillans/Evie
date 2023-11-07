@@ -8,8 +8,8 @@
 #include "evie/core.h"
 #include "evie/error.h"
 #include "window/event_manager.h"
-#include "window/window_events.h"
-#include <evie/types.h>
+#include "evie/window_events.h"
+#include "evie/types.h"
 
 namespace evie {
 

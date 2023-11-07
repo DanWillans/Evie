@@ -6,20 +6,9 @@
 #include "evie/core.h"
 #include "evie/events.h"
 #include "evie/logging.h"
-
+#include "evie/types.h"
 
 namespace evie {
-struct EVIE_API MousePosition
-{
-  double x{ 0 };
-  double y{ 0 };
-};
-
-struct EVIE_API MouseScrollOffset
-{
-  double x_offset{ 0 };
-  double y_offset{ 0 };
-};
 
 class EVIE_API MouseButtonEvent : public Event
 {
@@ -112,7 +101,7 @@ public:
     return stream.str();
   }
 
-  [[nodiscard]] const MousePosition& GetMousePosition() { return position_; }
+  [[nodiscard]] const MousePosition& GetMousePosition() const { return position_; }
 
 
 private:
@@ -146,7 +135,7 @@ public:
     return stream.str();
   }
 
-  [[nodiscard]] MouseScrollOffset GetScrollOffset() { return scroll_offset_; }
+  [[nodiscard]] MouseScrollOffset GetScrollOffset() const { return scroll_offset_; }
 
 private:
   MouseScrollOffset scroll_offset_{ 0, 0 };
