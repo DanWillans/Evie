@@ -10,6 +10,7 @@
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
+#include "rendering/camera.h"
 #include "rendering/shader.h"
 #include "rendering/shader_program.h"
 #include "window/debug_layer.h"
@@ -81,12 +82,7 @@ private:
   std::unique_ptr<Layer> debug_layer_;
   std::unique_ptr<IInputManager> input_manager_;
   LayerQueue layer_queue_;
-  float last_x = 400;
-  float last_y = 300;
-  float camera_pitch = 0.0f;
-  float camera_yaw = -90.0f;
-  glm::vec3 camera_front;
-  float fov = 45.0f;
+  Camera camera_;
 };
 
 void Application::Impl::PushLayerFront(Layer& layer) { layer_queue_.PushFront(layer); }
@@ -129,38 +125,18 @@ Error Application::Initialise(const WindowProperties& props)
 
   impl_->event_manager_->SubscribeToEventType(EventType::MouseMoved, [this](Event& event) {
     MouseMovementEvent* e = static_cast<MouseMovementEvent*>(&event);
-    auto& pitch = this->impl_->camera_pitch;
-    auto& yaw = this->impl_->camera_yaw;
-    float x_offset = static_cast<float>(e->GetMousePosition().x) - this->impl_->last_x;
-    float y_offset = this->impl_->last_y - static_cast<float>(e->GetMousePosition().y);
-    this->impl_->last_x = static_cast<float>(e->GetMousePosition().x);
-    this->impl_->last_y = static_cast<float>(e->GetMousePosition().y);
-    const float sensitivity = 0.1f;
-    x_offset *= sensitivity;
-    y_offset *= sensitivity;
-    yaw += x_offset;
-    pitch += y_offset;
-    if (pitch > 89.0f) {
-      pitch = 89.0f;
-    }
-    if (pitch < -89.0f) {
-      pitch = -89.0f;
-    }
-    glm::vec3 direction;
-    direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-    direction.y = sin(glm::radians(pitch));
-    direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-    this->impl_->camera_front = glm::normalize(direction);
+    this->impl_->camera_.Rotate(e->GetMousePosition());
+    return;
   });
 
-  impl_->event_manager_->SubscribeToEventType(EventType::MouseScrolled, [this](Event& event){
+  impl_->event_manager_->SubscribeToEventType(EventType::MouseScrolled, [this](Event& event) {
     MouseScrolledEvent* e = static_cast<MouseScrolledEvent*>(&event);
-    auto& fov = this->impl_->fov;
+    auto& fov = this->impl_->camera_.field_of_view;
     fov -= static_cast<float>(e->GetScrollOffset().y_offset);
-    if(fov < 1.0f){
+    if (fov < 1.0f) {
       fov = 1.0f;
     }
-    if(fov > 45.0f){
+    if (fov > 45.0f) {
       fov = 45.0f;
     }
   });
@@ -460,10 +436,8 @@ float vertices[] = {
   shader_program.SetInt("ourTexture1", 0);
   shader_program.SetInt("ourTexture2", 1);
   float mixer{ 0.2f };
-  glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-  glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-  glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
   shader_program.SetFloat("mixer", mixer);
+  Camera& camera = impl_->camera_;
   float lastFrame = 0.0f;// Time of last frame
   while (running_ && err.Good()) {
     float currentFrame = static_cast<float>(glfwGetTime());
@@ -510,35 +484,22 @@ float vertices[] = {
         model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
       }
       shader_program.SetMat4("model", glm::value_ptr(model));
-      const float cameraSpeed = 2.5f * deltaTime;
-      cameraFront = this->impl_->camera_front;
       if (GetInputManager()->IsKeyPressed(KeyCode::W)) {
-        // If W is pressed then update the camera position
-        // The camera position is updated by multiplying a cameraSpeed with the cameraFront vector.
-        // The cameraFront vector is the target/direction vector of where we want to look or what we want to look at.
-        // To simulate the camera moving forwards when we press W we move the world forwards along the positive Z axis.
-        // We do this by changing making the cameras view position more and more negative which pushes it along the
-        // negative z axis.
-        cameraPos += cameraSpeed * cameraFront;
+        camera.MoveForwards(deltaTime);
       }
       if (GetInputManager()->IsKeyPressed(KeyCode::S)) {
-        // We move the camera position along the positive Z axis.
-        cameraPos -= cameraSpeed * cameraFront;
+        camera.MoveBackwards(deltaTime);
       }
       if (GetInputManager()->IsKeyPressed(KeyCode::A)) {
-        // To strafe left we do a cross product. The cross product creates a perpendicular vector to the plane of the
-        // two vectors. If you cross product the Front and Up vectors you'll get a right vector. If we want the camera
-        // to go left we move the world right. So we negate the right vector from the camera position. This move the
-        // camera along the negative x axis.
-        cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+        camera.MoveLeft(deltaTime);
       }
       if (GetInputManager()->IsKeyPressed(KeyCode::D)) {
-        cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+        camera.MoveRight(deltaTime);
       }
-      glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+      mat4 view = camera.GetViewMatrix();
       shader_program.SetMat4("view", glm::value_ptr(view));
       // This sets up the projection. What's our FoV? What's our aspect ratio?
-      glm::mat4 projection = glm::perspective(glm::radians(this->impl_->fov), 800.0f / 600.0f, 0.1f, 100.0f);
+      glm::mat4 projection = glm::perspective(glm::radians(camera.field_of_view), 800.0f / 600.0f, 0.1f, 100.0f);
       shader_program.SetMat4("projection", glm::value_ptr(projection));
       glDrawArrays(GL_TRIANGLES, 0, 36);
     }

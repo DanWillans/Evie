@@ -6,6 +6,7 @@ Evie_add_library(
   SRCS
   shader_program.cpp
   texture.cpp
+  camera.cpp
 )
 
 target_link_libraries(
@@ -13,6 +14,7 @@ target_link_libraries(
   PUBLIC
   Evie::Evie_options
   Evie::Evie_warnings
+  Evie::Window
 )
 
 target_link_system_libraries(
@@ -22,4 +24,5 @@ target_link_system_libraries(
   Evie::Glad
   Evie::Logging
   OpenGL::GL
+  glm::glm
 )
