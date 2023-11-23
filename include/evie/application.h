@@ -8,6 +8,7 @@
 #include "evie/input_manager.h"
 #include "evie/layer.h"
 #include "evie/types.h"
+#include "evie/window.h"
 
 namespace evie {
 class EVIE_API Application
@@ -23,6 +24,7 @@ public:
   void Run();
   [[nodiscard]] Error Initialise(const WindowProperties& props);
   [[nodiscard]] const IInputManager* GetInputManager() const;
+  [[nodiscard]] IWindow* GetWindow() const;
   void PushLayerFront(Layer& layer);
   void PushLayerBack(Layer& layer);
   void Shutdown();

@@ -7,7 +7,6 @@
 #include "evie/ids.h"
 #include "evie/logging.h"
 #include "evie/result.h"
-#include "rendering/shader.h"
 
 #include <array>
 #include <filesystem>
@@ -17,6 +16,7 @@
 
 namespace evie {
 
+// Maybe put this in an implimentation file so users don't need glad headers?
 template<int T> class EVIE_API Shader
 {
 public:

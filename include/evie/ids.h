@@ -38,6 +38,21 @@ struct TextureTag
 };
 using TextureID = ID<unsigned int, TextureTag>;
 
+struct VertexArrayTag
+{
+};
+using VertexArrayID = ID<unsigned int, VertexArrayTag>;
+
+struct VertexBufferTag
+{
+};
+using VertexBufferID = ID<unsigned int, VertexBufferTag>;
+
+struct IndicesArrayTag
+{
+};
+using IndicesArrayID = ID<unsigned int, IndicesArrayTag>;
+
 }// namespace evie
 
 #endif// EVIE_IDS_H_

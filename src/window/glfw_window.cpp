@@ -3,9 +3,9 @@
 #include "evie/key_events.h"
 #include "evie/logging.h"
 #include "evie/mouse_events.h"
+#include "evie/window.h"
 #include "evie/window_events.h"
 #include "window/event_manager.h"
-#include "window/window.h"
 
 
 #ifdef EVIE_PLATFORM_WINDOWS

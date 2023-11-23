@@ -19,6 +19,7 @@ class TestLayer final : public evie::Layer
 {
 public:
   void OnUpdate() override {}
+  void OnRender() override {}
   void OnEvent(evie::Event& event) override
   {
     if (event.GetEventType() == evie::EventType::KeyPressed) {
@@ -37,6 +38,7 @@ class TestLayer2 final : public evie::Layer
 {
 public:
   void OnUpdate() override {}
+  void OnRender() override {}
   void OnEvent(evie::Event& event) override
   {
     if (event.GetEventType() == evie::EventType::MouseButtonPressed) {

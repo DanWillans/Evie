@@ -3,7 +3,7 @@
 
 #include "evie/error.h"
 #include "evie/ids.h"
-#include "rendering/shader.h"
+#include "evie/shader.h"
 
 
 namespace evie {
@@ -16,7 +16,7 @@ public:
   void SetInt(const std::string& name, int value) const;
   void SetFloat(const std::string& name, float value) const;
   void SetMat4(const std::string& name, float* first_element) const;
-  void Delete() const;
+  void Destroy() const;
   Result<ShaderProgramID> GetID()
   {
     Error err = CheckIfInitialised();

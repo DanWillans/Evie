@@ -54,23 +54,6 @@ void Camera::MoveRight(const float& delta_time)
 
 mat4 Camera::GetViewMatrix()
 {
-  // Create mat4
-  // auto right = glm::normalize(glm::cross(glm::normalize(position_ + direction_), glm::normalize(up_)));
-  // mat4 rot = mat4{ 1.0f };
-  // rot[0][0] = right.x;
-  // rot[1][0] = right.y;
-  // rot[2][0] = right.z;
-  // rot[0][1] = up_.x;
-  // rot[1][1] = up_.y;
-  // rot[2][1] = up_.z;
-  // rot[0][2] = direction_.x;
-  // rot[1][2] = direction_.y;
-  // rot[2][2] = direction_.z;
-  // mat4 pos = mat4{ 1.0f };
-  // pos[3][0] = -position_.x;
-  // pos[3][1] = -position_.y;
-  // pos[3][2] = -position_.z;
-  // return rot * pos;
   // 1. Position = known
   // 2. Calculate cameraDirection
   glm::vec3 zaxis = glm::normalize(-direction_);
@@ -99,6 +82,10 @@ mat4 Camera::GetViewMatrix()
   // Return lookAt matrix as combination of translation and rotation matrix
   return rotation * translation;// Remember to read from right to left (first translation then rotation)
   // return glm::lookAt(position_, position_ + direction_, up_);
+}
+
+void Camera::ResetCameraPosition(const vec3& position){
+  position_ = position;
 }
 
 }// namespace evie

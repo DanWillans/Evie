@@ -34,8 +34,9 @@ DebugLayer::DebugLayer([[maybe_unused]] void* window)
   EV_INFO("Initialised debug layer");
 }
 
-void DebugLayer::OnUpdate()
+void DebugLayer::OnUpdate(){}
 
+void DebugLayer::OnRender()
 {
   ImGui_ImplOpenGL3_NewFrame();
   ImGui_ImplGlfw_NewFrame();

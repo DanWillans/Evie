@@ -23,6 +23,8 @@ public:
   virtual void SwapBuffers() = 0;
   [[nodiscard]] virtual Error RegisterEventManager(EventManager& event_manager) = 0;
   virtual void* GetNativeWindow() = 0;
+  virtual void EnableCursor() = 0;
+  virtual void DisableCursor() = 0;
 };
 
 

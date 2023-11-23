@@ -20,11 +20,11 @@ spdlog::logger* LoggingManager::GetEngineLogger(){
 void LoggingManager::Init()
 {
   // Engine logger setup
-  engine_logger_->set_pattern("[%H:%M:%S %z] [%n] [%^---%L---%$] [thread %t] %v");
+  // engine_logger_->set_pattern("[%H:%M:%S %z] [%n] [%^---%L---%$] [thread %t] %v");
   engine_logger_->set_level(spdlog::level::trace);
 
   // Client logger setup
-  client_logger_->set_pattern("[%H:%M:%S %z] [%n] [%^---%L---%$] [thread %t] %v");
+  // client_logger_->set_pattern("[%H:%M:%S %z] [%n] [%^---%L---%$] [thread %t] %v");
   client_logger_->set_level(spdlog::level::trace);
 }
 

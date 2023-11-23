@@ -22,6 +22,9 @@ target_link_libraries(
   Evie::Application
   Evie::Logging
   Evie::Rendering
+  PUBLIC
+  # This is just for Time. Make Evie::Time.
+  glfw
 )
 
 install(DIRECTORY textures DESTINATION ${CMAKE_INSTALL_PREFIX})

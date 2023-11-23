@@ -1,6 +1,7 @@
 #ifndef EVIE_EVENT_SYSTEM_KEY_EVENT_H_
 #define EVIE_EVENT_SYSTEM_KEY_EVENT_H_
 
+#include <evie/input.h>
 #include <sstream>
 
 #include "evie/events.h"
@@ -9,10 +10,9 @@ namespace evie {
 class EVIE_API KeyEvent : public Event
 {
 public:
-  [[nodiscard]] int GetKeyCode() const
-  {
-    return key_code_;
-  };
+  [[nodiscard]] bool IsKeyCode(KeyCode code) const { return static_cast<int>(code) == key_code_; }
+
+  [[nodiscard]] int GetKeyCode() const { return key_code_; }
 
   [[nodiscard]] constexpr EventCategoryBitmask GetCategoryFlags() const override
   {
@@ -43,10 +43,7 @@ public:
 
   [[nodiscard]] constexpr EventType GetEventType() const override { return KeyPressedEvent::type; }
 
-  [[nodiscard]] int GetRepeatCount()
-  {
-    return repeat_count_;
-  };
+  [[nodiscard]] int GetRepeatCount() { return repeat_count_; };
 
   [[nodiscard]] std::string ToString() const override
   {

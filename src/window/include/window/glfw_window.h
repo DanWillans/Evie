@@ -4,7 +4,7 @@
 #include "evie/error.h"
 #include "evie/events.h"
 #include "window/event_manager.h"
-#include "window/window.h"
+#include "evie/window.h"
 
 #include "glad/glad.h"
 
@@ -28,8 +28,8 @@ public:
   void* GetNativeWindow() override;
   EventManager* GetEventManager();
   void SetVSync(bool enabled);
-  void DisableCursor();
-  void EnableCursor();
+  void DisableCursor() override;
+  void EnableCursor() override;
 
 private:
   [[nodiscard]] Error DispatchEvent(std::unique_ptr<Event> event);

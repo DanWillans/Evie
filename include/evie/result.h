@@ -125,7 +125,7 @@ public:
 
   // ----------------------------------------
   // Destructor
-  ~Result()
+  constexpr ~Result()
   {
     if (error_state_) {
       // cppcheck-suppress ignoredReturnValue

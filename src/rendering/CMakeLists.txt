@@ -7,6 +7,10 @@ Evie_add_library(
   shader_program.cpp
   texture.cpp
   camera.cpp
+  indices_array.cpp
+  vertex_array.cpp
+  vertex_buffer.cpp
+  debug.cpp
 )
 
 target_link_libraries(

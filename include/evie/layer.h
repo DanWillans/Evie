@@ -11,6 +11,7 @@ public:
   virtual ~Layer() = default;
   virtual void OnUpdate() = 0;
   virtual void OnEvent(Event& event) = 0;
+  virtual void OnRender() = 0;
   virtual void Shutdown() {}
 };
 }// namespace evie
