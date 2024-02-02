@@ -305,6 +305,10 @@ public:
     shader_program_.Destroy();
     container_texture_.Destroy();
     face_texture_.Destroy();
+    // Destroy entities
+    for(auto& entity : cube_entities_){
+      entity.Destroy();
+    }
   }
 
 
