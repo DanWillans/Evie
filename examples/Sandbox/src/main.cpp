@@ -1,3 +1,6 @@
+
+#include <evie/ecs/components/Transform.hpp>
+#include <evie/ecs/system_manager.hpp>
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <memory>
@@ -5,6 +8,8 @@
 #include "evie/application.h"
 #include "evie/camera.h"
 #include "evie/default_models.h"
+#include "evie/ecs/components/transform.hpp"
+#include "evie/ecs/ecs_controller.h"
 #include "evie/error.h"
 #include "evie/events.h"
 #include "evie/evie.h"
@@ -35,14 +40,46 @@ glm::vec3 cubePositions[] = { glm::vec3(0.0f, 0.0f, 0.0f),
   glm::vec3(1.5f, 2.0f, -2.5f),
   glm::vec3(1.5f, 0.2f, -1.5f),
   glm::vec3(-1.3f, 1.0f, -1.5f) };
-}
+
+class RenderCubeSystem : public evie::System
+{
+  void Update()
+  {
+    int i = 0;
+    for (const auto& entity : entities) {
+      evie::mat4 model(1.0f);
+      auto& translate = component_manager->GetComponent(entity, transform_component_id);
+      glm::translate(model, translate.position);
+      // This rotates the object to where we want it in the world space.
+      float angle = 20.0f * static_cast<float>(0);
+      i++;
+      model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+      // if (i % 3 == 0) {
+      //   model =
+      //     glm::rotate(model, static_cast<float>(glfwGetTime()) * glm::radians(50.0f), evie::vec3(1.0f, 0.3f, 0.5f));
+      // } else {
+      //   model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+      // }
+      // shader_program_.SetMat4("model", glm::value_ptr(model));
+      // evie::mat4 view = camera_.GetViewMatrix();
+      // shader_program_.SetMat4("view", glm::value_ptr(view));
+      // This sets up the projection. What's our FoV? What's our aspect ratio?
+      // evie::mat4 projection = glm::perspective(glm::radians(camera_.field_of_view), 800.0f / 600.0f, 0.1f, 100.0f);
+      // shader_program_.SetMat4("projection", glm::value_ptr(projection));
+      // glDrawArrays(GL_TRIANGLES, 0, 36);
+    }
+  }
+
+  evie::ComponentID<evie::TransformRotationComponent> transform_component_id{ 0 };
+};
+}// namespace
 
 class GameLayer : public evie::Layer
 {
 public:
   GameLayer() = default;
-  explicit GameLayer(const evie::IInputManager* input_manager, evie::IWindow* window)
-    : input_manager_(input_manager), window_(window)
+  explicit GameLayer(const evie::IInputManager* input_manager, evie::IWindow* window, evie::ECSController* ecs)
+    : input_manager_(input_manager), window_(window), ecs_(ecs)
   {}
 
   evie::Error Initialise()
@@ -91,14 +128,38 @@ public:
     // Disable cursor initially
     window_->DisableCursor();
 
+    // Register components with ECS
+    transform_component_id_ = ecs_->RegisterComponent<evie::TransformRotationComponent>();
+
+    // Register system with ECS
+    evie::SystemSignature signature;
+    signature.SetComponent(transform_component_id_);
+    render_cube_system_id_ = ecs_->RegisterSystem<RenderCubeSystem>(signature);
+
+    // Create 10 cube entities
+    for (int i = 0; i < 10; ++i) {
+      auto entity = ecs_->CreateEntity();
+      if (entity.Good()) {
+        cube_entities_.push_back(*entity);
+        float angle = 20.0f * static_cast<float>(i);
+        evie::TransformRotationComponent transform;
+        transform.rotation = evie::vec3(1.0f, 0.3f, 0.5f) * glm::radians(angle);
+        transform.position = cubePositions[i];
+        transform.scale = 1;
+        err = entity->AddComponent(transform_component_id_, transform);
+        if (err.Bad()) {
+          break;
+        }
+      }
+    }
     return err;
   }
 
   void OnRender() override
   {
     // Set texture slots
-    face_texture_.SetSlot(0);
-    container_texture_.SetSlot(1);
+    face_texture_.SetSlot(1);
+    container_texture_.SetSlot(0);
     // Update mixer for shader
     shader_program_.SetFloat("mixer", mixer_);
     // Bind the Vertex Array that associates our cube models
@@ -108,8 +169,8 @@ public:
       evie::mat4 model = evie::mat4(1.0f);
       // This translates the object to the position in the world that we want it.
       model = glm::translate(model, cubePositions[i]);
-      float angle = 20.0f * static_cast<float>(i);
       // This rotates the object to where we want it in the world space.
+      float angle = 20.0f * static_cast<float>(i);
       if (i % 3 == 0) {
         model =
           glm::rotate(model, static_cast<float>(glfwGetTime()) * glm::radians(50.0f), evie::vec3(1.0f, 0.3f, 0.5f));
@@ -196,11 +257,11 @@ public:
           window_->EnableCursor();
           cursor_enabled_ = true;
         }
-      } else if (key_event->IsKeyCode(evie::KeyCode::Up)){
+      } else if (key_event->IsKeyCode(evie::KeyCode::Up)) {
         camera_.camera_speed += 0.05f;
-      } else if (key_event->IsKeyCode(evie::KeyCode::Down)){
+      } else if (key_event->IsKeyCode(evie::KeyCode::Down)) {
         camera_.camera_speed -= 0.05f;
-      } else if (key_event->IsKeyCode(evie::KeyCode::R)){
+      } else if (key_event->IsKeyCode(evie::KeyCode::R)) {
         camera_.ResetCameraPosition();
       }
     }
@@ -232,6 +293,10 @@ private:
   bool cursor_enabled_{ false };
   const evie::IInputManager* input_manager_{ nullptr };
   evie::IWindow* window_{ nullptr };
+  evie::ECSController* ecs_{ nullptr };
+  std::vector<evie::Entity> cube_entities_;
+  evie::ComponentID<evie::TransformRotationComponent> transform_component_id_{ 0 };
+  evie::SystemID<RenderCubeSystem> render_cube_system_id_{ 0 };
 };
 
 
@@ -249,7 +314,7 @@ public:
     evie::Error err = Initialise(props);
     if (err.Good()) {
       APP_INFO("Creating GameLayer");
-      t_layer_ = GameLayer(GetInputManager(), GetWindow());
+      t_layer_ = GameLayer(GetInputManager(), GetWindow(), GetECSController());
       APP_INFO("Initialising layer");
       err = t_layer_.Initialise();
       if (err.Good()) {

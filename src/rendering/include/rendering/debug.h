@@ -15,17 +15,19 @@ Error EVIE_API glCheckError();
 
 template<typename func, typename... Ts> struct EVIE_API CallOpenGL
 {
-  CallOpenGL(func&& f, Ts&&... ts, const std::source_location& loc = std::source_location::current())
+  // CallOpenGL(func&& f, Ts&&... ts, const std::source_location& loc = std::source_location::current())
+  CallOpenGL(func&& f, Ts&&... ts)
   {
     f(ts...);
     Error error = glCheckError();
     if (error.Bad()) {
-      EV_ERROR("OPENGL ERROR - File: {}({}:{}) `{}`: {}",
-        loc.file_name(),
-        loc.line(),
-        loc.column(),
-        loc.function_name(),
-        error.Message());
+      EV_ERROR("OPENGL ERROR - {}", error.Message());
+      // EV_ERROR("OPENGL ERROR - File: {}({}:{}) `{}`: {}",
+      //   loc.file_name(),
+      //   loc.line(),
+      //   loc.column(),
+      //   loc.function_name(),
+      //   error.Message());
         //assert(false);
     }
   }

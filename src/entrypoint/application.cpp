@@ -3,24 +3,12 @@
 
 #include "evie/application.h"
 #include "evie/camera.h"
-#include "evie/default_models.h"
 #include "evie/error.h"
 #include "evie/events.h"
-#include "evie/ids.h"
-#include "evie/indices_array.h"
 #include "evie/input_manager.h"
-#include "evie/key_events.h"
 #include "evie/logging.h"
-#include "evie/mouse_events.h"
-#include "evie/shader.h"
-#include "evie/shader_program.h"
-#include "evie/texture.h"
-#include "evie/vertex_array.h"
-#include "evie/vertex_buffer.h"
 #include "evie/window.h"
-#include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
+#include "evie/ecs/ecs_controller.h"
 #include "rendering/debug.h"
 #include "window/debug_layer.h"
 #include "window/event_manager.h"
@@ -28,8 +16,6 @@
 #include "window/layer_queue.h"
 
 #include "glad/glad.h"
-
-#include "GLFW/glfw3.h"
 
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
@@ -55,6 +41,7 @@ private:
   std::unique_ptr<EventManager> event_manager_;
   std::unique_ptr<Layer> debug_layer_;
   std::unique_ptr<IInputManager> input_manager_;
+  std::unique_ptr<ECSController> ecs_controller_;
   LayerQueue layer_queue_;
   Camera camera_;
 };
@@ -69,6 +56,8 @@ Application::~Application() { delete impl_; }
 const IInputManager* Application::GetInputManager() const { return impl_->input_manager_.get(); }
 
 IWindow* Application::GetWindow() const { return impl_->window_.get(); }
+
+ECSController* Application::GetECSController() const { return impl_->ecs_controller_.get(); }
 
 Error Application::Initialise(const WindowProperties& props)
 {
@@ -105,6 +94,10 @@ Error Application::Initialise(const WindowProperties& props)
   }
 
   if (err.Good()) {
+    impl_->ecs_controller_ = std::make_unique<ECSController>();
+  }
+
+  if (err.Good()) {
     initialised_ = true;
   }
 
@@ -123,12 +116,16 @@ void Application::Run()
   glEnable(GL_DEPTH_TEST);
   while (running_ && err.Good()) {
     impl_->window_->PollEvents();
+    // Move this to the renderer in the future
+    //
     glClearColor(0.2F, 0.3F, 0.3F, 1.0F);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // Generally this involves updating physics etc based on events.
     for (const auto& layer_wrapper : impl_->layer_queue_) {
       layer_wrapper.layer->OnUpdate();
     }
-    for (const auto& layer_wrapper : impl_->layer_queue_){
+    // Let all layers render what they want to render based on the previous on update.
+    for (const auto& layer_wrapper : impl_->layer_queue_) {
       layer_wrapper.layer->OnRender();
     }
     impl_->window_->SwapBuffers();

@@ -14,6 +14,8 @@ endif()
 # when compiling with PCH enabled
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+set(BUILD_SHARED_LIBS ON)
+
 # Set the project name and language
 project(
   Evie
@@ -107,11 +109,14 @@ Evie_package_project(
   Application
   Window
   Rendering
+  EntityComponentSystem
   Evie_options
   Evie_warnings
   ImGui
   glfw
   Glad
+  spdlog
+  fmt
 
   # Package up examples
   sandbox

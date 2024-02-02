@@ -11,7 +11,7 @@ function(Evie_setup_dependencies)
       NAME
       fmt
       GIT_TAG
-      9.1.0
+      "13156e54bf91e44641ce3aac041d31f9a15a8042" # This has a fix for installing FMT.
       GITHUB_REPOSITORY
       "fmtlib/fmt"
       OPTIONS
@@ -24,7 +24,7 @@ function(Evie_setup_dependencies)
       NAME
       spdlog
       VERSION
-      1.11.0
+      1.12.0
       GITHUB_REPOSITORY
       "gabime/spdlog"
       OPTIONS
@@ -49,7 +49,9 @@ function(Evie_setup_dependencies)
       GITHUB_REPOSITORY
       "glfw/glfw"
       OPTIONS
-      "BUILD_SHARED_LIBS ON"
+      "GLFW_BUILD_TESTS OFF"
+      "GLFW_BUILD_DOCS OFF"
+      "GLFW_BUILD_EXAMPLES OFF"
       SYSTEM)
   endif()
 
@@ -62,7 +64,7 @@ function(Evie_setup_dependencies)
       GITHUB_REPOSITORY
       "g-truc/glm"
       SYSTEM)
-  # This include is needed for global logging access
+  # This include is needed for global glm access
   include_directories(SYSTEM ${glm_SOURCE_DIR})
   endif()
 

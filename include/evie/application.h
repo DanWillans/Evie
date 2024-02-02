@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "evie/core.h"
+#include "evie/ecs/ecs_controller.h"
 #include "evie/error.h"
 #include "evie/input_manager.h"
 #include "evie/layer.h"
@@ -24,6 +25,7 @@ public:
   void Run();
   [[nodiscard]] Error Initialise(const WindowProperties& props);
   [[nodiscard]] const IInputManager* GetInputManager() const;
+  [[nodiscard]] ECSController* GetECSController() const;
   [[nodiscard]] IWindow* GetWindow() const;
   void PushLayerFront(Layer& layer);
   void PushLayerBack(Layer& layer);

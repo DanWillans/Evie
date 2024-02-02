@@ -38,21 +38,21 @@ function(Evie_add_library)
 
   Evie_target_export_definitions(${PARSED_ARG_TARGET} PUBLIC)
 
-  if(WIN32)
-    set(OUTPUT_NAME libevie_${TARGET_LOWER})
-    if(NOT PARSED_ARG_STATIC)
-      set(SUFFIX ".dll")
-    else()
-      set(SUFFIX ".lib")
-    endif()
-  else()
-    set(OUTPUT_NAME evie_${TARGET_LOWER})
-    if(NOT PARSED_ARG_STATIC)
-      set(SUFFIX ".so")
-    else()
-      set(SUFFIX ".a")
-    endif()
-  endif()
+  set(OUTPUT_NAME libevie_${TARGET_LOWER})
+  # if(WIN32)
+  #   if(NOT PARSED_ARG_STATIC)
+  #     set(SUFFIX ".dll")
+  #   else()
+  #     set(SUFFIX ".lib")
+  #   endif()
+  # else()
+  #   set(OUTPUT_NAME evie_${TARGET_LOWER})
+  #   if(NOT PARSED_ARG_STATIC)
+  #     set(SUFFIX ".so")
+  #   else()
+  #     set(SUFFIX ".a")
+  #   endif()
+  # endif()
 
   set_target_properties(
     ${PARSED_ARG_TARGET}
@@ -61,7 +61,8 @@ function(Evie_add_library)
     CXX_VISIBILITY_PRESET hidden
     VISIBILITY_INLINES_HIDDEN YES
     OUTPUT_NAME ${OUTPUT_NAME}
-    SUFFIX ${SUFFIX})
+    # SUFFIX ${SUFFIX}
+  )
 endfunction()
 
 function(Evie_target_export_definitions target)
