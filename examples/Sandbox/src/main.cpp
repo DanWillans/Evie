@@ -212,10 +212,7 @@ public:
     shader_program_.SetFloat("mixer", mixer_);
     // Bind the Vertex Array that associates our cube models
     vertex_array_.Bind();
-    // Iterate over our cube positions and draw them
-    for (unsigned int i = 0; i < 10; ++i) {
-      cube_render_->Update();
-    }
+    cube_render_->Update();
   }
 
   void OnUpdate() override
