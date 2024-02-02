@@ -2,13 +2,16 @@
 #include <evie/ecs/components/Transform.hpp>
 #include <evie/ecs/system_manager.hpp>
 #include <glm/ext/matrix_transform.hpp>
+#include <glm/gtc/quaternion.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/euler_angles.hpp>
 #include <memory>
 
 #include "evie/application.h"
 #include "evie/camera.h"
 #include "evie/default_models.h"
 #include "evie/ecs/components/transform.hpp"
+#include "evie/ecs/components/velocity.hpp"
 #include "evie/ecs/ecs_controller.h"
 #include "evie/error.h"
 #include "evie/events.h"
@@ -41,36 +44,61 @@ glm::vec3 cubePositions[] = { glm::vec3(0.0f, 0.0f, 0.0f),
   glm::vec3(1.5f, 0.2f, -1.5f),
   glm::vec3(-1.3f, 1.0f, -1.5f) };
 
+class PhysicsSystem : public evie::System
+{
+public:
+  void Update(float delta_time) const
+  {
+    for (const auto& entity : entities) {
+      auto& translate = component_manager->GetComponent(entity, transform_component_id_);
+      const auto& velocity = component_manager->GetComponent(entity, velocity_component_id_);
+      translate.position.x += delta_time * velocity.velocity.x;
+      translate.position.y += delta_time * velocity.velocity.y;
+      translate.position.z += delta_time * velocity.velocity.z;
+    }
+  }
+
+private:
+  evie::ComponentID<evie::TransformRotationComponent> transform_component_id_{ 0 };
+  evie::ComponentID<evie::VelocityComponent> velocity_component_id_{ 1 };
+};
+
 class RenderCubeSystem : public evie::System
 {
-  void Update()
+public:
+  RenderCubeSystem(evie::Camera* camera, evie::ShaderProgram* shader_program)
+    : camera_(camera), shader_program_(shader_program)
+  {}
+  void Update() const
   {
     int i = 0;
     for (const auto& entity : entities) {
       evie::mat4 model(1.0f);
-      auto& translate = component_manager->GetComponent(entity, transform_component_id);
-      glm::translate(model, translate.position);
+      const auto& translate = component_manager->GetComponent(entity, transform_component_id);
+      // This moves the object to where we want it in world space.
+      model = glm::translate(model, translate.position);
       // This rotates the object to where we want it in the world space.
-      float angle = 20.0f * static_cast<float>(0);
+      auto rot_mat4 = glm::eulerAngleXYZ(translate.rotation.x, translate.rotation.y, translate.rotation.z);
+      model = model * rot_mat4;
+      if (i % 3 == 0) {
+        model =
+          glm::rotate(model, static_cast<float>(glfwGetTime()) * glm::radians(50.0f), evie::vec3(1.0f, 0.3f, 0.5f));
+      }
       i++;
-      model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-      // if (i % 3 == 0) {
-      //   model =
-      //     glm::rotate(model, static_cast<float>(glfwGetTime()) * glm::radians(50.0f), evie::vec3(1.0f, 0.3f, 0.5f));
-      // } else {
-      //   model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-      // }
-      // shader_program_.SetMat4("model", glm::value_ptr(model));
-      // evie::mat4 view = camera_.GetViewMatrix();
-      // shader_program_.SetMat4("view", glm::value_ptr(view));
+      shader_program_->SetMat4("model", glm::value_ptr(model));
+      evie::mat4 view = camera_->GetViewMatrix();
+      shader_program_->SetMat4("view", glm::value_ptr(view));
       // This sets up the projection. What's our FoV? What's our aspect ratio?
-      // evie::mat4 projection = glm::perspective(glm::radians(camera_.field_of_view), 800.0f / 600.0f, 0.1f, 100.0f);
-      // shader_program_.SetMat4("projection", glm::value_ptr(projection));
-      // glDrawArrays(GL_TRIANGLES, 0, 36);
+      evie::mat4 projection = glm::perspective(glm::radians(camera_->field_of_view), 800.0f / 600.0f, 0.1f, 100.0f);
+      shader_program_->SetMat4("projection", glm::value_ptr(projection));
+      glDrawArrays(GL_TRIANGLES, 0, 36);
     }
   }
 
+private:
   evie::ComponentID<evie::TransformRotationComponent> transform_component_id{ 0 };
+  evie::Camera* camera_;
+  evie::ShaderProgram* shader_program_;
 };
 }// namespace
 
@@ -130,11 +158,20 @@ public:
 
     // Register components with ECS
     transform_component_id_ = ecs_->RegisterComponent<evie::TransformRotationComponent>();
+    velocity_component_id_ = ecs_->RegisterComponent<evie::VelocityComponent>();
 
     // Register system with ECS
-    evie::SystemSignature signature;
-    signature.SetComponent(transform_component_id_);
-    render_cube_system_id_ = ecs_->RegisterSystem<RenderCubeSystem>(signature);
+    evie::SystemSignature render_signature;
+    render_signature.SetComponent(transform_component_id_);
+    render_cube_system_id_ = ecs_->RegisterSystem<RenderCubeSystem>(render_signature, &camera_, &shader_program_);
+    cube_render_ = ecs_->GetSystem(render_cube_system_id_);
+
+    evie::SystemSignature physics_signature;
+    physics_signature.SetComponent(transform_component_id_);
+    physics_signature.SetComponent(velocity_component_id_);
+    physics_system_id_ = ecs_->RegisterSystem<PhysicsSystem>(physics_signature);
+    physics_system_ = ecs_->GetSystem(physics_system_id_);
+
 
     // Create 10 cube entities
     for (int i = 0; i < 10; ++i) {
@@ -150,8 +187,19 @@ public:
         if (err.Bad()) {
           break;
         }
+        evie::VelocityComponent velocity;
+        velocity.velocity.x = 0;
+        velocity.velocity.y = -1;
+        velocity.velocity.z = 0;
+        err = entity->AddComponent(velocity_component_id_, velocity);
+        if (err.Bad()) {
+          break;
+        }
       }
     }
+
+    // Initialise camera speed
+    camera_.camera_speed = 10;
     return err;
   }
 
@@ -166,24 +214,7 @@ public:
     vertex_array_.Bind();
     // Iterate over our cube positions and draw them
     for (unsigned int i = 0; i < 10; ++i) {
-      evie::mat4 model = evie::mat4(1.0f);
-      // This translates the object to the position in the world that we want it.
-      model = glm::translate(model, cubePositions[i]);
-      // This rotates the object to where we want it in the world space.
-      float angle = 20.0f * static_cast<float>(i);
-      if (i % 3 == 0) {
-        model =
-          glm::rotate(model, static_cast<float>(glfwGetTime()) * glm::radians(50.0f), evie::vec3(1.0f, 0.3f, 0.5f));
-      } else {
-        model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-      }
-      shader_program_.SetMat4("model", glm::value_ptr(model));
-      evie::mat4 view = camera_.GetViewMatrix();
-      shader_program_.SetMat4("view", glm::value_ptr(view));
-      // This sets up the projection. What's our FoV? What's our aspect ratio?
-      evie::mat4 projection = glm::perspective(glm::radians(camera_.field_of_view), 800.0f / 600.0f, 0.1f, 100.0f);
-      shader_program_.SetMat4("projection", glm::value_ptr(projection));
-      glDrawArrays(GL_TRIANGLES, 0, 36);
+      cube_render_->Update();
     }
   }
 
@@ -193,6 +224,8 @@ public:
     float current_frame = static_cast<float>(glfwGetTime());
     float delta_time = current_frame - last_frame_;
     last_frame_ = current_frame;
+
+    physics_system_->Update(delta_time);
 
     // Handle camera translation
     if (input_manager_->IsKeyPressed(evie::KeyCode::W)) {
@@ -296,7 +329,11 @@ private:
   evie::ECSController* ecs_{ nullptr };
   std::vector<evie::Entity> cube_entities_;
   evie::ComponentID<evie::TransformRotationComponent> transform_component_id_{ 0 };
+  evie::ComponentID<evie::VelocityComponent> velocity_component_id_{ 0 };
   evie::SystemID<RenderCubeSystem> render_cube_system_id_{ 0 };
+  evie::SystemID<PhysicsSystem> physics_system_id_{ 0 };
+  const RenderCubeSystem* cube_render_{ nullptr };
+  const PhysicsSystem* physics_system_{ nullptr };
 };
 
 

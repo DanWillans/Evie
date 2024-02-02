@@ -92,14 +92,15 @@ public:
     return component_manager_->RegisterComponent<ComponentName>();
   }
 
-  template<typename SystemName> [[nodiscard]] SystemID<SystemName> RegisterSystem(const SystemSignature& signature)
+  template<typename SystemName, typename... Args>
+  [[nodiscard]] SystemID<SystemName> RegisterSystem(const SystemSignature& signature, Args... args)
   {
-    return system_manager_->RegisterSystem<SystemName>(signature);
+    return system_manager_->RegisterSystem<SystemName>(signature, args...);
   }
 
-  template<typename SystemName> const System& GetSystem(SystemID<SystemName> system_id)
+  template<typename SystemName> const SystemName* GetSystem(SystemID<SystemName> system_id)
   {
-    return system_manager_->GetSystem(system_id);
+    return static_cast<const SystemName*>(&system_manager_->GetSystem(system_id));
   }
 
   [[nodiscard]] uint64_t EntityCount() const { return entity_manager_->EntityCount(); }

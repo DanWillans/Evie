@@ -21,19 +21,19 @@ constexpr evie::Result<OpenGLTypeAndSize> ConvertVertexDataTypeToOpenGL(evie::Ve
 {
   switch (type) {
   case evie::VertexDataType::Byte:
-    return { GL_BYTE, (sizeof(std::byte)) };
+    return { static_cast<GLenum>(GL_BYTE), (sizeof(std::byte)) };
   case evie::VertexDataType::UnsignedByte:
-    return { GL_UNSIGNED_BYTE, sizeof(unsigned char) };
+    return { static_cast<GLenum>(GL_UNSIGNED_BYTE), sizeof(unsigned char) };
   case evie::VertexDataType::Short:
-    return { GL_SHORT, sizeof(short) };
+    return { static_cast<GLenum>(GL_SHORT), sizeof(short) };
   case evie::VertexDataType::UnsignedShort:
-    return { GL_UNSIGNED_SHORT, sizeof(unsigned short) };
+    return { static_cast<GLenum>(GL_UNSIGNED_SHORT), sizeof(unsigned short) };
   case evie::VertexDataType::Int:
-    return { GL_INT, sizeof(int) };
+    return { static_cast<GLenum>(GL_INT), sizeof(int) };
   case evie::VertexDataType::Float:
-    return { GL_FLOAT, sizeof(float) };
+    return { static_cast<GLenum>(GL_FLOAT), sizeof(float) };
   case evie::VertexDataType::Double:
-    return { GL_DOUBLE, sizeof(double) };
+    return { static_cast<GLenum>(GL_DOUBLE), sizeof(double) };
   default:
     return evie::Error{ "VertexDataType undefined" };
   }

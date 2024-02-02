@@ -53,7 +53,7 @@ public:
 class SystemManager
 {
 public:
-  SystemManager(ComponentManager* component_manager) : component_manager_(component_manager) {}
+  explicit SystemManager(ComponentManager* component_manager) : component_manager_(component_manager) {}
   SystemManager(const SystemManager&) = delete;
   SystemManager& operator=(const SystemManager&) = delete;
   // Register a new system with a required signature.
