@@ -4,6 +4,7 @@
 #include "evie/error.h"
 #include "evie/ids.h"
 #include "evie/shader.h"
+#include <evie/types.h>
 
 
 namespace evie {
@@ -16,6 +17,7 @@ public:
   void SetInt(const std::string& name, int value) const;
   void SetFloat(const std::string& name, float value) const;
   void SetMat4(const std::string& name, float* first_element) const;
+  void SetVec3(const std::string& name, evie::vec3 vec) const;
   void Destroy() const;
   Result<ShaderProgramID> GetID()
   {

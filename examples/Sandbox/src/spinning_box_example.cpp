@@ -147,9 +147,7 @@ public:
     }
 
     if (err.Good()) {
-      indices_array_.Initialise(evie::default_models::cube_indices);
       vertex_array_.Initialise();
-      vertex_array_.AssociateIndicesArray(indices_array_);
       err = vertex_array_.AssociateVertexBuffer(vertex_buffer_);
     }
 
@@ -182,7 +180,6 @@ public:
         evie::TransformRotationComponent transform;
         transform.rotation = evie::vec3(1.0f, 0.3f, 0.5f) * glm::radians(angle);
         transform.position = cubePositions[i];
-        transform.scale = 1;
         err = entity->AddComponent(transform_component_id_, transform);
         if (err.Bad()) {
           break;
@@ -197,6 +194,8 @@ public:
         }
       }
     }
+
+    // Create 
 
     // Initialise camera speed
     camera_.camera_speed = 10;
@@ -306,7 +305,7 @@ public:
     container_texture_.Destroy();
     face_texture_.Destroy();
     // Destroy entities
-    for(auto& entity : cube_entities_){
+    for (auto& entity : cube_entities_) {
       entity.Destroy();
     }
   }

@@ -12,10 +12,26 @@ project(Sandbox
   HOMEPAGE_URL "https://github.com/DanWillans/Evie"
   LANGUAGES CXX C)
 
-add_executable(sandbox src/main.cpp)
+add_executable(spinning_box_example src/spinning_box_example.cpp)
 
 target_link_libraries(
-  sandbox
+  spinning_box_example
+  PRIVATE
+  Evie::Evie_options
+  Evie::Evie_warnings
+  Evie::Application
+  Evie::Logging
+  Evie::Rendering
+  Evie::EntityComponentSystem
+  PUBLIC
+  # This is just for Time. Make Evie::Time.
+  glfw
+)
+
+add_executable(lighting_example src/lighting_example.cpp)
+
+target_link_libraries(
+  lighting_example
   PRIVATE
   Evie::Evie_options
   Evie::Evie_warnings

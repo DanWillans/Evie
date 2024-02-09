@@ -12,10 +12,10 @@ rem Iterate through each directory within "binaryPath"
 for /D %%D in ("%binaryPath%*") do (
     set "binaryDir=%%D\bin"
 
-    rem Check if the "sandbox.exe" file exists within the "bin" directory
-    if exist "!binaryDir!\sandbox.exe" (
-        echo Running "sandbox.exe" in !binaryDir!
-        start "" "!binaryDir!\sandbox.exe"
+    rem Check if the "spinning_box_example.exe" file exists within the "bin" directory
+    if exist "!binaryDir!\spinning_box_example.exe" (
+        echo Running "spinning_box_example.exe" in !binaryDir!
+        start "" "!binaryDir!\spinning_box_example.exe"
     )
 )
 

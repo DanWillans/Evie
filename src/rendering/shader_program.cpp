@@ -6,6 +6,7 @@
 #include "rendering/debug.h"
 
 #include <array>
+#include <evie/types.h>
 
 namespace evie {
 
@@ -71,6 +72,11 @@ void ShaderProgram::SetFloat(const std::string& name, float value) const
 void ShaderProgram::SetMat4(const std::string& name, float* first_element) const
 {
   CallOpenGL(glUniformMatrix4fv, glGetUniformLocation(id_, name.c_str()), 1, false, first_element);
+}
+
+void ShaderProgram::SetVec3(const std::string& name, evie::vec3 vector) const
+{
+  CallOpenGL(glUniform3f, glGetUniformLocation(id_, name.c_str()), vector.x, vector.y, vector.z);
 }
 
 void ShaderProgram::Destroy() const { CallOpenGL(glDeleteProgram, id_); }

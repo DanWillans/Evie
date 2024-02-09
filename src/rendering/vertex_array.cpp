@@ -54,11 +54,9 @@ Error VertexArray::AssociateVertexBuffer(VertexBuffer& vertex_buffer)
 {
   // Bind this vertex array object
   Bind();
-  // Get a pointer to the vertex buffer pointer
-  vertex_buffer_ = &vertex_buffer;
   // Bind the vertex buffer to associate it to the vertex array
-  vertex_buffer_->Bind();
-  const auto& buffer_layout = vertex_buffer_->GetBufferLayout();
+  vertex_buffer.Bind();
+  const auto& buffer_layout = vertex_buffer.GetBufferLayout();
   // Convert Evie layout type to OpenGL
   Result<OpenGLTypeAndSize> type_and_size;
   if (type_and_size = ConvertVertexDataTypeToOpenGL(buffer_layout.type); type_and_size.Bad()) {
@@ -66,7 +64,8 @@ Error VertexArray::AssociateVertexBuffer(VertexBuffer& vertex_buffer)
   }
   // Iterate over the layout sizes of the buffer_layout and set attribute pointers
   for (size_t i = 0; i < buffer_layout.layout_sizes.size(); ++i) {
-    CallOpenGL(glVertexAttribPointer, static_cast<GLuint>(i),
+    CallOpenGL(glVertexAttribPointer,
+      static_cast<GLuint>(i),
       buffer_layout.layout_sizes[i],
       type_and_size->type,
       false,
@@ -80,11 +79,10 @@ Error VertexArray::AssociateVertexBuffer(VertexBuffer& vertex_buffer)
 void VertexArray::AssociateIndicesArray(IndicesArray& indices_array)
 {
   Bind();
-  indices_array_ = &indices_array;
-  indices_array_->Bind();
+  indices_array.Bind();
 }
 
-void VertexArray::Bind() { CallOpenGL(glBindVertexArray, id_.Get()); }
+void VertexArray::Bind() const { CallOpenGL(glBindVertexArray, id_.Get()); }
 
 void VertexArray::Destroy() { CallOpenGL(glDeleteVertexArrays, 1, &id_.Get()); }
 

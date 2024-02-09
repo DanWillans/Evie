@@ -18,7 +18,7 @@ public:
   void Initialise();
   Error AssociateVertexBuffer(VertexBuffer& vertex_buffer);
   void AssociateIndicesArray(IndicesArray& indices_array);
-  void Bind();
+  void Bind() const;
   void Destroy();
 
 private:

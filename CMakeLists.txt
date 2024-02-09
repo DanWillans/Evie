@@ -119,7 +119,8 @@ Evie_package_project(
   fmt
 
   # Package up examples
-  sandbox
+  lighting_example
+  spinning_box_example
 
   # FIXME: this does not work! CK
   # PRIVATE_DEPENDENCIES_CONFIGURED project_options project_warnings

@@ -5,9 +5,9 @@
 namespace evie {
 struct TransformRotationComponent
 {
-  evie::vec3 position;
-  evie::vec3 rotation;
-  float scale;
+  evie::vec3 position{ 0.0 };
+  evie::vec3 rotation{ 0.0 };
+  evie::vec3 scale{ 1.0 };
 };
 }// namespace evie
 #endif// !EVIE_INCLUDE_EVIE_ECS_COMPONENTS_TRANSFORM_HPP_
