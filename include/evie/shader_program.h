@@ -18,6 +18,7 @@ public:
   void SetFloat(const std::string& name, float value) const;
   void SetMat4(const std::string& name, float* first_element) const;
   void SetVec3(const std::string& name, evie::vec3 vec) const;
+  bool HasVec3(const std::string& name) const;
   void Destroy() const;
   Result<ShaderProgramID> GetID()
   {

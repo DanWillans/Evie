@@ -72,11 +72,13 @@ public:
    */
   void Rotate(const float& yaw_offset, const float& pitch_offset);
 
-  void ResetCameraPosition(const vec3& position = {0.0f, 0.0f, 0.0f});
+  void ResetCameraPosition(const vec3& position = { 0.0f, 0.0f, 0.0f });
 
   float camera_speed = 1.0f;
   float field_of_view = 45.0f;
   float sensitivity = 0.05f;
+
+  const vec3& GetPosition() const { return position_; }
 
 private:
   // Fix this. This last mouse position should be the centre of the

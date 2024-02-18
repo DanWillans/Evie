@@ -45,11 +45,22 @@ public:
     return err;
   }
 
+  template<typename ComponentName> [[nodiscard]] ComponentName& GetComponent(ComponentID<ComponentName> component_id)
+  {
+    return component_manager_->GetComponent(id_, component_id);
+  }
+
   void Destroy()
   {
     component_manager_->EntityDestroyed(id_);
     system_manager_->EntityDestroyed(id_);
     entity_manager_->DestroyEntity(id_);
+  }
+
+  void MoveEntity(Entity*& other){
+    void* mem = malloc(sizeof(Entity));
+    memcpy(mem, this, sizeof(Entity));
+    other = static_cast<Entity*>(mem);
   }
 
   bool operator==(const Entity& rhs) const { return rhs.id_ == this->id_; }

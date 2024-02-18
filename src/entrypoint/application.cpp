@@ -78,8 +78,8 @@ Error Application::Initialise(const WindowProperties& props)
 #if defined EVIE_PLATFORM_WINDOWS || defined EVIE_PLATFORM_APPLE || defined EVIE_PLATFORM_UNIX
   impl_->window_ = std::make_unique<GLFWWindow>();
   evie::Error err = impl_->window_->Initialise(props);
-  impl_->debug_layer_ = std::make_unique<DebugLayer>(impl_->window_->GetNativeWindow());
-  impl_->PushLayerBack(*impl_->debug_layer_);
+  // impl_->debug_layer_ = std::make_unique<DebugLayer>(impl_->window_->GetNativeWindow());
+  // impl_->PushLayerBack(*impl_->debug_layer_);
 #endif
 
   // Event System

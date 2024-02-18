@@ -89,11 +89,14 @@ public:
       // This rotates the object to where we want it in the world space.
       auto rot_mat4 = glm::eulerAngleXYZ(translate.rotation.x, translate.rotation.y, translate.rotation.z);
       model = model * rot_mat4;
-      model = glm::scale(model, translate.scale);// Make this 3D scaling not just a fixed scale.
+      model = glm::scale(model, translate.scale);
 
       // Bind VAO and Shader Program
       auto& shader_program = mesh.shader_program;
       shader_program.Use();
+      if (shader_program.HasVec3("viewPos")) {
+        shader_program.SetVec3("viewPos", camera_->GetPosition());
+      }
       mesh.vertex_array.Bind();
 
       // Update uniforms in the shader program
@@ -203,14 +206,14 @@ public:
     physics_system_ = ecs_->GetSystem(physics_system_id_);
 
 
-    evie::vec3 light_pos{ 1.2f, 1.0f, 2.0f };
+    evie::vec3 light_pos{ 2.0f, 1.5f, 0.0f };
     // Create cube
     auto entity = ecs_->CreateEntity();
     if (entity.Good()) {
       evie::TransformRotationComponent transform;
       transform.rotation = { 0.0, 0.0, 0.0 };
       transform.position = { 0.0, 0.0, 0.0 };
-      transform.scale = {1.0, 2.0, 3.0};
+      transform.scale = { 1.0, 2.0, 3.0 };
       err = entity->AddComponent(transform_component_id_, transform);
     }
     if (err.Good()) {
@@ -221,6 +224,7 @@ public:
       mesh_component.shader_program.SetVec3("lightColor", { 1.0f, 1.0f, 1.0f });
       err = entity->AddComponent(mesh_component_id_, mesh_component);
     }
+    entity->MoveEntity(cube_entity_);
 
     // Create light source
     auto light_entity = ecs_->CreateEntity();
@@ -234,6 +238,7 @@ public:
     if (err.Good()) {
       err = light_entity->AddComponent(mesh_component_id_, light_source_mesh_component);
     }
+    light_entity->MoveEntity(light_entity_);
     // Initialise camera speed
     camera_.camera_speed = 10;
     return err;
@@ -249,6 +254,17 @@ public:
     last_frame_ = current_frame;
 
     physics_system_->Update(delta_time);
+
+    // Move light entity
+    auto& light_transform = light_entity_->GetComponent(transform_component_id_);
+    light_transform.position.x = 2 * cos(glfwGetTime());
+    light_transform.position.z = 2 * sin(glfwGetTime());
+
+    // Update cube entity with new light position
+    auto& mesh = cube_entity_->GetComponent(mesh_component_id_);
+    mesh.shader_program.Use();
+    mesh.shader_program.SetVec3("lightPos", light_transform.position);
+
 
     // Handle camera translation
     if (input_manager_->IsKeyPressed(evie::KeyCode::W)) {
@@ -340,6 +356,8 @@ private:
   evie::SystemID<PhysicsSystem> physics_system_id_{ 0 };
   const RenderCubeSystem* cube_render_{ nullptr };
   const PhysicsSystem* physics_system_{ nullptr };
+  evie::Entity* light_entity_;
+  evie::Entity* cube_entity_;
 };
 
 

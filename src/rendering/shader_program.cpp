@@ -79,6 +79,11 @@ void ShaderProgram::SetVec3(const std::string& name, evie::vec3 vector) const
   CallOpenGL(glUniform3f, glGetUniformLocation(id_, name.c_str()), vector.x, vector.y, vector.z);
 }
 
+bool ShaderProgram::HasVec3(const std::string& name) const
+{
+  return glad_glGetUniformLocation(id_, name.c_str()) != -1;
+}
+
 void ShaderProgram::Destroy() const { CallOpenGL(glDeleteProgram, id_); }
 
 }// namespace evie
