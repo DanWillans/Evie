@@ -6,10 +6,10 @@ out vec3 Normal;
 out vec3 FragPos;
 out vec3 LightPos;
 
-uniform vec3 lightPos;
 uniform mat4 projection;
 uniform mat4 model;
 uniform mat4 view;
+uniform vec3 lightPos;
 
 void main()
 {

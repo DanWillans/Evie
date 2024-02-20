@@ -1,6 +1,7 @@
 #ifndef EVIE_APPLICATION_H_
 #define EVIE_APPLICATION_H_
 
+#include <imgui_internal.h>
 #include <memory>
 
 #include "evie/core.h"
@@ -27,6 +28,7 @@ public:
   [[nodiscard]] const IInputManager* GetInputManager() const;
   [[nodiscard]] ECSController* GetECSController() const;
   [[nodiscard]] IWindow* GetWindow() const;
+  [[nodiscard]] ImGuiContext* GetImGuiContext() const;
   void PushLayerFront(Layer& layer);
   void PushLayerBack(Layer& layer);
   void Shutdown();

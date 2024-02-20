@@ -1,14 +1,15 @@
+#include <imgui_internal.h>
 #include <memory>
 #include <thread>
 
 #include "evie/application.h"
 #include "evie/camera.h"
+#include "evie/ecs/ecs_controller.h"
 #include "evie/error.h"
 #include "evie/events.h"
 #include "evie/input_manager.h"
 #include "evie/logging.h"
 #include "evie/window.h"
-#include "evie/ecs/ecs_controller.h"
 #include "rendering/debug.h"
 #include "window/debug_layer.h"
 #include "window/event_manager.h"
@@ -20,6 +21,10 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
+
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
 
 #if defined EVIE_PLATFORM_WINDOWS || defined EVIE_PLATFORM_APPLE || defined EVIE_PLATFORM_UNIX
 #include "window/glfw_window.h"
@@ -59,6 +64,8 @@ IWindow* Application::GetWindow() const { return impl_->window_.get(); }
 
 ECSController* Application::GetECSController() const { return impl_->ecs_controller_.get(); }
 
+ImGuiContext* Application::GetImGuiContext() const { return ImGui::GetCurrentContext(); }
+
 Error Application::Initialise(const WindowProperties& props)
 {
   // Logging
@@ -97,6 +104,20 @@ Error Application::Initialise(const WindowProperties& props)
     impl_->ecs_controller_ = std::make_unique<ECSController>();
   }
 
+  // Evie supports ImGui natively so set up the context here for other layers to use.
+  if (err.Good()) {
+    ImGui::CreateContext();
+    ImGui::GetCurrentContext();
+    ImGuiIO& imgui_io = ImGui::GetIO();
+    imgui_io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;// Enable Keyboard Controls
+    imgui_io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+    imgui_io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+    // Setup Platform/Renderer backends
+    ImGui_ImplGlfw_InitForOpenGL(static_cast<GLFWwindow*>(impl_->window_->GetNativeWindow()),
+      true);// Second param install_callback=true will install GLFW callbacks and chain to existing ones.
+    ImGui_ImplOpenGL3_Init();
+  }
+
   if (err.Good()) {
     initialised_ = true;
   }
@@ -118,14 +139,27 @@ void Application::Run()
     impl_->window_->PollEvents();
     // Move this to the renderer in the future
     glClearColor(0.2F, 0.3F, 0.3F, 1.0F);
+    // glClearColor(1.0F, 1.0F, 1.0F, 1.0F);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     // Generally this involves updating physics etc based on events.
     for (const auto& layer_wrapper : impl_->layer_queue_) {
       layer_wrapper.layer->OnUpdate();
     }
     // Let all layers render what they want to render based on the previous on update.
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
     for (const auto& layer_wrapper : impl_->layer_queue_) {
       layer_wrapper.layer->OnRender();
+    }
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    const ImGuiIO& imgui_io = ImGui::GetIO();
+    if (imgui_io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+      GLFWwindow* backup_current_context = glfwGetCurrentContext();
+      ImGui::UpdatePlatformWindows();
+      ImGui::RenderPlatformWindowsDefault();
+      glfwMakeContextCurrent(backup_current_context);
     }
     impl_->window_->SwapBuffers();
   }

@@ -32,6 +32,8 @@
 #include "evie/vertex_array.h"
 #include "evie/vertex_buffer.h"
 
+#include "imgui.h"
+
 #include "GLFW/glfw3.h"
 namespace {
 glm::vec3 cubePositions[] = { glm::vec3(0.0f, 0.0f, 0.0f),
@@ -219,9 +221,24 @@ public:
     if (err.Good()) {
       // Update the color here
       mesh_component.shader_program.Use();
+      // mesh_component.shader_program.SetVec3("material.ambient", { 1.0f, 0.5f, 0.31f });
+      // mesh_component.shader_program.SetVec3("material.diffuse", { 1.0f, 0.5f, 0.31f });
+      // mesh_component.shader_program.SetVec3("material.specular", { 0.5f, 0.5f, 0.5f });
+      // mesh_component.shader_program.SetVec3("material.ambient", { 0.19225f, 0.19225f, 0.19225f });
+      // mesh_component.shader_program.SetVec3("material.diffuse", { 0.50754f, 0.50754f, 0.5074f });
+      // mesh_component.shader_program.SetVec3("material.specular", { 0.508723f, 0.508723f, 0.508723f });
+      // mesh_component.shader_program.SetFloat("material.shininess", 51.2f);
+      // gold	0.24725	0.1995	0.0745	0.75164	0.60648	0.22648	0.628281	0.555802	0.366065	0.4
+      mesh_component.shader_program.SetVec3("material.ambient", { 0.24725f, 0.1995f, 0.0745f });
+      mesh_component.shader_program.SetVec3("material.diffuse", { 0.75164f, 0.60648f, 0.22648f });
+      mesh_component.shader_program.SetVec3("material.specular", { 0.628281f, 0.555802f, 0.366065f });
+      mesh_component.shader_program.SetFloat("material.shininess", 51.2f);
       mesh_component.shader_program.SetVec3("lightPos", light_pos);
-      mesh_component.shader_program.SetVec3("objectColor", { 1.0f, 0.5f, 0.31f });
-      mesh_component.shader_program.SetVec3("lightColor", { 1.0f, 1.0f, 1.0f });
+      mesh_component.shader_program.SetVec3("light.position", light_pos);
+      mesh_component.shader_program.SetVec3("light.ambient", { 0.5f, 0.5f, 0.5f });
+      mesh_component.shader_program.SetVec3("light.diffuse", { 0.5f, 0.5f, 0.5f });
+      mesh_component.shader_program.SetVec3("light.specular", { 1.0f, 1.0f, 1.0f });
+
       err = entity->AddComponent(mesh_component_id_, mesh_component);
     }
     entity->MoveEntity(cube_entity_);
@@ -244,7 +261,29 @@ public:
     return err;
   }
 
-  void OnRender() override { cube_render_->Update(); }
+  void OnRender() override
+  {
+    if (!ImGui::Begin("Lighting Example", nullptr, 0)) {
+      ImGui::End();
+    }
+    const char* items[] = { "Silver", "Gold", "Black Plastic", "Red Rubber" };
+    static int item_current_index = 0;
+    const char* combo_preview_value = items[item_current_index];
+    if (ImGui::BeginCombo("Cube Material", combo_preview_value, 0)) {
+      for (int n = 0; n < IM_ARRAYSIZE(items); n++) {
+        const bool is_selected = item_current_index == n;
+        if (ImGui::Selectable(items[n], is_selected)) {
+          item_current_index = n;
+        }
+        if (is_selected) {
+          ImGui::SetItemDefaultFocus();
+        }
+      }
+      ImGui::EndCombo();
+    }
+    ImGui::End();
+    cube_render_->Update();
+  }
 
   void OnUpdate() override
   {
@@ -264,7 +303,20 @@ public:
     auto& mesh = cube_entity_->GetComponent(mesh_component_id_);
     mesh.shader_program.Use();
     mesh.shader_program.SetVec3("lightPos", light_transform.position);
+    glm::vec3 lightColor{ 1.0 };
+    // lightColor.x = sin(glfwGetTime() * 2.0f);
+    // lightColor.y = sin(glfwGetTime() * 0.7f);
+    // lightColor.z = sin(glfwGetTime() * 1.3f);
 
+    glm::vec3 diffuseColor = lightColor * glm::vec3(1.0f);
+    glm::vec3 ambientColor = diffuseColor * glm::vec3(1.0f);
+
+    mesh.shader_program.SetVec3("light.ambient", ambientColor);
+    mesh.shader_program.SetVec3("light.diffuse", diffuseColor);
+
+    auto& light_mesh = light_entity_->GetComponent(mesh_component_id_);
+    light_mesh.shader_program.Use();
+    light_mesh.shader_program.SetVec3("lightColor", lightColor);
 
     // Handle camera translation
     if (input_manager_->IsKeyPressed(evie::KeyCode::W)) {
@@ -373,6 +425,8 @@ public:
     // Always Initialise the engine before doing anything with it.
     APP_INFO("Initialiasing engine");
     evie::Error err = Initialise(props);
+    // Set ImGui context from the engine.
+    ImGui::SetCurrentContext(GetImGuiContext());
     if (err.Good()) {
       APP_INFO("Creating GameLayer");
       t_layer_ = GameLayer(GetInputManager(), GetWindow(), GetECSController());

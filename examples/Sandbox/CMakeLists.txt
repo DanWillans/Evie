@@ -39,6 +39,7 @@ target_link_libraries(
   Evie::Logging
   Evie::Rendering
   Evie::EntityComponentSystem
+  Evie::ImGui
   PUBLIC
   # This is just for Time. Make Evie::Time.
   glfw
