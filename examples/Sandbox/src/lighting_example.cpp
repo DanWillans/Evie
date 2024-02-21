@@ -118,6 +118,185 @@ private:
   evie::ComponentID<evie::MeshComponent> mesh_component_id_{ 0 };
   evie::Camera* camera_;
 };
+struct Material
+{
+  evie::vec3 ambient;
+  evie::vec3 diffuse;
+  evie::vec3 specular;
+  float shininess;
+};
+// clang-format off
+std::unordered_map<const char*, Material> material_map{ 
+  { "Emerald",
+  { { 0.0215, 0.1745, 0.0215 },
+    { 0.07568, 0.612424, 0.07568 },
+    { 0.633, 0.727811, 0.633 },
+     76.8
+  }
+  },
+  { "Jade",
+  { { 0.135, 0.225, 0.1575 },
+    { 0.54, 0.89, 0.63 },
+    { 0.316228, 0.316228, 0.316228 },
+     12.8
+  }
+  },
+  { "Obsidian",
+  { { 0.05373, 0.05, 0.06625 },
+    { 0.18275, 0.17, 0.22525 },
+    { 0.332741, 0.328634, 0.346435 },
+     38.4
+  }
+  },
+  { "Pearl",
+  { { 0.25, 0.20725, 0.20725 },
+    { 1, 0.829, 0.829 },
+    { 0.296648, 0.296648, 0.296648 },
+     11.264
+  }
+  },
+  { "Ruby",
+  { { 0.1754, 0.01175, 0.01175 },
+    { 0.396, 0.74151, 0.69102 },
+    { 0.297254, 0.30829, 0.306678 },
+     76.8
+  }
+  },
+  { "Turquoise",
+  { { 0.1, 0.18725, 0.1745 },
+    { 0.396, 0.74151, 0.69102 },
+    { 0.297254, 0.30829, 0.306678 },
+     12.8
+  }
+  },
+  { "Brass",
+  { { 0.329412, 0.223529, 0.027451 },
+    { 0.780392, 0.568627, 0.113725 },
+    { 0.992157, 0.941176, 0.807843 },
+     27.897
+  }
+  },
+  { "Bronze",
+  { { 0.2125, 0.1275, 0.054 },
+    { 0.714, 0.4284, 0.18144 },
+    { 0.393548, 0.271906, 0.166721 },
+     25.6
+  }
+  },
+  { "Chrome",
+  { { 0.25, 0.25, 0.25 },
+    { 0.4, 0.4, 0.4 },
+    { 0.774597, 0.774597, 0.774597 },
+     76.8
+  }
+  },
+  { "Copper",
+  { { 0.19125, 0.0735, 0.0225 },
+    { 0.7038, 0.27048, 0.0828 },
+    { 0.25677, 0.137622, 0.086014 },
+    12.8 
+  }
+  },
+  { "Gold",
+  { { 0.24725, 0.1995, 0.0745 },
+    { 0.7516, 0.60648, 0.22648 },
+    { 0.628281, 0.555802, 0.366065 },
+    12.8 
+  }
+  },
+  { "Silver",
+  { { 0.19225, 0.19225, 0.19225 },
+    { 0.50754, 0.50754, 0.50754 },
+    { 0.508273, 0.508273, 0.508273 },
+    12.8 
+  }
+  },
+  { "Black Plastic",
+  { { 0.0, 0.0, 0.0 },
+    { 0.01, 0.01, 0.01 },
+    { 0.50, 0.50, 0.50 },
+    32
+  }
+  },
+  { "Cyan Plastic",
+  { { 0.0, 0.1, 0.06 },
+    { 0.0, 0.50980392, 0.50980392 },
+    { 0.50196078, 0.50196078, 0.50196078 },
+    32
+  }
+  },
+  { "Green Plastic",
+  { { 0.0, 0.0, 0.0 },
+    { 0.1, 0.35, 0.1 },
+    { 0.45, 0.55, 0.45 },
+    32
+  }
+  },
+  { "Red Plastic",
+  { { 0.0, 0.0, 0.0 },
+    { 0.5, 0.0, 0.0 },
+    { 0.7, 0.6, 0.6 },
+    32
+  }
+  },
+  { "White Plastic",
+  { { 0.0, 0.0, 0.0 },
+    { 0.55, 0.55, 0.55 },
+    { 0.7, 0.7, 0.7 },
+    32
+  }
+  },
+  { "Yellow Plastic",
+  { { 0.0, 0.0, 0.0 },
+    { 0.5, 0.5, 0.0 },
+    { 0.6, 0.6, 0.5 },
+    32
+  }
+  },
+  { "Black Rubber",
+  { { 0.02, 0.02, 0.02 },
+    { 0.01, 0.01, 0.01 },
+    { 0.4, 0.4, 0.4 },
+    10
+  }
+  },
+  { "Cyan Rubber",
+  { { 0.0, 0.05, 0.05 },
+    { 0.4, 0.5, 0.5 },
+    { 0.04, 0.7, 0.7 },
+    10
+  }
+  },
+  { "Green Rubber",
+  { { 0.0, 0.05, 0.0 },
+    { 0.4, 0.5, 0.4 },
+    { 0.04, 0.7, 0.04 },
+    10
+  }
+  },
+  { "Red Rubber",
+  { { 0.05, 0.0, 0.0 },
+    { 0.5, 0.4, 0.4 },
+    { 0.7, 0.04, 0.04 },
+    10
+  }
+  },
+  { "White Rubber",
+  { { 0.05, 0.05, 0.05 },
+    { 0.5, 0.5, 0.5 },
+    { 0.7, 0.7, 0.7 },
+    10
+  }
+  },
+  { "Yellow Rubber",
+  { { 0.05, 0.05, 0.0 },
+    { 0.5, 0.5, 0.4 },
+    { 0.7, 0.7, 0.04 },
+    10
+  }
+  },
+};
+// clang-format on
 }// namespace
 
 class GameLayer : public evie::Layer
@@ -229,10 +408,10 @@ public:
       // mesh_component.shader_program.SetVec3("material.specular", { 0.508723f, 0.508723f, 0.508723f });
       // mesh_component.shader_program.SetFloat("material.shininess", 51.2f);
       // gold	0.24725	0.1995	0.0745	0.75164	0.60648	0.22648	0.628281	0.555802	0.366065	0.4
-      mesh_component.shader_program.SetVec3("material.ambient", { 0.24725f, 0.1995f, 0.0745f });
-      mesh_component.shader_program.SetVec3("material.diffuse", { 0.75164f, 0.60648f, 0.22648f });
-      mesh_component.shader_program.SetVec3("material.specular", { 0.628281f, 0.555802f, 0.366065f });
-      mesh_component.shader_program.SetFloat("material.shininess", 51.2f);
+      mesh_component.shader_program.SetVec3("material.ambient", current_material_index_.second.ambient);
+      mesh_component.shader_program.SetVec3("material.diffuse", current_material_index_.second.diffuse);
+      mesh_component.shader_program.SetVec3("material.specular", current_material_index_.second.specular);
+      mesh_component.shader_program.SetFloat("material.shininess", current_material_index_.second.shininess);
       mesh_component.shader_program.SetVec3("lightPos", light_pos);
       mesh_component.shader_program.SetVec3("light.position", light_pos);
       mesh_component.shader_program.SetVec3("light.ambient", { 0.5f, 0.5f, 0.5f });
@@ -263,25 +442,25 @@ public:
 
   void OnRender() override
   {
-    if (!ImGui::Begin("Lighting Example", nullptr, 0)) {
+    if (cursor_enabled_) {
+      if (!ImGui::Begin("Lighting Example", nullptr, 0)) {
+        ImGui::End();
+      }
+      const char* combo_preview_value = current_material_index_.first;
+      if (ImGui::BeginCombo("Cube Material", combo_preview_value, 0)) {
+        for (const auto& material : material_map) {
+          const bool is_selected = material.first == current_material_index_.first;
+          if (ImGui::Selectable(material.first, is_selected)) {
+            current_material_index_ = material;
+          }
+          if (is_selected) {
+            ImGui::SetItemDefaultFocus();
+          }
+        }
+        ImGui::EndCombo();
+      }
       ImGui::End();
     }
-    const char* items[] = { "Silver", "Gold", "Black Plastic", "Red Rubber" };
-    static int item_current_index = 0;
-    const char* combo_preview_value = items[item_current_index];
-    if (ImGui::BeginCombo("Cube Material", combo_preview_value, 0)) {
-      for (int n = 0; n < IM_ARRAYSIZE(items); n++) {
-        const bool is_selected = item_current_index == n;
-        if (ImGui::Selectable(items[n], is_selected)) {
-          item_current_index = n;
-        }
-        if (is_selected) {
-          ImGui::SetItemDefaultFocus();
-        }
-      }
-      ImGui::EndCombo();
-    }
-    ImGui::End();
     cube_render_->Update();
   }
 
@@ -303,6 +482,10 @@ public:
     auto& mesh = cube_entity_->GetComponent(mesh_component_id_);
     mesh.shader_program.Use();
     mesh.shader_program.SetVec3("lightPos", light_transform.position);
+    mesh.shader_program.SetVec3("material.ambient", current_material_index_.second.ambient);
+    mesh.shader_program.SetVec3("material.diffuse", current_material_index_.second.diffuse);
+    mesh.shader_program.SetVec3("material.specular", current_material_index_.second.specular);
+    mesh.shader_program.SetFloat("material.shininess", current_material_index_.second.shininess);
     glm::vec3 lightColor{ 1.0 };
     // lightColor.x = sin(glfwGetTime() * 2.0f);
     // lightColor.y = sin(glfwGetTime() * 0.7f);
@@ -410,6 +593,7 @@ private:
   const PhysicsSystem* physics_system_{ nullptr };
   evie::Entity* light_entity_;
   evie::Entity* cube_entity_;
+  std::pair<const char*, Material> current_material_index_{ *material_map.begin() };
 };
 
 
