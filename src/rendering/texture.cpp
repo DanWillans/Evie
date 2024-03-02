@@ -57,7 +57,7 @@ Error Texture2D::Initialise(const std::string& filename, ImageFormat format, boo
     CallOpenGL(glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
     // Generate the 2D Texture Image in openGL
-    CallOpenGL(glTexImage2D, GL_TEXTURE_2D, 0, GL_RGB, width_, height_, 0, *ogl_format, GL_UNSIGNED_BYTE, data);
+    CallOpenGL(glTexImage2D, GL_TEXTURE_2D, 0, *ogl_format, width_, height_, 0, *ogl_format, GL_UNSIGNED_BYTE, data);
     // Get openGL to generate the MipMap of the texture for us.
     CallOpenGL(glGenerateMipmap, GL_TEXTURE_2D);
     stbi_image_free(data);

@@ -31,6 +31,17 @@
 			"detail": "Copy compile commands from build dir."
 		},
 		{
+			"label": "Run diffuse map example",
+			"type": "shell",
+			"windows": {
+				"command": ".\\scripts\\run_diffuse_map_example.bat"
+			},
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": []
+		},
+		{
 			"label": "Run lighting example",
 			"type": "shell",
 			"windows": {

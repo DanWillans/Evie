@@ -18,6 +18,11 @@ void Camera::Rotate(const float& yaw_offset, const float& pitch_offset)
 
 void Camera::Rotate(const MousePosition& mouse_pos)
 {
+  if(first_mouse_){
+    last_mouse_x_ = mouse_pos.x;
+    last_mouse_y_ = mouse_pos.y;
+    first_mouse_ = false;
+  }
   float x_offset = static_cast<float>(mouse_pos.x) - last_mouse_x_;
   float y_offset = last_mouse_y_ - static_cast<float>(mouse_pos.y);
   last_mouse_x_ = static_cast<float>(mouse_pos.x);
@@ -54,34 +59,34 @@ void Camera::MoveRight(const float& delta_time)
 
 mat4 Camera::GetViewMatrix()
 {
-  // 1. Position = known
-  // 2. Calculate cameraDirection
-  glm::vec3 zaxis = glm::normalize(-direction_);
-  // 3. Get positive right axis vector
-  glm::vec3 xaxis = glm::normalize(glm::cross(glm::normalize(up_), zaxis));
-  // 4. Calculate camera up vector
-  glm::vec3 yaxis = glm::cross(zaxis, xaxis);
+  // // 1. Position = known
+  // // 2. Calculate cameraDirection
+  // glm::vec3 zaxis = glm::normalize(-direction_);
+  // // 3. Get positive right axis vector
+  // glm::vec3 xaxis = glm::normalize(glm::cross(glm::normalize(up_), zaxis));
+  // // 4. Calculate camera up vector
+  // glm::vec3 yaxis = glm::cross(zaxis, xaxis);
 
-  // Create translation and rotation matrix
-  // In glm we access elements as mat[col][row] due to column-major layout
-  glm::mat4 translation = glm::mat4(1.0f);// Identity matrix by default
-  translation[3][0] = -position_.x;// Third column, first row
-  translation[3][1] = -position_.y;
-  translation[3][2] = -position_.z;
-  glm::mat4 rotation = glm::mat4(1.0f);
-  rotation[0][0] = xaxis.x;// First column, first row
-  rotation[1][0] = xaxis.y;
-  rotation[2][0] = xaxis.z;
-  rotation[0][1] = yaxis.x;// First column, second row
-  rotation[1][1] = yaxis.y;
-  rotation[2][1] = yaxis.z;
-  rotation[0][2] = zaxis.x;// First column, third row
-  rotation[1][2] = zaxis.y;
-  rotation[2][2] = zaxis.z;
+  // // Create translation and rotation matrix
+  // // In glm we access elements as mat[col][row] due to column-major layout
+  // glm::mat4 translation = glm::mat4(1.0f);// Identity matrix by default
+  // translation[3][0] = -position_.x;// Third column, first row
+  // translation[3][1] = -position_.y;
+  // translation[3][2] = -position_.z;
+  // glm::mat4 rotation = glm::mat4(1.0f);
+  // rotation[0][0] = xaxis.x;// First column, first row
+  // rotation[1][0] = xaxis.y;
+  // rotation[2][0] = xaxis.z;
+  // rotation[0][1] = yaxis.x;// First column, second row
+  // rotation[1][1] = yaxis.y;
+  // rotation[2][1] = yaxis.z;
+  // rotation[0][2] = zaxis.x;// First column, third row
+  // rotation[1][2] = zaxis.y;
+  // rotation[2][2] = zaxis.z;
 
-  // Return lookAt matrix as combination of translation and rotation matrix
-  return rotation * translation;// Remember to read from right to left (first translation then rotation)
-  // return glm::lookAt(position_, position_ + direction_, up_);
+  // // Return lookAt matrix as combination of translation and rotation matrix
+  // return rotation * translation;// Remember to read from right to left (first translation then rotation)
+  return glm::lookAt(position_, position_ + direction_, up_);
 }
 
 void Camera::ResetCameraPosition(const vec3& position){

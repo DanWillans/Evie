@@ -79,13 +79,14 @@ public:
   float sensitivity = 0.05f;
 
   const vec3& GetPosition() const { return position_; }
+  const vec3& GetDirection() const { return direction_; }
 
 private:
   // Fix this. This last mouse position should be the centre of the
   // viewport size. Construct based on the viewport size or set the
   // viewport.
-  float last_mouse_x_ = 400;
-  float last_mouse_y_ = 300;
+  float last_mouse_x_ = 630;
+  float last_mouse_y_ = 360;
   float pitch_ = 0.0f;
   // Offset yaw by -90.0f. A yaw of 0 degrees points the camera at
   // the positive x axis. Counter clockwise 90 degrees to point at z axis.
@@ -93,6 +94,7 @@ private:
   vec3 direction_{ 0.0f, 0.0f, -1.0f };
   vec3 up_{ 0.0f, 1.0f, 0.0f };
   vec3 position_{ 0.0f, 0.0f, 3.0f };
+  bool first_mouse_{true};
 };
 }// namespace evie
 

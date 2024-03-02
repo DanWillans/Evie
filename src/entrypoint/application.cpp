@@ -138,7 +138,7 @@ void Application::Run()
   while (running_ && err.Good()) {
     impl_->window_->PollEvents();
     // Move this to the renderer in the future
-    glClearColor(0.2F, 0.3F, 0.3F, 1.0F);
+    glClearColor(0.14F, 0.15F, 0.16F, 1.0F);
     // glClearColor(1.0F, 1.0F, 1.0F, 1.0F);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     // Generally this involves updating physics etc based on events.

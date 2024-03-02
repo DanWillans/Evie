@@ -132,7 +132,7 @@ public:
       // Remove the component from the entity map.
       entity_index_map_.erase(entity_id);
     } else {
-      EV_WARN("EntityID: {} - doesn't exist", entity_id.Get());
+      EV_WARN("EntityID: {} - doesn't exist for component id: {}", entity_id.Get(), id_.Get());
     }
   }
 
@@ -140,9 +140,7 @@ public:
 
   ComponentIterator<T> GetComponentIterator() { return ComponentIterator<T>(components_); }
 
-  T& GetComponent(EntityID entity_id) {
-    return components_[entity_index_map_[entity_id]].component;
-  }
+  T& GetComponent(EntityID entity_id) { return components_[entity_index_map_[entity_id]].component; }
 
   ~ComponentArray<T>() override = default;
 

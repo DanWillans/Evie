@@ -8,7 +8,7 @@
       "name": "Debug Sandbox Windows",
       "type": "cppvsdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/out/install/windows-msvc-debug-developer-mode/bin/lighting_example.exe",
+      "program": "${workspaceFolder}/out/install/windows-msvc-debug-developer-mode/bin/diffuse_map_example.exe",
       "args": [],
       "stopAtEntry": false,
       "cwd": "${fileDirname}",

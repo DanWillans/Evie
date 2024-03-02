@@ -63,6 +63,7 @@ Error VertexArray::AssociateVertexBuffer(VertexBuffer& vertex_buffer)
     return type_and_size.Error();
   }
   // Iterate over the layout sizes of the buffer_layout and set attribute pointers
+  int offset = 0;
   for (size_t i = 0; i < buffer_layout.layout_sizes.size(); ++i) {
     CallOpenGL(glVertexAttribPointer,
       static_cast<GLuint>(i),
@@ -70,8 +71,9 @@ Error VertexArray::AssociateVertexBuffer(VertexBuffer& vertex_buffer)
       type_and_size->type,
       false,
       static_cast<GLsizei>(buffer_layout.stride * type_and_size->size),
-      reinterpret_cast<void*>(type_and_size->size * (i == 0 ? 0 : buffer_layout.layout_sizes[i - 1])));
+      reinterpret_cast<void*>(type_and_size->size * offset));
     CallOpenGL(glEnableVertexAttribArray, static_cast<GLuint>(i));
+    offset += buffer_layout.layout_sizes[i];
   }
   return Error::OK();
 }

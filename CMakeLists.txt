@@ -121,6 +121,7 @@ Evie_package_project(
   # Package up examples
   lighting_example
   spinning_box_example
+  diffuse_map_example
 
   # FIXME: this does not work! CK
   # PRIVATE_DEPENDENCIES_CONFIGURED project_options project_warnings

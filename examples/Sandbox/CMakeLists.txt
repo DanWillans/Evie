@@ -45,4 +45,21 @@ target_link_libraries(
   glfw
 )
 
+add_executable(diffuse_map_example src/diffuse_map_example.cpp)
+
+target_link_libraries(
+  diffuse_map_example
+  PRIVATE
+  Evie::Evie_options
+  Evie::Evie_warnings
+  Evie::Application
+  Evie::Logging
+  Evie::Rendering
+  Evie::EntityComponentSystem
+  Evie::ImGui
+  PUBLIC
+  # This is just for Time. Make Evie::Time.
+  glfw
+)
+
 install(DIRECTORY textures DESTINATION ${CMAKE_INSTALL_PREFIX})

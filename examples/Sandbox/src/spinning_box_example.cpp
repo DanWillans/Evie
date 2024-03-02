@@ -136,6 +136,9 @@ public:
     // Setup shader uniforms
     shader_program_.SetInt("ourTexture1", 0);
     shader_program_.SetInt("ourTexture2", 1);
+    // Set texture slots
+    face_texture_.SetSlot(1);
+    container_texture_.SetSlot(0);
 
     // ----- Initialise Vertex Objects -----
     if (err.Good()) {
@@ -204,9 +207,6 @@ public:
 
   void OnRender() override
   {
-    // Set texture slots
-    face_texture_.SetSlot(1);
-    container_texture_.SetSlot(0);
     // Update mixer for shader
     shader_program_.SetFloat("mixer", mixer_);
     // Bind the Vertex Array that associates our cube models
