@@ -43,4 +43,10 @@ void VertexBuffer::Bind() { CallOpenGL(glBindBuffer, GL_ARRAY_BUFFER, id_.Get())
 
 void VertexBuffer::Destroy() { CallOpenGL(glDeleteBuffers, 1, &id_.Get()); }
 
+void VertexBuffer::UpdateBuffer(const std::vector<float>& vertices_data)
+{
+  Bind();
+  CallOpenGL(glBufferSubData, GL_ARRAY_BUFFER, 0, vertices_data.size() * sizeof(float), vertices_data.data());
+}
+
 }// namespace evie

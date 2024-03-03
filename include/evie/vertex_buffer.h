@@ -35,6 +35,8 @@ public:
   void Destroy();
   [[nodiscard]] const BufferLayout& GetBufferLayout() const { return buffer_layout_; }
 
+  void UpdateBuffer(const std::vector<float>& vertices_data);
+
 private:
   std::vector<float> vertices_data_{};
   BufferLayout buffer_layout_{};

@@ -1,12 +1,16 @@
+#include <evie/core.h>
 #include <evie/ecs/components/Transform.hpp>
 #include <evie/ecs/components/mesh_component.hpp>
 #include <evie/ecs/components/transform.hpp>
 #include <evie/ecs/system_manager.hpp>
 #include <glm/ext/matrix_transform.hpp>
+#include <glm/ext/scalar_constants.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/euler_angles.hpp>
 #include <memory>
+#define _USE_MATH_DEFINES
+#include <math.h>
 
 #include "evie/application.h"
 #include "evie/camera.h"
@@ -77,7 +81,28 @@ public:
     evie::ComponentID<evie::TransformRotationComponent> transform_componend_id,
     evie::ComponentID<evie::MeshComponent> mesh_component_id)
     : camera_(camera), transform_component_id_(transform_componend_id), mesh_component_id_(mesh_component_id)
-  {}
+  {
+    vshader.Initialise(R"(C:\Users\willa\devel\Evie\shaders\vertex_line_shader.vs)");
+    fshader.Initialise(R"(C:\Users\willa\devel\Evie\shaders\fragment_line_shader.fs)");
+    prog.Initialise(&vshader, &fshader);
+    evie::BufferLayout layout;
+    layout.stride = 3;
+    layout.type = evie::VertexDataType::Float;
+    layout.layout_sizes = { 3 };
+    triangle.resize(9);
+    triangle[0] = 0.0f;
+    triangle[1] = 0.0f;
+    triangle[2] = 0.0f;
+    triangle[3] = 0.0f;
+    triangle[4] = 0.0f;
+    triangle[5] = -5.0f;
+    triangle[6] = 0.0f + 0.01f;
+    triangle[7] = 0.0f;
+    triangle[8] = -5.0f;
+    vbuffer.Initialise(triangle, layout);
+    vao.Initialise();
+    vao.AssociateVertexBuffer(vbuffer);
+  }
   void Update() const
   {
     for (const auto& entity : entities) {
@@ -111,13 +136,77 @@ public:
 
       glDrawArrays(GL_TRIANGLES, 0, 36);
     }
+    // Draw line from camera position to camera direction
+    auto& pos = camera_->GetPosition();
+    auto& dir = camera_->GetDirection();
+    // Setting up a VAO:
+
+    // Let's draw a line by drawing a single triangle
+    // *     <-- Endpoint
+    // *
+    // *
+    // **
+    // **
+    // **
+    // ***  <-- small offset to start point
+    // ^
+    // |
+    // Start point
+
+    glDisable(GL_DEPTH_TEST);
+    prog.Use();
+    vao.Bind();
+    // Handle transforming the object first
+    // This moves the object to where we want it in world space.
+    auto model = glm::mat4(1.0);
+    // model = glm::translate(model, {0.0});
+    EV_INFO("Pos.x: {}, Pos.y: {}, Pos.z {}", pos.x, pos.y, pos.z);
+    EV_INFO("Dir.x: {}, dir.y: {}, dir.z {}", dir.x, dir.y, dir.z);
+    // model = glm::translate(model, { 0.0, 0.0 - 0.05f, 3.0 });
+    model = glm::translate(model, { pos.x, pos.y - 0.05f, pos.z });
+
+    // Create a rotation matrix based on the direction vector
+    glm::vec3 up(0.0f, 1.0f, 0.0f);// Assuming up vector is (0, 1, 0), adjust if needed
+    glm::vec3 right = glm::normalize(glm::cross(up, dir));
+    glm::vec3 newUp = glm::normalize(glm::cross(dir, right));
+    glm::mat4 rotationMatrix(1.0f);
+    rotationMatrix[0] = glm::vec4(right, 0.0f);
+    rotationMatrix[1] = glm::vec4(newUp, 0.0f);
+    rotationMatrix[2] = glm::vec4(dir, 0.0f);
+
+    // Multiply your original transformation matrix by the rotation matrix
+    model = model * rotationMatrix;
+
+    // float pitch = 180 * asin(dir.z) / M_PI;
+    // float yaw = 180 * atan2(dir.z, dir.x) / M_PI;
+    // auto rot_mat4 = glm::eulerAngleXYZ(pitch, yaw, 0.0f);
+    // model = model * rot_mat4;
+    prog.SetMat4("model", glm::value_ptr(model));
+    evie::mat4 view = camera_->GetViewMatrix();
+    prog.SetMat4("view", glm::value_ptr(view));
+    // This sets up the projection. What's our FoV? What's our aspect ratio? Fix this to get from camera.
+    evie::mat4 projection = glm::perspective(glm::radians(camera_->field_of_view), 1920.0f / 1080.0f, 0.1f, 100.0f);
+    prog.SetMat4("projection", glm::value_ptr(projection));
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+    glEnable(GL_DEPTH_TEST);
   }
+
+  evie::VertexShader vshader;
+  evie::FragmentShader fshader;
+  evie::ShaderProgram prog;
+  static evie::VertexBuffer vbuffer;
+  static std::vector<float> triangle;
+  evie::VertexArray vao;
+
 
 private:
   evie::ComponentID<evie::TransformRotationComponent> transform_component_id_{ 0 };
   evie::ComponentID<evie::MeshComponent> mesh_component_id_{ 0 };
   evie::Camera* camera_;
 };
+
+std::vector<float> RenderCubeSystem::triangle = {};
+evie::VertexBuffer RenderCubeSystem::vbuffer;
 struct Material
 {
   evie::vec3 ambient;
