@@ -37,7 +37,10 @@ uniform Light light;
 
 void main()
 {
+  // Spotlight position is 0.0,0.0,0.0 because we do everything in view space
+  // Camera is at 0.0,0.0,0.0
   vec3 lightDir = normalize(vec3(0.0,0.0,0.0)-FragPos);
+  // direction vector is 0.0,0.0,1.0 because we do the direction from the fragpos to the light
   float theta = dot(lightDir, vec3(0.0,0.0,1.0));
   float epsilon = light.cutOff - light.outerCutOff;
   float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
