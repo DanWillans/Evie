@@ -22,5 +22,16 @@ void main()
   // costly for the GPU.
   Normal = mat3(transpose(inverse(view * model))) * aNormal;
   // Move world space lightposition to camera view co-ordinate space.
+  // Don't need this for flashlight because the light is always at 0,0,0 and facing 0,0,1 
   LightPos = vec3(view * vec4(lightPos, 1.0));
+  You should convert the expression
+
+float theta = dot(lightDir, vec3(0,0,-1));
+
+into
+
+float theta = dot(lightDir, vec3(0,0,1));
+
+because the theta angle is between the light direction from fragment (lightDir)
+and the spot light direction from fragment (vec3(0,0,1), it derives from camera)).
 }
