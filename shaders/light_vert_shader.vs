@@ -24,5 +24,4 @@ void main()
   // Move world space lightposition to camera view co-ordinate space.
   // Don't need this for flashlight because the light is always at 0,0,0 and facing 0,0,1 
   LightPos = vec3(view * vec4(lightPos, 1.0));
-  You should convert the expression
 }

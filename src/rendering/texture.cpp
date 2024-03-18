@@ -1,33 +1,17 @@
 #include <iostream>
 #include <string>
 
-#include "evie/texture.h"
 #include "evie/ids.h"
 #include "evie/result.h"
+#include "evie/texture.h"
 #include "rendering/debug.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb/stb_image.h"
 
-namespace {
-
-constexpr evie::Result<GLenum> ConvertToOpenGLFormat(evie::ImageFormat format)
-{
-  switch (format) {
-  case evie::ImageFormat::RGB:
-    return static_cast<unsigned int>(GL_RGB);
-  case evie::ImageFormat::RGBA:
-    return static_cast<unsigned int>(GL_RGBA);
-  default:
-    return "Unsupported conversion";
-  };
-}
-
-};// namespace
-
 namespace evie {
 
-Error Texture2D::Initialise(const std::string& filename, ImageFormat format, bool flip)
+Error Texture2D::Initialise(const std::string& filename, bool flip)
 {
   Error err = Error::OK();
   if (flip) {
@@ -35,12 +19,22 @@ Error Texture2D::Initialise(const std::string& filename, ImageFormat format, boo
   }
   unsigned char* data = nullptr;
 
-  Result<GLenum> ogl_format = ConvertToOpenGLFormat(format);
-  if (ogl_format.Bad()) {
-    return ogl_format.Error();
+  data = stbi_load(filename.c_str(), &width_, &height_, &number_of_channels_, 0);
+  GLenum ogl_format = 0;
+  switch (number_of_channels_) {
+  case 2:
+    ogl_format = GL_RG;
+    break;
+  case 3:
+    ogl_format = GL_RGB;
+    break;
+  case 4:
+    ogl_format = GL_RGBA;
+    break;
+  default:
+    return Error{ "Unsupported conversion" };
   }
 
-  data = stbi_load(filename.c_str(), &width_, &height_, &number_of_channels_, 0);
   if (data) {
     // Generate the texture
     unsigned int id;
@@ -57,7 +51,7 @@ Error Texture2D::Initialise(const std::string& filename, ImageFormat format, boo
     CallOpenGL(glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
     // Generate the 2D Texture Image in openGL
-    CallOpenGL(glTexImage2D, GL_TEXTURE_2D, 0, *ogl_format, width_, height_, 0, *ogl_format, GL_UNSIGNED_BYTE, data);
+    CallOpenGL(glTexImage2D, GL_TEXTURE_2D, 0, ogl_format, width_, height_, 0, ogl_format, GL_UNSIGNED_BYTE, data);
     // Get openGL to generate the MipMap of the texture for us.
     CallOpenGL(glGenerateMipmap, GL_TEXTURE_2D);
     stbi_image_free(data);

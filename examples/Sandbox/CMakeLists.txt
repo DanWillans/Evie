@@ -45,10 +45,10 @@ target_link_libraries(
   glfw
 )
 
-add_executable(diffuse_map_example src/diffuse_map_example.cpp)
+add_executable(all_lighting_example src/all_lighting_example.cpp)
 
 target_link_libraries(
-  diffuse_map_example
+  all_lighting_example
   PRIVATE
   Evie::Evie_options
   Evie::Evie_warnings
@@ -62,4 +62,4 @@ target_link_libraries(
   glfw
 )
 
-install(DIRECTORY textures DESTINATION ${CMAKE_INSTALL_PREFIX})
+install(DIRECTORY assets DESTINATION ${CMAKE_INSTALL_PREFIX})

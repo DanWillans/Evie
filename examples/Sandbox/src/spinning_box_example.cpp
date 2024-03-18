@@ -114,12 +114,10 @@ public:
   {
     // ----- Textures -----
     evie::Error err = face_texture_.Initialise(
-      "C:\\Users\\willa\\devel\\Evie\\out\\install\\windows-msvc-debug-developer-mode\\textures\\awesomeface.png",
-      evie::ImageFormat::RGBA);
+      "C:\\Users\\willa\\devel\\Evie\\out\\install\\windows-msvc-debug-developer-mode\\textures\\awesomeface.png");
     if (err.Good()) {
       err = container_texture_.Initialise(
         "C:\\Users\\willa\\devel\\Evie\\out\\install\\windows-msvc-debug-developer-mode\\textures\\container.jpg",
-        evie::ImageFormat::RGB,
         true);
     }
     // ----- Shaders -----
@@ -198,7 +196,7 @@ public:
       }
     }
 
-    // Create 
+    // Create
 
     // Initialise camera speed
     camera_.camera_speed = 10;

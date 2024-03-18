@@ -31,10 +31,10 @@
 			"detail": "Copy compile commands from build dir."
 		},
 		{
-			"label": "Run diffuse map example",
+			"label": "Run all lighting example",
 			"type": "shell",
 			"windows": {
-				"command": ".\\scripts\\run_diffuse_map_example.bat"
+				"command": ".\\scripts\\run_all_lighting_example.bat"
 			},
 			"options": {
 				"cwd": "${workspaceFolder}"

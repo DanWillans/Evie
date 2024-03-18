@@ -5,6 +5,7 @@
 #include <evie/ecs/system_manager.hpp>
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/ext/scalar_constants.hpp>
+#include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/euler_angles.hpp>
@@ -41,16 +42,6 @@
 
 #include "GLFW/glfw3.h"
 namespace {
-glm::vec3 cubePositions[] = { glm::vec3(0.0f, 0.0f, 0.0f),
-  glm::vec3(2.0f, 5.0f, -15.0f),
-  glm::vec3(-1.5f, -2.2f, -2.5f),
-  glm::vec3(-3.8f, -2.0f, -12.3f),
-  glm::vec3(2.4f, -0.4f, -3.5f),
-  glm::vec3(-1.7f, 3.0f, -7.5f),
-  glm::vec3(1.3f, -2.0f, -2.5f),
-  glm::vec3(1.5f, 2.0f, -2.5f),
-  glm::vec3(1.5f, 0.2f, -1.5f),
-  glm::vec3(-1.3f, 1.0f, -1.5f) };
 
 class PhysicsSystem : public evie::System
 {
@@ -110,6 +101,8 @@ public:
       shader_program.SetMat4("model", glm::value_ptr(model));
       evie::mat4 view = camera_->GetViewMatrix();
       shader_program.SetMat4("view", glm::value_ptr(view));
+      view = glm::inverseTranspose(view);
+      shader_program.SetMat4("inverse_transpose_view", glm::value_ptr(view));
       // This sets up the projection. What's our FoV? What's our aspect ratio? Fix this to get from camera.
       evie::mat4 projection = glm::perspective(glm::radians(camera_->field_of_view), 1920.0f / 1080.0f, 0.1f, 100.0f);
       shader_program.SetMat4("projection", glm::value_ptr(projection));
@@ -124,185 +117,6 @@ private:
   evie::ComponentID<evie::MeshComponent> mesh_component_id_{ 0 };
   evie::Camera* camera_;
 };
-struct Material
-{
-  evie::vec3 ambient;
-  evie::vec3 diffuse;
-  evie::vec3 specular;
-  float shininess;
-};
-// clang-format off
-std::unordered_map<const char*, Material> material_map{ 
-  { "Emerald",
-  { { 0.0215, 0.1745, 0.0215 },
-    { 0.07568, 0.612424, 0.07568 },
-    { 0.633, 0.727811, 0.633 },
-     76.8
-  }
-  },
-  { "Jade",
-  { { 0.135, 0.225, 0.1575 },
-    { 0.54, 0.89, 0.63 },
-    { 0.316228, 0.316228, 0.316228 },
-     12.8
-  }
-  },
-  { "Obsidian",
-  { { 0.05373, 0.05, 0.06625 },
-    { 0.18275, 0.17, 0.22525 },
-    { 0.332741, 0.328634, 0.346435 },
-     38.4
-  }
-  },
-  { "Pearl",
-  { { 0.25, 0.20725, 0.20725 },
-    { 1, 0.829, 0.829 },
-    { 0.296648, 0.296648, 0.296648 },
-     11.264
-  }
-  },
-  { "Ruby",
-  { { 0.1754, 0.01175, 0.01175 },
-    { 0.396, 0.74151, 0.69102 },
-    { 0.297254, 0.30829, 0.306678 },
-     76.8
-  }
-  },
-  { "Turquoise",
-  { { 0.1, 0.18725, 0.1745 },
-    { 0.396, 0.74151, 0.69102 },
-    { 0.297254, 0.30829, 0.306678 },
-     12.8
-  }
-  },
-  { "Brass",
-  { { 0.329412, 0.223529, 0.027451 },
-    { 0.780392, 0.568627, 0.113725 },
-    { 0.992157, 0.941176, 0.807843 },
-     27.897
-  }
-  },
-  { "Bronze",
-  { { 0.2125, 0.1275, 0.054 },
-    { 0.714, 0.4284, 0.18144 },
-    { 0.393548, 0.271906, 0.166721 },
-     25.6
-  }
-  },
-  { "Chrome",
-  { { 0.25, 0.25, 0.25 },
-    { 0.4, 0.4, 0.4 },
-    { 0.774597, 0.774597, 0.774597 },
-     76.8
-  }
-  },
-  { "Copper",
-  { { 0.19125, 0.0735, 0.0225 },
-    { 0.7038, 0.27048, 0.0828 },
-    { 0.25677, 0.137622, 0.086014 },
-    12.8 
-  }
-  },
-  { "Gold",
-  { { 0.24725, 0.1995, 0.0745 },
-    { 0.7516, 0.60648, 0.22648 },
-    { 0.628281, 0.555802, 0.366065 },
-    12.8 
-  }
-  },
-  { "Silver",
-  { { 0.19225, 0.19225, 0.19225 },
-    { 0.50754, 0.50754, 0.50754 },
-    { 0.508273, 0.508273, 0.508273 },
-    12.8 
-  }
-  },
-  { "Black Plastic",
-  { { 0.0, 0.0, 0.0 },
-    { 0.01, 0.01, 0.01 },
-    { 0.50, 0.50, 0.50 },
-    32
-  }
-  },
-  { "Cyan Plastic",
-  { { 0.0, 0.1, 0.06 },
-    { 0.0, 0.50980392, 0.50980392 },
-    { 0.50196078, 0.50196078, 0.50196078 },
-    32
-  }
-  },
-  { "Green Plastic",
-  { { 0.0, 0.0, 0.0 },
-    { 0.1, 0.35, 0.1 },
-    { 0.45, 0.55, 0.45 },
-    32
-  }
-  },
-  { "Red Plastic",
-  { { 0.0, 0.0, 0.0 },
-    { 0.5, 0.0, 0.0 },
-    { 0.7, 0.6, 0.6 },
-    32
-  }
-  },
-  { "White Plastic",
-  { { 0.0, 0.0, 0.0 },
-    { 0.55, 0.55, 0.55 },
-    { 0.7, 0.7, 0.7 },
-    32
-  }
-  },
-  { "Yellow Plastic",
-  { { 0.0, 0.0, 0.0 },
-    { 0.5, 0.5, 0.0 },
-    { 0.6, 0.6, 0.5 },
-    32
-  }
-  },
-  { "Black Rubber",
-  { { 0.02, 0.02, 0.02 },
-    { 0.01, 0.01, 0.01 },
-    { 0.4, 0.4, 0.4 },
-    10
-  }
-  },
-  { "Cyan Rubber",
-  { { 0.0, 0.05, 0.05 },
-    { 0.4, 0.5, 0.5 },
-    { 0.04, 0.7, 0.7 },
-    10
-  }
-  },
-  { "Green Rubber",
-  { { 0.0, 0.05, 0.0 },
-    { 0.4, 0.5, 0.4 },
-    { 0.04, 0.7, 0.04 },
-    10
-  }
-  },
-  { "Red Rubber",
-  { { 0.05, 0.0, 0.0 },
-    { 0.5, 0.4, 0.4 },
-    { 0.7, 0.04, 0.04 },
-    10
-  }
-  },
-  { "White Rubber",
-  { { 0.05, 0.05, 0.05 },
-    { 0.5, 0.5, 0.5 },
-    { 0.7, 0.7, 0.7 },
-    10
-  }
-  },
-  { "Yellow Rubber",
-  { { 0.05, 0.05, 0.0 },
-    { 0.5, 0.5, 0.4 },
-    { 0.7, 0.7, 0.04 },
-    10
-  }
-  },
-};
-// clang-format on
 }// namespace
 
 class GameLayer : public evie::Layer
@@ -317,18 +131,21 @@ public:
   {
     // ----- Textures -----
     evie::Error err = diffuse_map_.Initialise(
-      "C:\\Users\\willa\\devel\\Evie\\out\\install\\windows-msvc-debug-developer-mode\\textures\\container2.png",
-      evie::ImageFormat::RGBA);
+      "C:\\Users\\willa\\devel\\Evie\\out\\install\\windows-msvc-debug-developer-mode\\textures\\container2.png");
     if (err.Good()) {
-      specular_map_.Initialise(
+      err = specular_map_.Initialise(
         "C:\\Users\\willa\\devel\\Evie\\out\\install\\windows-msvc-debug-developer-mode\\textures\\container2_specular."
-        "png",
-        evie::ImageFormat::RGBA);
+        "png");
     }
     if (err.Good()) {
-      emission_map_.Initialise(
-        "C:\\Users\\willa\\devel\\Evie\\out\\install\\windows-msvc-debug-developer-mode\\textures\\matrix.jpg",
-        evie::ImageFormat::RGB);
+      err = emission_map_.Initialise(
+        "C:\\Users\\willa\\devel\\Evie\\out\\install\\windows-msvc-debug-developer-mode\\textures\\matrix.jpg");
+    }
+    evie::Texture2D nice_;
+    if (err.Good()) {
+      err = nice_.Initialise(
+        "C:\\Users\\willa\\devel\\Evie\\out\\install\\windows-msvc-debug-developer-mode\\textures\\nice_scene.jpg",
+        true);
     }
     // ----- Shaders -----
     if (err.Good()) {
@@ -406,8 +223,6 @@ public:
       ecs_->RegisterSystem<PhysicsSystem>(physics_signature, transform_component_id_, velocity_component_id_);
     physics_system_ = ecs_->GetSystem(physics_system_id_);
 
-
-    evie::vec3 light_pos{ 1.2f, 1.0f, 2.0f };
     // Create cubes
     for (unsigned int i = 0; i < 10; ++i) {
       auto entity = ecs_->CreateEntity();
@@ -427,38 +242,62 @@ public:
         specular_map_.SetSlot(1);
         mesh_component.shader_program.SetInt("material.emission", 2);
         emission_map_.SetSlot(2);
+        mesh_component.shader_program.SetInt("spot_light.image", 3);
+        nice_.SetSlot(3);
+        // Directional light (The Sun!)
+        mesh_component.shader_program.SetVec3("directional_light.direction", { 0.0f, -1.0f, 0.0f });
+        mesh_component.shader_program.SetVec3("directional_light.ambient", { 0.2f, 0.2f, 0.2f });
+        mesh_component.shader_program.SetVec3("directional_light.diffuse", { 0.5f, 0.5f, 0.5f });
+        mesh_component.shader_program.SetVec3("directional_light.specular", { 1.0f, 1.0f, 1.0f });
         mesh_component.shader_program.SetFloat("material.shininess", 32.0f);
-        mesh_component.shader_program.SetFloat("light.cutOff", glm::cos(glm::radians(12.5f)));
-        mesh_component.shader_program.SetFloat("light.outerCutOff", glm::cos(glm::radians(15.0f)));
-        mesh_component.shader_program.SetVec3("light.ambient", { 0.2f, 0.2f, 0.2f });
-        mesh_component.shader_program.SetVec3("light.diffuse", { 0.5f, 0.5f, 0.5f });
-        mesh_component.shader_program.SetVec3("light.specular", { 1.0f, 1.0f, 1.0f });
-        mesh_component.shader_program.SetFloat("light.constant", 1.0f);
-        mesh_component.shader_program.SetFloat("light.linear", 0.09f);
-        mesh_component.shader_program.SetFloat("light.quadratic", 0.032f);
-
+        for (unsigned int i = 0; i < 4; ++i) {
+          mesh_component.shader_program.SetVec3(
+            "point_lights[" + std::to_string(i) + "].position", { pointLightPositions[i] });
+          mesh_component.shader_program.SetFloat("point_lights[" + std::to_string(i) + "].linear", 0.09f);
+          mesh_component.shader_program.SetFloat("point_lights[" + std::to_string(i) + "].quadratic", 0.032f);
+          mesh_component.shader_program.SetFloat("point_lights[" + std::to_string(i) + "].constant", 1.0f);
+          mesh_component.shader_program.SetVec3(
+            "point_lights[" + std::to_string(i) + "].ambient", { 0.2f, 0.2f, 0.2f });
+          mesh_component.shader_program.SetVec3(
+            "point_lights[" + std::to_string(i) + "].diffuse", { 0.5f, 0.5f, 0.5f });
+          mesh_component.shader_program.SetVec3(
+            "point_lights[" + std::to_string(i) + "].specular", { 1.0f, 1.0f, 1.0f });
+        }
+        // Spot_light is the flashlight from the camera
+        mesh_component.shader_program.SetVec3("spot_light.position", camera_.GetPosition());
+        mesh_component.shader_program.SetVec3("spot_light.direction", camera_.GetDirection());
+        mesh_component.shader_program.SetFloat("spot_light.cut_off", glm::cos(glm::radians(12.5f)));
+        mesh_component.shader_program.SetFloat("spot_light.outer_cut_off", glm::cos(glm::radians(15.0f)));
+        mesh_component.shader_program.SetVec3("spot_light.ambient", { 0.2f, 0.2f, 0.2f });
+        mesh_component.shader_program.SetVec3("spot_light.diffuse", { 0.8f, 0.8f, 0.8f });
+        mesh_component.shader_program.SetVec3("spot_light.specular", { 1.0f, 1.0f, 1.0f });
+        mesh_component.shader_program.SetFloat("spot_light.linear", 0.09f);
+        mesh_component.shader_program.SetFloat("spot_light.quadratic", 0.032f);
+        mesh_component.shader_program.SetFloat("spot_light.constant", 1.0f);
         err = entity->AddComponent(mesh_component_id_, mesh_component);
         cube_entities_.push_back(*entity);
       }
     }
 
     // Create light source
-    auto light_entity = ecs_->CreateEntity();
-    if (light_entity) {
-      evie::TransformRotationComponent transform;
-      transform.rotation = { 0.0, 0.0, 0.0 };
-      transform.position = light_pos;
-      transform.scale = { 0.2, 0.2, 0.2 };
-      err = light_entity->AddComponent(transform_component_id_, transform);
+    for (unsigned int i = 0; i < 4; ++i) {
+      auto light_entity = ecs_->CreateEntity();
+      if (light_entity) {
+        evie::TransformRotationComponent transform;
+        transform.rotation = { 0.0, 0.0, 0.0 };
+        transform.position = pointLightPositions[i];
+        transform.scale = { 0.2, 0.2, 0.2 };
+        err = light_entity->AddComponent(transform_component_id_, transform);
+      }
+      if (err.Good()) {
+        err = light_entity->AddComponent(mesh_component_id_, light_source_mesh_component);
+        auto& light_mesh = light_entity->GetComponent(mesh_component_id_);
+        light_mesh.shader_program.Use();
+        glm::vec3 lightColor{ 1.0 };
+        light_mesh.shader_program.SetVec3("lightColor", lightColor);
+      }
+      light_entities_.push_back(*light_entity);
     }
-    if (err.Good()) {
-      err = light_entity->AddComponent(mesh_component_id_, light_source_mesh_component);
-      auto& light_mesh = light_entity->GetComponent(mesh_component_id_);
-      light_mesh.shader_program.Use();
-      glm::vec3 lightColor{ 1.0 };
-      light_mesh.shader_program.SetVec3("lightColor", lightColor);
-    }
-    light_entity->MoveEntity(light_entity_);
     // Initialise camera speed
     camera_.camera_speed = 10;
     return err;
@@ -522,6 +361,12 @@ public:
     if (input_manager_->IsKeyPressed(evie::KeyCode::D)) {
       camera_.MoveRight(delta_time);
     }
+    for (int i = 0; i < 10; ++i) {
+      auto& mesh_component = cube_entities_[i].GetComponent(mesh_component_id_);
+      mesh_component.shader_program.Use();
+      mesh_component.shader_program.SetVec3("spot_light.position", camera_.GetPosition());
+      mesh_component.shader_program.SetVec3("spot_light.direction", camera_.GetDirection());
+    }
   }
 
   void OnEvent([[maybe_unused]] evie::Event& event) override
@@ -578,6 +423,9 @@ public:
     for (auto& entity : cube_entities_) {
       entity.Destroy();
     }
+    for (auto& entity : light_entities_) {
+      entity.Destroy();
+    }
   }
 
 
@@ -592,6 +440,7 @@ private:
   evie::IWindow* window_{ nullptr };
   evie::ECSController* ecs_{ nullptr };
   std::vector<evie::Entity> cube_entities_;
+  std::vector<evie::Entity> light_entities_;
   evie::ComponentID<evie::TransformRotationComponent> transform_component_id_{ 0 };
   evie::ComponentID<evie::VelocityComponent> velocity_component_id_{ 0 };
   evie::ComponentID<evie::MeshComponent> mesh_component_id_{ 0 };
@@ -605,6 +454,7 @@ private:
   evie::Texture2D diffuse_map_;
   evie::Texture2D specular_map_;
   evie::Texture2D emission_map_;
+  evie::Texture2D nice_;
 };
 
 
