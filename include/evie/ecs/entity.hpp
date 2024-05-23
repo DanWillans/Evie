@@ -1,13 +1,12 @@
-#ifndef EVIE_ECS_INCLUDE_ECS_CONTROLLER_H_
-#define EVIE_ECS_INCLUDE_ECS_CONTROLLER_H_
+#ifndef INCLUDE_ECS_ENTITY_HPP_
+#define INCLUDE_ECS_ENTITY_HPP_
 
-#include "evie/ecs/component_manager.hpp"
-#include "evie/ecs/entity_manager.hpp"
-#include "evie/ecs/system_manager.hpp"
-#include "evie/error.h"
-#include "evie/ids.h"
+#include "component_array.hpp"
+#include "component_manager.hpp"
+#include "entity_manager.hpp"
+#include "system_manager_interface.hpp"
 
-#include <memory>
+#include "ankerl/unordered_dense.h"
 
 namespace evie {
 
@@ -19,7 +18,8 @@ public:
   [[nodiscard]] EntityID GetID() const { return id_; }
 
   template<typename ComponentName>
-  [[nodiscard]] Error AddComponent(ComponentID<ComponentName> component_id, const ComponentName& component)
+  [[nodiscard]] Error AddComponent(ComponentID<ComponentName> component_id,
+    const ComponentName& component = ComponentName{})
   {
     // Add this entities component to the component manager
     auto err = component_manager_->AddComponent(id_, component_id, component);
@@ -45,7 +45,8 @@ public:
     return err;
   }
 
-  template<typename ComponentName> [[nodiscard]] ComponentName& GetComponent(ComponentID<ComponentName> component_id)
+  template<typename ComponentName>
+  [[nodiscard]] ComponentName& GetComponent(ComponentID<ComponentName> component_id) const
   {
     return component_manager_->GetComponent(id_, component_id);
   }
@@ -57,7 +58,8 @@ public:
     entity_manager_->DestroyEntity(id_);
   }
 
-  void MoveEntity(Entity*& other){
+  void MoveEntity(Entity*& other)
+  {
     void* mem = malloc(sizeof(Entity));
     memcpy(mem, this, sizeof(Entity));
     other = static_cast<Entity*>(mem);
@@ -67,62 +69,37 @@ public:
 
 private:
   friend class ECSController;
-  Entity(SystemManager* system_manager,
+  friend class SystemManager;
+  Entity(ISystemManager* system_manager,
     ComponentManager* component_manager,
     EntityManager* entity_manager,
     EntityID entity_id)
     : id_(entity_id), system_manager_(system_manager), component_manager_(component_manager),
       entity_manager_(entity_manager)
   {}
+  Entity(EntityID id) : id_(id) {}
   EntityID id_;
-  SystemManager* system_manager_;
+  ISystemManager* system_manager_;
   ComponentManager* component_manager_;
   EntityManager* entity_manager_;
 };
 
-class ECSController
-{
-public:
-  ECSController()
-    : component_manager_(std::make_unique<ComponentManager>()),
-      system_manager_(std::make_unique<SystemManager>(component_manager_.get())),
-      entity_manager_(std::make_unique<EntityManager>())
-  {}
-
-  Result<Entity> CreateEntity()
-  {
-    Result<EntityID> entity_id = entity_manager_->CreateEntity();
-    if (entity_id.Bad()) {
-      return entity_id.Error();
-    }
-    return Entity{ system_manager_.get(), component_manager_.get(), entity_manager_.get(), *entity_id };
-  }
-
-  template<typename ComponentName> [[nodiscard]] ComponentID<ComponentName> RegisterComponent()
-  {
-    return component_manager_->RegisterComponent<ComponentName>();
-  }
-
-  template<typename SystemName, typename... Args>
-  [[nodiscard]] SystemID<SystemName> RegisterSystem(const SystemSignature& signature, Args... args)
-  {
-    return system_manager_->RegisterSystem<SystemName>(signature, args...);
-  }
-
-  template<typename SystemName> const SystemName* GetSystem(SystemID<SystemName> system_id)
-  {
-    return static_cast<const SystemName*>(&system_manager_->GetSystem(system_id));
-  }
-
-  [[nodiscard]] uint64_t EntityCount() const { return entity_manager_->EntityCount(); }
-
-private:
-  // Create these all on the heap because they could be quite large
-  std::unique_ptr<ComponentManager> component_manager_;
-  std::unique_ptr<SystemManager> system_manager_;
-  std::unique_ptr<EntityManager> entity_manager_;
-};
-
 }// namespace evie
 
-#endif// !EVIE_ECS_INCLUDE_ECS_CONTROLLER_H_
+namespace std {
+  template<> struct hash<evie::Entity>
+  {
+    uint64_t operator()(const evie::Entity& id) const noexcept { return id.GetID().Get(); }
+  };
+}// namespace std
+
+template<> struct ankerl::unordered_dense::hash<evie::Entity>
+{
+  using is_avalanching = void;
+
+  [[nodiscard]] auto operator()(evie::Entity const& x) const noexcept -> uint64_t
+  {
+    return detail::wyhash::hash(x.GetID().Get());
+  }
+};
+#endif// !INCLUDE_ECS_ENTITY_HPP_

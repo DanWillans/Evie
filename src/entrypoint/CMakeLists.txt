@@ -10,6 +10,7 @@ target_link_libraries(
   Evie::Window
   Evie::Rendering
   Evie::StbImage
+  Evie::EntityComponentSystem
 )
 
 target_link_system_libraries(

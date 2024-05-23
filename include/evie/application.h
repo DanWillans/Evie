@@ -5,7 +5,7 @@
 #include <memory>
 
 #include "evie/core.h"
-#include "evie/ecs/ecs_controller.h"
+#include "evie/ecs/ecs_controller.hpp"
 #include "evie/error.h"
 #include "evie/input_manager.h"
 #include "evie/layer.h"

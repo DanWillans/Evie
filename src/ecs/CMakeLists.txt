@@ -5,7 +5,6 @@ Evie_add_library(
     entity_manager.cpp
     component_manager.cpp
     system_manager.cpp
-    ecs_controller.cpp
 )
 
 target_link_libraries(

@@ -4,7 +4,7 @@
 
 #include "evie/application.h"
 #include "evie/camera.h"
-#include "evie/ecs/ecs_controller.h"
+#include "evie/ecs/ecs_controller.hpp"
 #include "evie/error.h"
 #include "evie/events.h"
 #include "evie/input_manager.h"

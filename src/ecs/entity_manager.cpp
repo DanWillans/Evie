@@ -1,14 +1,14 @@
 #include "evie/ecs/entity_manager.hpp"
 #include "evie/ecs/ecs_constants.hpp"
+#include "evie/ids.h"
 #include "evie/result.h"
-#include <evie/ids.h>
-
 
 namespace evie {
+
 Result<EntityID> EntityManager::CreateEntity()
 {
-  if (entity_count_ == MAX_ENTITY_COUNT && free_slots_.empty()) {
-    return Error{ "Max entity count reached, cannot create anymore entities" };
+  if (entity_count_ == MAX_ENTITY_COUNT + 1 && free_slots_.empty()) {
+    return "Max entity count reached, cannot create anymore entities";
   }
   // Check if there are any free entity slots to use first
   if (!free_slots_.empty()) {
@@ -22,6 +22,5 @@ Result<EntityID> EntityManager::CreateEntity()
 
 void EntityManager::DestroyEntity(EntityID entity_id) { free_slots_.push(entity_id.Get()); }
 
-uint64_t EntityManager::EntityCount() const { return entity_count_ - free_slots_.size(); }
-
+uint64_t EntityManager::EntityCount() const { return entity_count_ - 1 - free_slots_.size(); }
 }// namespace evie

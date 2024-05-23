@@ -1,19 +1,18 @@
-#ifndef EVIE_ECS_INCLUDE_COMPONENT_MANAGER_H_
-#define EVIE_ECS_INCLUDE_COMPONENT_MANAGER_H_
+#ifndef INCLUDE_COMPONENT_MANAGER_H_
+#define INCLUDE_COMPONENT_MANAGER_H_
 
 #include <array>
+#include <cstddef>
 #include <memory>
 
-
-#include "evie/ecs/component_array.hpp"
-#include "evie/ecs/ecs_constants.hpp"
+#include "component_array.hpp"
+#include "ecs_constants.hpp"
 #include "evie/error.h"
 #include "evie/ids.h"
-#include "evie/result.h"
 #include "evie/core.h"
 
-
 namespace evie {
+
 class EVIE_API ComponentManager
 {
 public:
@@ -54,28 +53,25 @@ public:
   void EntityDestroyed(EntityID entity_id);
 
   template<typename ComponentName>
-  ComponentName& GetComponent(EntityID entity_id, ComponentID<ComponentName> component_id){
+  ComponentName& GetComponent(EntityID entity_id, ComponentID<ComponentName> component_id)
+  {
     auto* comp_array = static_cast<ComponentArray<ComponentName>*>(components_[component_id.Get()].get());
     return comp_array->GetComponent(entity_id);
   }
 
-  template<typename ComponentName>
-  Result<ComponentIterator<ComponentName>> GetComponentIterator(ComponentID<ComponentName> component_id)
+  template<typename ComponentName> size_t GetComponentCount(ComponentID<ComponentName> component_id)
   {
-    if (component_id.Get() >= component_index_count_) {
-      return Error{ "Component Index out of bounds" };
-    }
     auto* comp_array = static_cast<ComponentArray<ComponentName>*>(components_[component_id.Get()].get());
-    return comp_array->GetComponentIterator();
+    return comp_array->Size();
   }
 
 private:
-  // The index for a specific component in this array maps to it's ComponentID value
+  // The index for a specific component in this array maps to it's ComponentID
+  // value
   std::array<std::unique_ptr<IComponentArray>, MAX_COMPONENT_COUNT> components_;
   // A count to store how "full" or components_ array is.
-  uint64_t component_index_count_{ 0 };
+  size_t component_index_count_{ 0 };
 };
+}// namespace
 
-}// namespace evie
-
-#endif// EVIE_ECS_INCLUDE_COMPONENT_MANAGER_H_
+#endif

@@ -15,7 +15,7 @@
 #include "evie/default_models.h"
 #include "evie/ecs/components/transform.hpp"
 #include "evie/ecs/components/velocity.hpp"
-#include "evie/ecs/ecs_controller.h"
+#include "evie/ecs/ecs_controller.hpp"
 #include "evie/entrypoint.h"
 #include "evie/error.h"
 #include "evie/events.h"
@@ -65,8 +65,8 @@ public:
   void Update(float delta_time) const
   {
     for (const auto& entity : entities) {
-      auto& translate = component_manager->GetComponent(entity, transform_component_id_);
-      const auto& velocity = component_manager->GetComponent(entity, velocity_component_id_);
+      auto& translate = entity.GetComponent(transform_component_id_);
+      const auto& velocity = entity.GetComponent(velocity_component_id_);
       translate.position.x += delta_time * velocity.velocity.x;
       translate.position.y += delta_time * velocity.velocity.y;
       translate.position.z += delta_time * velocity.velocity.z;
@@ -90,8 +90,8 @@ public:
   {
     for (const auto& entity : entities) {
       evie::mat4 model(1.0f);
-      const auto& translate = component_manager->GetComponent(entity, transform_component_id_);
-      const auto& mesh = component_manager->GetComponent(entity, mesh_component_id_);
+      const auto& translate = entity.GetComponent(transform_component_id_);
+      const auto& mesh = entity.GetComponent(mesh_component_id_);
 
       // Handle transforming the object first
       // This moves the object to where we want it in world space.
@@ -155,7 +155,7 @@ public:
     }
     if (err.Good()) {
       err = nice_.Initialise(
-        R"(C:\Users\willa\devel\Evie\out\install\windows-msvc-debug-developer-mode\assets\textures\ai_laptop.png)", true);
+        R"(C:\Users\willa\devel\Evie\out\install\windows-msvc-debug-developer-mode\assets\textures\ty.png)", true);
     }
     // ----- Shaders -----
     if (err.Good()) {
@@ -223,14 +223,14 @@ public:
     render_signature.SetComponent(mesh_component_id_);
     render_cube_system_id_ =
       ecs_->RegisterSystem<RenderCubeSystem>(render_signature, &camera_, transform_component_id_, mesh_component_id_);
-    cube_render_ = ecs_->GetSystem(render_cube_system_id_);
+    cube_render_ = &ecs_->GetSystem(render_cube_system_id_);
 
     evie::SystemSignature physics_signature;
     physics_signature.SetComponent(transform_component_id_);
     physics_signature.SetComponent(velocity_component_id_);
     physics_system_id_ =
       ecs_->RegisterSystem<PhysicsSystem>(physics_signature, transform_component_id_, velocity_component_id_);
-    physics_system_ = ecs_->GetSystem(physics_system_id_);
+    physics_system_ = &ecs_->GetSystem(physics_system_id_);
 
     // Create cubes
     for (unsigned int i = 0; i < 10; ++i) {
@@ -259,18 +259,18 @@ public:
         mesh_component.shader_program.SetVec3("directional_light.diffuse", { 0.5f, 0.5f, 0.5f });
         mesh_component.shader_program.SetVec3("directional_light.specular", { 1.0f, 1.0f, 1.0f });
         mesh_component.shader_program.SetFloat("material.shininess", 32.0f);
-        for (unsigned int i = 0; i < 4; ++i) {
+        for (unsigned int j = 0; j < 4; ++j) {
           mesh_component.shader_program.SetVec3(
-            "point_lights[" + std::to_string(i) + "].position", { pointLightPositions[i] });
-          mesh_component.shader_program.SetFloat("point_lights[" + std::to_string(i) + "].linear", 0.09f);
-          mesh_component.shader_program.SetFloat("point_lights[" + std::to_string(i) + "].quadratic", 0.032f);
-          mesh_component.shader_program.SetFloat("point_lights[" + std::to_string(i) + "].constant", 1.0f);
+            "point_lights[" + std::to_string(j) + "].position", { pointLightPositions[j] });
+          mesh_component.shader_program.SetFloat("point_lights[" + std::to_string(j) + "].linear", 0.09f);
+          mesh_component.shader_program.SetFloat("point_lights[" + std::to_string(j) + "].quadratic", 0.032f);
+          mesh_component.shader_program.SetFloat("point_lights[" + std::to_string(j) + "].constant", 1.0f);
           mesh_component.shader_program.SetVec3(
-            "point_lights[" + std::to_string(i) + "].ambient", { 0.2f, 0.2f, 0.2f });
+            "point_lights[" + std::to_string(j) + "].ambient", { 0.1f, 0.1f, 0.1f });
           mesh_component.shader_program.SetVec3(
-            "point_lights[" + std::to_string(i) + "].diffuse", { 0.5f, 0.5f, 0.5f });
+            "point_lights[" + std::to_string(j) + "].diffuse", { 0.2f, 0.2f, 0.2f });
           mesh_component.shader_program.SetVec3(
-            "point_lights[" + std::to_string(i) + "].specular", { 1.0f, 1.0f, 1.0f });
+            "point_lights[" + std::to_string(j) + "].specular", { 1.0f, 1.0f, 1.0f });
         }
         // Spot_light is the flashlight from the camera
         mesh_component.shader_program.SetVec3("spot_light.position", camera_.GetPosition());
@@ -290,22 +290,22 @@ public:
 
     // Create light source
     for (unsigned int i = 0; i < 4; ++i) {
-      // auto light_entity = ecs_->CreateEntity();
-      // if (light_entity) {
-      //   evie::TransformRotationComponent transform;
-      //   transform.rotation = { 0.0, 0.0, 0.0 };
-      //   transform.position = pointLightPositions[i];
-      //   transform.scale = { 0.2, 0.2, 0.2 };
-      //   err = light_entity->AddComponent(transform_component_id_, transform);
-      // }
-      // if (err.Good()) {
-      //   err = light_entity->AddComponent(mesh_component_id_, light_source_mesh_component);
-      //   auto& light_mesh = light_entity->GetComponent(mesh_component_id_);
-      //   light_mesh.shader_program.Use();
-      //   glm::vec3 lightColor{ 1.0 };
-      //   light_mesh.shader_program.SetVec3("lightColor", lightColor);
-      // }
-      // light_entities_.push_back(*light_entity);
+      auto light_entity = ecs_->CreateEntity();
+      if (light_entity) {
+        evie::TransformRotationComponent transform;
+        transform.rotation = { 0.0, 0.0, 0.0 };
+        transform.position = pointLightPositions[i];
+        transform.scale = { 0.2, 0.2, 0.2 };
+        err = light_entity->AddComponent(transform_component_id_, transform);
+      }
+      if (err.Good()) {
+        err = light_entity->AddComponent(mesh_component_id_, light_source_mesh_component);
+        auto& light_mesh = light_entity->GetComponent(mesh_component_id_);
+        light_mesh.shader_program.Use();
+        glm::vec3 lightColor{ 1.0 };
+        light_mesh.shader_program.SetVec3("lightColor", lightColor);
+      }
+      light_entities_.push_back(*light_entity);
     }
     // Initialise camera speed
     camera_.camera_speed = 10;
@@ -322,6 +322,8 @@ public:
     last_frame_ = current_frame;
 
     physics_system_->Update(delta_time);
+    auto& rotation = cube_entities_[0].GetComponent(transform_component_id_).rotation;
+    rotation.y = static_cast<float>(glfwGetTime()) * glm::radians(50.0f);
 
     // Handle camera translation
     if (input_manager_->IsKeyPressed(evie::KeyCode::W)) {

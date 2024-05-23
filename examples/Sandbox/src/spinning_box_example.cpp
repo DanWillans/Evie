@@ -12,7 +12,7 @@
 #include "evie/default_models.h"
 #include "evie/ecs/components/transform.hpp"
 #include "evie/ecs/components/velocity.hpp"
-#include "evie/ecs/ecs_controller.h"
+#include "evie/ecs/ecs_controller.hpp"
 #include "evie/error.h"
 #include "evie/events.h"
 #include "evie/evie.h"
@@ -50,8 +50,8 @@ public:
   void Update(float delta_time) const
   {
     for (const auto& entity : entities) {
-      auto& translate = component_manager->GetComponent(entity, transform_component_id_);
-      const auto& velocity = component_manager->GetComponent(entity, velocity_component_id_);
+      auto& translate = entity.GetComponent(transform_component_id_);
+      const auto& velocity = entity.GetComponent(velocity_component_id_);
       translate.position.x += delta_time * velocity.velocity.x;
       translate.position.y += delta_time * velocity.velocity.y;
       translate.position.z += delta_time * velocity.velocity.z;
@@ -74,7 +74,7 @@ public:
     int i = 0;
     for (const auto& entity : entities) {
       evie::mat4 model(1.0f);
-      const auto& translate = component_manager->GetComponent(entity, transform_component_id);
+      const auto& translate = entity.GetComponent(transform_component_id);
       // This moves the object to where we want it in world space.
       model = glm::translate(model, translate.position);
       // This rotates the object to where we want it in the world space.
@@ -163,13 +163,13 @@ public:
     evie::SystemSignature render_signature;
     render_signature.SetComponent(transform_component_id_);
     render_cube_system_id_ = ecs_->RegisterSystem<RenderCubeSystem>(render_signature, &camera_, &shader_program_);
-    cube_render_ = ecs_->GetSystem(render_cube_system_id_);
+    cube_render_ = &ecs_->GetSystem(render_cube_system_id_);
 
     evie::SystemSignature physics_signature;
     physics_signature.SetComponent(transform_component_id_);
     physics_signature.SetComponent(velocity_component_id_);
     physics_system_id_ = ecs_->RegisterSystem<PhysicsSystem>(physics_signature);
-    physics_system_ = ecs_->GetSystem(physics_system_id_);
+    physics_system_ = &ecs_->GetSystem(physics_system_id_);
 
 
     // Create 10 cube entities
@@ -220,6 +220,8 @@ public:
     last_frame_ = current_frame;
 
     physics_system_->Update(delta_time);
+    auto& rotation = cube_entities_[0].GetComponent(transform_component_id_).rotation;
+    rotation.y += static_cast<float>(glfwGetTime()) * glm::radians(1.0f);
 
     // Handle camera translation
     if (input_manager_->IsKeyPressed(evie::KeyCode::W)) {

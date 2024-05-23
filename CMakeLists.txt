@@ -63,6 +63,7 @@ add_subdirectory(configured_files)
 # Adding the src:
 add_subdirectory(src)
 
+
 # Don't even look at tests if we're not top level
 if(NOT PROJECT_IS_TOP_LEVEL)
   return()
@@ -122,6 +123,9 @@ Evie_package_project(
   lighting_example
   spinning_box_example
   all_lighting_example
+
+  # Games
+  dan_dan_the_game
 
   # FIXME: this does not work! CK
   # PRIVATE_DEPENDENCIES_CONFIGURED project_options project_warnings

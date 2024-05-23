@@ -64,8 +64,20 @@ function(Evie_setup_dependencies)
       GITHUB_REPOSITORY
       "g-truc/glm"
       SYSTEM)
-  # This include is needed for global glm access
-  include_directories(SYSTEM ${glm_SOURCE_DIR})
+
+    # This include is needed for global glm access
+    include_directories(SYSTEM ${glm_SOURCE_DIR})
   endif()
 
+  if(NOT TARGET ankerl::unordered_dense)
+    cpmaddpackage(
+      NAME
+      ankerl
+      GIT_TAG
+      v4.4.0
+      GITHUB_REPOSITORY
+      "martinus/unordered_dense"
+      SYSTEM)
+    include_directories(SYSTEM ${ankerl_SOURCE_DIR}/include)
+  endif()
 endfunction()
