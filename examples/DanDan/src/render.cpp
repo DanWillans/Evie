@@ -8,7 +8,7 @@
 
 void Renderer::Initialise(evie::ComponentID<evie::MeshComponent> mesh_cid,
   evie::ComponentID<evie::TransformRotationComponent> transform_cid,
-  evie::Camera* camera)
+  evie::FPSCamera* camera)
 {
   mesh_cid_ = mesh_cid;
   transform_cid_ = transform_cid;
@@ -48,6 +48,6 @@ void Renderer::Iterate()
     evie::mat4 projection = glm::perspective(glm::radians(camera_->field_of_view), 1920.0f / 1080.0f, 0.1f, 100.0f);
     shader_program.SetMat4("projection", glm::value_ptr(projection));
 
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glDrawArrays(GL_TRIANGLES, 0, mesh.GetModelIndices());
   }
 }

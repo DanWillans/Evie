@@ -14,11 +14,15 @@
 #include <evie/texture.h>
 #include <evie/vertex_array.h>
 #include <evie/vertex_buffer.h>
+#include <evie/window.h>
 
 class GameLayer final : public evie::Layer
 {
 public:
-  evie::Error Initialise(evie::IInputManager* input_manager, evie::ECSController* ecs_controller);
+  static constexpr float DefaultPlayerSpeed = 5.0f;
+
+  evie::Error
+    Initialise(evie::IInputManager* input_manager, evie::ECSController* ecs_controller, evie::IWindow* window);
   void OnUpdate() override;
   void OnRender() override;
   void OnEvent(evie::Event& event) override;
@@ -26,8 +30,10 @@ public:
 private:
   void HandlePlayerCameraMovement(float delta_time);
 
+  evie::Error SetupFloor();
+
   // Player camera
-  evie::Camera player_camera_;
+  evie::FPSCamera player_camera_;
 
   // Last frame time stamp
   float last_frame_{ 0.0F };
@@ -38,14 +44,17 @@ private:
   // ECS controller
   evie::ECSController* ecs_{ nullptr };
 
+  // Window interface
+  evie::IWindow* window_{ nullptr };
+
   // Floor Texture
   evie::Texture2D floor_texture_;
 
   // MeshComponent ID
-  evie::ComponentID<evie::MeshComponent> mesh_cid_{0};
+  evie::ComponentID<evie::MeshComponent> mesh_cid_{ 0 };
 
   // TransformComponent ID
-  evie::ComponentID<evie::TransformRotationComponent> transform_cid_{0};
+  evie::ComponentID<evie::TransformRotationComponent> transform_cid_{ 0 };
 
   // Floor Vertex Shader
   evie::VertexShader floor_vertex_shader_;
@@ -55,6 +64,12 @@ private:
 
   // Render System
   Renderer* renderer_;
+
+  // Show cursor
+  bool enable_cursor_{ false };
+
+  // Player sprinting
+  bool sprint_{ false };
 };
 
 #endif// !INCLUDE_GAME_LAYER_HPP_

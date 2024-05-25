@@ -14,6 +14,11 @@ struct MeshComponent
   VertexArray vertex_array;
   ShaderProgram shader_program;
   // How do we handle cleaning up these resources?
+
+  int GetModelIndices() const {
+    return model_data.GetBuffer().size() / model_data.GetBufferLayout().stride;
+  }
 };
+
 }// namespace evie
 #endif// !EVIE_INCLUDE_EVIE_ECS_COMPONENTS_MESH_COMPONENT_HPP_

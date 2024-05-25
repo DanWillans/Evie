@@ -37,6 +37,8 @@ public:
 
   void UpdateBuffer(const std::vector<float>& vertices_data);
 
+  [[nodiscard]] const std::vector<float> GetBuffer() const { return vertices_data_; }
+
 private:
   std::vector<float> vertices_data_{};
   BufferLayout buffer_layout_{};

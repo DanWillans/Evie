@@ -9,9 +9,27 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb/stb_image.h"
 
+namespace {
+
+constexpr int GetOpenGLTextureWrapping(evie::TextureWrapping wrapping)
+{
+  switch (wrapping) {
+  case evie::TextureWrapping::Repeat:
+    return GL_REPEAT;
+  case evie::TextureWrapping::MirroredRepeat:
+    return GL_MIRRORED_REPEAT;
+  case evie::TextureWrapping::ClampToBorder:
+    return GL_CLAMP_TO_BORDER;
+  case evie::TextureWrapping::ClampToEdge:
+    return GL_CLAMP_TO_EDGE;
+  }
+}
+
+}// namespace
+
 namespace evie {
 
-Error Texture2D::Initialise(const std::string& filename, bool flip)
+Error Texture2D::Initialise(const std::string& filename, bool flip, TextureWrapping wrapping)
 {
   Error err = Error::OK();
   if (flip) {
@@ -45,8 +63,8 @@ Error Texture2D::Initialise(const std::string& filename, bool flip)
     this->Bind();
     // Set wrapping parameters. This is the default for now. Will extend the class
     // in the future to allow customisation of this.
-    CallOpenGL(glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    CallOpenGL(glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    CallOpenGL(glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GetOpenGLTextureWrapping(wrapping));
+    CallOpenGL(glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GetOpenGLTextureWrapping(wrapping));
     CallOpenGL(glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     CallOpenGL(glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 

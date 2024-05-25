@@ -12,13 +12,13 @@ class Renderer : public evie::System
 public:
   void Initialise(evie::ComponentID<evie::MeshComponent> mesh_cid,
     evie::ComponentID<evie::TransformRotationComponent> transform_cid,
-    evie::Camera* camera);
+    evie::FPSCamera* camera);
   void Iterate();
 
 private:
   evie::ComponentID<evie::MeshComponent> mesh_cid_{ 0 };
   evie::ComponentID<evie::TransformRotationComponent> transform_cid_{ 0 };
-  evie::Camera* camera_;
+  evie::FPSCamera* camera_;
 };
 
 #endif// !INCLUDE_RENDER_HPP_

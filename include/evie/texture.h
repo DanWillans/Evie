@@ -10,10 +10,17 @@
 #include "glad/glad.h"
 
 namespace evie {
+
+enum class TextureWrapping {
+  Repeat,
+  MirroredRepeat,
+  ClampToEdge,
+  ClampToBorder
+};
 class EVIE_API Texture2D
 {
 public:
-  Error Initialise(const std::string& filename, bool flip = false);
+  Error Initialise(const std::string& filename, bool flip = false, TextureWrapping wrapping = TextureWrapping::Repeat);
   void SetSlot(int slot);
   void Bind();
   void Destroy();
