@@ -58,7 +58,7 @@ void Application::Impl::PushLayerBack(Layer& layer) { layer_queue_.PushBack(laye
 Application::Application() : impl_(new Impl()) {}
 Application::~Application() { delete impl_; }
 
-const IInputManager* Application::GetInputManager() const { return impl_->input_manager_.get(); }
+IInputManager* Application::GetInputManager() const { return impl_->input_manager_.get(); }
 
 IWindow* Application::GetWindow() const { return impl_->window_.get(); }
 
@@ -139,8 +139,8 @@ void Application::Run()
     impl_->window_->PollEvents();
     // Move this to the renderer in the future
     // glClearColor(0.14F, 0.15F, 0.16F, 1.0F);
-    // glClearColor(0.14F, 0.15F, 0.16F, 1.0F);
-    glClearColor(0.0F, 0.0F, 0.0F, 1.0F);
+    glClearColor(0.14F, 0.15F, 0.16F, 1.0F);
+    // glClearColor(0.0F, 0.0F, 0.0F, 1.0F);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     // Generally this involves updating physics etc based on events.
     for (const auto& layer_wrapper : impl_->layer_queue_) {

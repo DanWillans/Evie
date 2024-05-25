@@ -25,7 +25,7 @@ public:
 
   void Run();
   [[nodiscard]] Error Initialise(const WindowProperties& props);
-  [[nodiscard]] const IInputManager* GetInputManager() const;
+  [[nodiscard]] IInputManager* GetInputManager() const;
   [[nodiscard]] ECSController* GetECSController() const;
   [[nodiscard]] IWindow* GetWindow() const;
   [[nodiscard]] ImGuiContext* GetImGuiContext() const;

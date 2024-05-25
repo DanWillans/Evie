@@ -14,7 +14,7 @@ project(DanDan
 
 include_directories(include)
 
-add_executable(dan_dan_the_game src/main.cpp)
+add_executable(dan_dan_the_game src/main.cpp src/game_layer.cpp src/render.cpp)
 
 target_link_libraries(
   dan_dan_the_game

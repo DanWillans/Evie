@@ -62,6 +62,17 @@
 				"cwd": "${workspaceFolder}"
 			},
 			"problemMatcher": []
+		},
+		{
+			"label": "Run DanDan",
+			"type": "shell",
+			"windows": {
+				"command": ".\\scripts\\run_dan_dan.bat"
+			},
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": []
 		}
 	]
 }

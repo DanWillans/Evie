@@ -14,10 +14,11 @@ public:
     props.name = "DanDanTheGame";
     props.dimensions.width = 1920;
     props.dimensions.height = 1080;
-    APP_INFO("Initialiasing engine");
+    APP_INFO("Initialising engine");
     evie::Error err = Initialise(props);
+    GetWindow()->DisableCursor();
     if (err.Good()) {
-      err = game_layer_.Initialise();
+      err = game_layer_.Initialise(GetInputManager(), GetECSController());
       if (err.Good()) {
         PushLayerBack(game_layer_);
       }
