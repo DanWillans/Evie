@@ -2,7 +2,14 @@
 #define EVIE_INCLUDE_EVIE_ECS_COMPONENTS_TRANSFORM_HPP_
 
 #include "evie/types.h"
+
 namespace evie {
+struct TransformComponent
+{
+  evie::vec3 position{ 0.0f };
+  evie::quat rotation{};
+  evie::vec3 scale{ 1.0F };
+};
 struct TransformRotationComponent
 {
   evie::vec3 position{ 0.0 };

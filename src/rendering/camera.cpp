@@ -1,9 +1,10 @@
 #include "evie/camera.h"
 #include "evie/types.h"
 
-#include "glm/gtc/matrix_transform.hpp"
 #include <evie/logging.h>
 #include <glm/geometric.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/trigonometric.hpp>
 
 namespace evie {
 void Camera::Rotate(const float& yaw_offset, const float& pitch_offset)

@@ -3,7 +3,9 @@
 
 #include <string>
 
-#include <glm/glm.hpp>
+#include <glm/vec3.hpp>
+#include <glm/mat4x4.hpp>
+#include <glm/ext/quaternion_float.hpp>
 
 namespace evie {
 struct WindowDimensions
@@ -35,6 +37,8 @@ using vec4 = glm::vec4;
 
 // Matrix types
 using mat4 = glm::mat4;
+
+using quat = glm::quat;
 
 
 }// namespace evie

@@ -15,6 +15,7 @@ namespace evie {
 class Entity
 {
 public:
+
   [[nodiscard]] EntityID GetID() const { return id_; }
 
   template<typename ComponentName>
@@ -51,7 +52,7 @@ public:
     return component_manager_->GetComponent(id_, component_id);
   }
 
-  void Destroy()
+  void Destroy() const
   {
     component_manager_->EntityDestroyed(id_);
     system_manager_->EntityDestroyed(id_);
@@ -66,6 +67,7 @@ public:
   }
 
   bool operator==(const Entity& rhs) const { return rhs.id_ == this->id_; }
+
 
 private:
   friend class ECSController;
@@ -87,10 +89,10 @@ private:
 }// namespace evie
 
 namespace std {
-  template<> struct hash<evie::Entity>
-  {
-    uint64_t operator()(const evie::Entity& id) const noexcept { return id.GetID().Get(); }
-  };
+template<> struct hash<evie::Entity>
+{
+  uint64_t operator()(const evie::Entity& id) const noexcept { return id.GetID().Get(); }
+};
 }// namespace std
 
 template<> struct ankerl::unordered_dense::hash<evie::Entity>

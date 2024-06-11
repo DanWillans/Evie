@@ -2,10 +2,8 @@
 #define INCLUDE_ECS_COMPONENT_ARRAY_H_
 
 #include <stack>
-#include <unordered_map>
-#include <utility>
 #include <vector>
-
+#include <array>
 
 #include "ecs_constants.hpp"
 #include "evie/ids.h"
@@ -72,13 +70,18 @@ public:
       free_slots_.push(back_component_index);
       // Update the index map with the new position
       entity_index_map_[back_component.id.Get()] = entity_index_map_[entity_id.Get()];
+      // Set the entity_index_map slot to 0 to prove the entity doesn't exist.
+      entity_index_map_[entity_id.Get()] = 0;
     }
   }
 
+  bool HasComponent(EntityID entity_id) const { return entity_index_map_[entity_id.Get()] != 0; }
 
   [[nodiscard]] size_t Size() const { return components_.size() - 1 - free_slots_.size(); }
 
   T& GetComponent(EntityID entity_id) { return components_[entity_index_map_[entity_id.Get()]].component; }
+
+  std::vector<ComponentWrapper<T>>& GetComponentVector() { return components_; }
 
   ~ComponentArray<T>() override = default;
 

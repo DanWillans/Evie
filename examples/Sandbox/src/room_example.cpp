@@ -50,7 +50,9 @@ public:
     evie::ComponentID<evie::VelocityComponent> velocity_component_id)
     : transform_component_id_(transform_component_id), velocity_component_id_(velocity_component_id)
   {}
-  void Update(float delta_time) const
+
+private:
+  void Update(const float& delta_time) const
   {
     for (const auto& entity : entities) {
       auto& translate = component_manager->GetComponent(entity, transform_component_id_);
@@ -61,7 +63,6 @@ public:
     }
   }
 
-private:
   evie::ComponentID<evie::TransformRotationComponent> transform_component_id_{ 0 };
   evie::ComponentID<evie::VelocityComponent> velocity_component_id_{ 0 };
 };
@@ -74,7 +75,9 @@ public:
     evie::ComponentID<evie::MeshComponent> mesh_component_id)
     : camera_(camera), transform_component_id_(transform_componend_id), mesh_component_id_(mesh_component_id)
   {}
-  void Update() const
+
+private:
+  void Update(const float& delta_time) const
   {
     for (const auto& entity : entities) {
       evie::mat4 model(1.0f);
@@ -111,8 +114,6 @@ public:
     }
   }
 
-
-private:
   evie::ComponentID<evie::TransformRotationComponent> transform_component_id_{ 0 };
   evie::ComponentID<evie::MeshComponent> mesh_component_id_{ 0 };
   evie::Camera* camera_;

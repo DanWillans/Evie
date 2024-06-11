@@ -46,8 +46,8 @@ glm::vec3 cubePositions[] = { glm::vec3(0.0f, 0.0f, 0.0f),
 
 class PhysicsSystem : public evie::System
 {
-public:
-  void Update(float delta_time) const
+private:
+  void Update(const float& delta_time)
   {
     for (const auto& entity : entities) {
       auto& translate = entity.GetComponent(transform_component_id_);
@@ -57,8 +57,6 @@ public:
       translate.position.z += delta_time * velocity.velocity.z;
     }
   }
-
-private:
   evie::ComponentID<evie::TransformRotationComponent> transform_component_id_{ 0 };
   evie::ComponentID<evie::VelocityComponent> velocity_component_id_{ 1 };
 };
@@ -69,7 +67,9 @@ public:
   RenderCubeSystem(evie::Camera* camera, evie::ShaderProgram* shader_program)
     : camera_(camera), shader_program_(shader_program)
   {}
-  void Update() const
+
+private:
+  void Update(const float& delta_time)
   {
     int i = 0;
     for (const auto& entity : entities) {
@@ -95,7 +95,6 @@ public:
     }
   }
 
-private:
   evie::ComponentID<evie::TransformRotationComponent> transform_component_id{ 0 };
   evie::Camera* camera_;
   evie::ShaderProgram* shader_program_;
@@ -209,7 +208,7 @@ public:
     shader_program_.SetFloat("mixer", mixer_);
     // Bind the Vertex Array that associates our cube models
     vertex_array_.Bind();
-    cube_render_->Update();
+    cube_render_->UpdateSystem(0.0F);
   }
 
   void OnUpdate() override
@@ -219,7 +218,7 @@ public:
     float delta_time = current_frame - last_frame_;
     last_frame_ = current_frame;
 
-    physics_system_->Update(delta_time);
+    physics_system_->UpdateSystem(delta_time);
     auto& rotation = cube_entities_[0].GetComponent(transform_component_id_).rotation;
     rotation.y += static_cast<float>(glfwGetTime()) * glm::radians(1.0f);
 
@@ -332,8 +331,8 @@ private:
   evie::ComponentID<evie::VelocityComponent> velocity_component_id_{ 0 };
   evie::SystemID<RenderCubeSystem> render_cube_system_id_{ 0 };
   evie::SystemID<PhysicsSystem> physics_system_id_{ 0 };
-  const RenderCubeSystem* cube_render_{ nullptr };
-  const PhysicsSystem* physics_system_{ nullptr };
+  RenderCubeSystem* cube_render_{ nullptr };
+  PhysicsSystem* physics_system_{ nullptr };
 };
 
 

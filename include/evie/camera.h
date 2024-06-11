@@ -4,7 +4,6 @@
 #include "evie/core.h"
 #include "evie/types.h"
 
-#include "glm/glm.hpp"
 #include <evie/camera.h>
 
 namespace evie {
@@ -95,11 +94,12 @@ private:
   vec3 direction_{ 0.0f, 0.0f, -1.0f };
   vec3 up_{ 0.0f, 1.0f, 0.0f };
   vec3 position_{ 0.0f, 0.0f, 3.0f };
-  bool first_mouse_{true};
+  bool first_mouse_{ true };
 };
 
-class EVIE_API FPSCamera{
-  public:
+class EVIE_API FPSCamera
+{
+public:
   /**
    * @brief Move the camera position backwards. This position moves in proportion to
    * the camera_speed. To change the movement speed change the public variable
@@ -151,7 +151,8 @@ class EVIE_API FPSCamera{
    * @brief Rotate the camera. This is a helper that will use the mouse position to rotate the camera.
    *
    * @param mouse_pos Current mouse position.
-   * @param enable_cursor If enabled then the cursor will rotate the camera. Use this flag to keep the camera up to date with the mouse position so that jump don't occur.
+   * @param enable_cursor If enabled then the cursor will rotate the camera. Use this flag to keep the camera up to date
+   * with the mouse position so that jump don't occur.
    */
   void Rotate(const MousePosition& mouse_pos, bool enable_cursor = true);
 
@@ -171,6 +172,13 @@ class EVIE_API FPSCamera{
 
   const vec3& GetPosition() const { return position_; }
   const vec3& GetDirection() const { return direction_; }
+  /**
+   * @brief Get the Euler Angles. Returns pitch, yaw, roll. Roll is 0.
+   *
+   * @return const vec3&  Vec3 of euler angles.
+   */
+  // Add 90.0F to align with z axis.
+  const vec3& GetEulerAngles() const { return { pitch_, -(yaw_ + 90.0F), 0.0F }; }
 
 private:
   // Fix this. This last mouse position should be the centre of the
@@ -185,7 +193,7 @@ private:
   vec3 direction_{ 0.0f, 0.0f, -1.0f };
   vec3 up_{ 0.0f, 1.0f, 0.0f };
   vec3 position_{ 0.0f, 0.0f, 3.0f };
-  bool first_mouse_{true};
+  bool first_mouse_{ true };
 };
 
 }// namespace evie

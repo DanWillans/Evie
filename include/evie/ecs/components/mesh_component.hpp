@@ -3,6 +3,7 @@
 
 #include "evie/types.h"
 #include "evie/shader.h"
+#include "evie/texture.h"
 #include "evie/shader_program.h"
 #include "evie/vertex_buffer.h"
 #include "evie/vertex_array.h"
@@ -13,6 +14,7 @@ struct MeshComponent
   VertexBuffer model_data;
   VertexArray vertex_array;
   ShaderProgram shader_program;
+  Texture2D texture;
   // How do we handle cleaning up these resources?
 
   int GetModelIndices() const {

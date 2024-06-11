@@ -55,7 +55,9 @@ public:
     evie::ComponentID<evie::VelocityComponent> velocity_component_id)
     : transform_component_id_(transform_component_id), velocity_component_id_(velocity_component_id)
   {}
-  void Update(float delta_time) const
+
+private:
+  void Update(const float& delta_time)
   {
     for (const auto& entity : entities) {
       auto& translate = entity.GetComponent(transform_component_id_);
@@ -66,7 +68,6 @@ public:
     }
   }
 
-private:
   evie::ComponentID<evie::TransformRotationComponent> transform_component_id_{ 0 };
   evie::ComponentID<evie::VelocityComponent> velocity_component_id_{ 0 };
 };
@@ -74,12 +75,15 @@ private:
 class RenderCubeSystem : public evie::System
 {
 public:
+virtual ~RenderCubeSystem() = default;
   RenderCubeSystem(evie::Camera* camera,
     evie::ComponentID<evie::TransformRotationComponent> transform_componend_id,
     evie::ComponentID<evie::MeshComponent> mesh_component_id)
     : camera_(camera), transform_component_id_(transform_componend_id), mesh_component_id_(mesh_component_id)
   {}
-  void Update() const
+
+private:
+  void Update(const float& delta_time)
   {
     for (const auto& entity : entities) {
       evie::mat4 model(1.0f);
@@ -114,7 +118,6 @@ public:
     }
   }
 
-private:
   evie::ComponentID<evie::TransformRotationComponent> transform_component_id_{ 0 };
   evie::ComponentID<evie::MeshComponent> mesh_component_id_{ 0 };
   evie::Camera* camera_;
@@ -283,7 +286,7 @@ public:
       }
       ImGui::End();
     }
-    cube_render_->Update();
+    cube_render_->UpdateSystem(0.0F);
   }
 
   void OnUpdate() override
@@ -293,7 +296,7 @@ public:
     float delta_time = current_frame - last_frame_;
     last_frame_ = current_frame;
 
-    physics_system_->Update(delta_time);
+    physics_system_->UpdateSystem(delta_time);
 
     // Move light entity
     auto& light_transform = light_entity_->GetComponent(transform_component_id_);
@@ -411,8 +414,8 @@ private:
   evie::ComponentID<evie::MeshComponent> mesh_component_id_{ 0 };
   evie::SystemID<RenderCubeSystem> render_cube_system_id_{ 0 };
   evie::SystemID<PhysicsSystem> physics_system_id_{ 0 };
-  const RenderCubeSystem* cube_render_{ nullptr };
-  const PhysicsSystem* physics_system_{ nullptr };
+  RenderCubeSystem* cube_render_{ nullptr };
+  PhysicsSystem* physics_system_{ nullptr };
   evie::Entity* light_entity_;
   evie::Entity* cube_entity_;
   std::pair<const char*, evie::Material> current_material_index_{ *evie::material_map.begin() };

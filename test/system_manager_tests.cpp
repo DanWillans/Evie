@@ -11,18 +11,23 @@ TEST_CASE("Test system manager")
 {
   struct System1 : public System
   {
+    void Update(const float& delta_time){}
   };
   struct System2 : public System
   {
+    void Update(const float& delta_time){}
   };
   struct System3 : public System
   {
+    void Update(const float& delta_time){}
   };
   struct System4 : public System
   {
+    void Update(const float& delta_time){}
   };
   struct System5 : public System
   {
+    void Update(const float& delta_time){}
   };
   struct TestComponent1
   {

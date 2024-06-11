@@ -7,9 +7,9 @@
 
 #include "component_array.hpp"
 #include "ecs_constants.hpp"
+#include "evie/core.h"
 #include "evie/error.h"
 #include "evie/ids.h"
-#include "evie/core.h"
 
 namespace evie {
 
@@ -65,6 +65,22 @@ public:
     return comp_array->Size();
   }
 
+  template<typename ComponentName>
+  std::vector<ComponentWrapper<ComponentName>>& GetComponentVector(ComponentID<ComponentName> component_id)
+  {
+    auto* comp_array = static_cast<ComponentArray<ComponentName>*>(components_[component_id.Get()].get());
+    return comp_array->GetComponentVector();
+  }
+
+  template<typename ComponentName>
+  bool HasComponent(EntityID id, ComponentID<ComponentName> component_id)
+  {
+    auto* comp_array = static_cast<ComponentArray<ComponentName>*>(components_[component_id.Get()].get());
+    return comp_array->HasComponent(id);
+  }
+
+
+
 private:
   // The index for a specific component in this array maps to it's ComponentID
   // value
@@ -72,6 +88,6 @@ private:
   // A count to store how "full" or components_ array is.
   size_t component_index_count_{ 0 };
 };
-}// namespace
+}// namespace evie
 
 #endif

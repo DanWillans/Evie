@@ -19,7 +19,6 @@ void EventManager::OnEvent(Event& event)
   // The input manager needs visibility on all events to store the state of the event.
   input_manager_->RegisterInput(event);
 
-
   // Is this unnecessary? Currently used to prioritise individual event captures like closing the window.
   auto type_sub_it = type_subscribers_.find(event.GetEventType());
   if (type_sub_it != type_subscribers_.end()) {

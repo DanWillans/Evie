@@ -17,12 +17,15 @@ TEST_CASE("Test ECS Controller")
   };
   struct System1 : public System
   {
+    void Update(const float& delta_time) {}
   };
   struct System2 : public System
   {
+    void Update(const float& delta_time) {}
   };
   struct System3 : public System
   {
+    void Update(const float& delta_time) {}
   };
   ECSController ecs;
   auto entity_1 = ecs.CreateEntity();
