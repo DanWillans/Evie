@@ -6,6 +6,7 @@
 #include "evie/window.h"
 #include "evie/window_events.h"
 #include "window/event_manager.h"
+#include <evie/types.h>
 
 
 #ifdef EVIE_PLATFORM_WINDOWS
@@ -27,6 +28,9 @@ namespace {
 
   void framebuffer_size_callback([[maybe_unused]] GLFWwindow* window, int width, int height)
   {
+    WindowDimensions dimensions{ width, height };
+    static_cast<GLFWWindow*>(glfwGetWindowUserPointer(window))->UpdateWindowDimensions(dimensions);
+    EV_INFO("Resize {} {}", width, height);
     glViewport(0, 0, width, height);
   }
 
@@ -128,7 +132,9 @@ namespace {
   {
     auto* event_manager = GetEventManager(window);
     if (event_manager != nullptr) {
-      DispatchEvent<WindowResizeEvent>(event_manager, WindowDimensions{ width, height });
+      WindowDimensions dimensions{ width, height };
+      EV_INFO("window size {} {}", width, height);
+      DispatchEvent<WindowResizeEvent>(event_manager, dimensions);
     }
   }
 
@@ -245,6 +251,16 @@ void GLFWWindow::DisableCursor()
 {
   glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
   glfwSetInputMode(window_, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+}
+
+void GLFWWindow::UpdateWindowDimensions(const WindowDimensions& dimensions) noexcept
+{
+  properties_.dimensions = dimensions;
+}
+
+float GLFWWindow::GetAspectRatio()
+{
+  return static_cast<float>(properties_.dimensions.width) / static_cast<float>(properties_.dimensions.height);
 }
 
 }// namespace evie

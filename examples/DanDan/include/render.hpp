@@ -6,6 +6,7 @@
 #include <evie/ecs/components/mesh_component.hpp>
 #include <evie/ecs/system.hpp>
 #include <evie/ids.h>
+#include <evie/window.h>
 
 class Renderer : public evie::System
 {
@@ -19,7 +20,8 @@ public:
 
   void Initialise(evie::ComponentID<evie::MeshComponent> mesh_cid,
     evie::ComponentID<evie::TransformComponent> transform_cid,
-    evie::FPSCamera* camera);
+    evie::FPSCamera* camera,
+    evie::IWindow* window);
 
 private:
   void Update(const float& delta_time) override;
@@ -27,6 +29,7 @@ private:
   evie::ComponentID<evie::MeshComponent> mesh_cid_{ 0 };
   evie::ComponentID<evie::TransformComponent> transform_cid_{ 0 };
   evie::FPSCamera* camera_{ nullptr };
+  evie::IWindow* window_{ nullptr };
 };
 
 #endif// !INCLUDE_RENDER_HPP_

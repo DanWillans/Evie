@@ -7,9 +7,9 @@
 
 #include "evie/core.h"
 #include "evie/error.h"
-#include "window/event_manager.h"
-#include "evie/window_events.h"
 #include "evie/types.h"
+#include "evie/window_events.h"
+#include "window/event_manager.h"
 
 namespace evie {
 
@@ -25,6 +25,8 @@ public:
   virtual void* GetNativeWindow() = 0;
   virtual void EnableCursor() = 0;
   virtual void DisableCursor() = 0;
+  virtual const WindowProperties& GetWindowProperties() = 0;
+  virtual float GetAspectRatio() = 0;
 };
 
 

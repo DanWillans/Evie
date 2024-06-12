@@ -64,7 +64,7 @@ evie::Error
   signature.SetComponent(transform_cid_);
   auto sys_id = ecs_->RegisterSystem<Renderer>(signature);
   renderer_ = &(ecs_->GetSystem(sys_id));
-  renderer_->Initialise(mesh_cid_, transform_cid_, &player_camera_);
+  renderer_->Initialise(mesh_cid_, transform_cid_, &player_camera_, window_);
 
   // Register our follow system
   evie::SystemSignature follow_signature;

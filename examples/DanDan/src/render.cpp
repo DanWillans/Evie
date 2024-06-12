@@ -1,6 +1,7 @@
 #include "render.hpp"
 #include <evie/ecs/components/Transform.hpp>
 #include <evie/ids.h>
+#include <evie/window.h>
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -9,16 +10,18 @@
 
 void Renderer::Initialise(evie::ComponentID<evie::MeshComponent> mesh_cid,
   evie::ComponentID<evie::TransformComponent> transform_cid,
-  evie::FPSCamera* camera)
+  evie::FPSCamera* camera,
+  evie::IWindow* window)
 {
   mesh_cid_ = mesh_cid;
   transform_cid_ = transform_cid;
   camera_ = camera;
+  window_ = window;
 }
 
 void Renderer::Update(const float& delta_time)
 {
-  (void)delta_time;
+  std::ignore = delta_time;
   for (const auto& entity : entities) {
     evie::mat4 model(1.0F);
     const auto& translate = entity.GetComponent(transform_cid_);
@@ -49,7 +52,10 @@ void Renderer::Update(const float& delta_time)
     // view = glm::inverseTranspose(view);
     // shader_program.SetMat4("inverse_transpose_view", glm::value_ptr(view));
     // This sets up the projection. What's our FoV? What's our aspect ratio? Fix this to get from camera.
-    evie::mat4 projection = glm::perspective(glm::radians(camera_->field_of_view), 1920.0f / 1080.0f, 0.1f, 10000.0f);
+    constexpr float near_cull = 0.1F;
+    constexpr float far_cull = 1000.0F;
+    evie::mat4 projection =
+      glm::perspective(glm::radians(camera_->field_of_view), window_->GetAspectRatio(), near_cull, far_cull);
     shader_program.SetMat4("projection", glm::value_ptr(projection));
 
     glDrawArrays(GL_TRIANGLES, 0, mesh.GetModelIndices());

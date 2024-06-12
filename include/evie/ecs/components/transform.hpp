@@ -6,7 +6,7 @@
 namespace evie {
 struct TransformComponent
 {
-  evie::vec3 position{ 0.0f };
+  evie::vec3 position{ 0.0F };
   evie::quat rotation{};
   evie::vec3 scale{ 1.0F };
 };

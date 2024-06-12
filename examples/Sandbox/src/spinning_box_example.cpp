@@ -32,6 +32,8 @@
 #include "evie/vertex_buffer.h"
 
 #include "GLFW/glfw3.h"
+
+// NOLINTBEGIN
 namespace {
 glm::vec3 cubePositions[] = { glm::vec3(0.0f, 0.0f, 0.0f),
   glm::vec3(2.0f, 5.0f, -15.0f),
@@ -380,3 +382,5 @@ std::unique_ptr<evie::Application> CreateApplication()
     return nullptr;
   }
 }
+
+// NOLINTEND

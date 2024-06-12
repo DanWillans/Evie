@@ -3,12 +3,13 @@
 
 #include "evie/error.h"
 #include "evie/events.h"
-#include "window/event_manager.h"
 #include "evie/window.h"
+#include "window/event_manager.h"
 
 #include "glad/glad.h"
 
 #include "GLFW/glfw3.h"
+#include <evie/types.h>
 
 namespace evie {
 
@@ -30,6 +31,10 @@ public:
   void SetVSync(bool enabled);
   void DisableCursor() override;
   void EnableCursor() override;
+
+  const WindowProperties& GetWindowProperties() override { return properties_; }
+  void UpdateWindowDimensions(const WindowDimensions& dimensions) noexcept;
+  float GetAspectRatio() override;
 
 private:
   [[nodiscard]] Error DispatchEvent(std::unique_ptr<Event> event);

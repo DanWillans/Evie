@@ -41,6 +41,8 @@
 #include "imgui.h"
 
 #include "GLFW/glfw3.h"
+
+// NOLINTBEGIN
 namespace {
 
 class PhysicsSystem : public evie::System
@@ -505,3 +507,5 @@ std::unique_ptr<evie::Application> CreateApplication()
     return nullptr;
   }
 }
+
+// NOLINTEND
