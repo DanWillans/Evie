@@ -4,6 +4,8 @@
 
 using namespace evie;
 
+// NOLINTBEGIN
+
 TEST_CASE("Test ECS Controller")
 {
   struct TestComponent1
@@ -17,15 +19,15 @@ TEST_CASE("Test ECS Controller")
   };
   struct System1 : public System
   {
-    void Update(const float& delta_time) {}
+    void Update(const float& delta_time) override { std::ignore = delta_time; }
   };
   struct System2 : public System
   {
-    void Update(const float& delta_time) {}
+    void Update(const float& delta_time) override { std::ignore = delta_time; }
   };
   struct System3 : public System
   {
-    void Update(const float& delta_time) {}
+    void Update(const float& delta_time) override { std::ignore = delta_time; }
   };
   ECSController ecs;
   auto entity_1 = ecs.CreateEntity();
@@ -144,3 +146,4 @@ TEST_CASE("Test ECS Controller")
 
   REQUIRE_EQ(ecs.EntityCount(), 0);
 }
+// NOLINTEND

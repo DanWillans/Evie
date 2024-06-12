@@ -81,7 +81,7 @@ public:
     }
   }
 
-  bool HasComponent(EntityID entity_id) const
+  [[nodiscard]] bool HasComponent(EntityID entity_id) const
   {
     return entity_index_map_[entity_id.Get()] != 0;// NOLINT (*-array-index)
   }

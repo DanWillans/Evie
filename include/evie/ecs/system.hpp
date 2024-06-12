@@ -19,13 +19,19 @@ namespace evie {
 // that this system is interested in.
 // It is recommended to use an Initialise() function instead of doing logic in the constructor. This is because
 // additional configuration to the system is done after construction.
+// NOLINTNEXTLINE
 class EVIE_API System
 {
 public:
+  virtual ~System() = default;
+
   // A set of entities that this system is interested in based on the SystemSignature
   ankerl::unordered_dense::set<Entity> entities;
   // The signature of components this system cares about.
   SystemSignature signature;
+  // A handle to the component manager
+  // Do not use until the system has been registered.
+  ComponentManager* component_manager{ nullptr };
 
   /**
    * @brief This should be called by the game. Internally it will call the user implemented Update() function.
@@ -38,14 +44,10 @@ public:
   // You may want to access entities that don't reflect your system signature.
   // You must not use this function until after the system has been Registered with the system manager.
   template<typename ComponentName>
-  std::vector<ComponentWrapper<ComponentName>>& GetComponentVector(ComponentID<ComponentName> id)
+  std::vector<ComponentWrapper<ComponentName>>& GetComponentVector(ComponentID<ComponentName> identifier)
   {
-    return component_manager->GetComponentVector(id);
+    return component_manager->GetComponentVector(identifier);
   }
-
-  // A handle to the component manager
-  // Do not use until the system has been registered.
-  ComponentManager* component_manager;
 
 protected:
   void MarkEntityForDeletion(const Entity& entity);
@@ -59,6 +61,8 @@ private:
    */
   virtual void Update([[maybe_unused]] const float& delta_time) = 0;
 
+  // We don't expose std::vector in the API so just disable the warning here.
+  #pragma warning( disable: 4251 )
   std::vector<Entity> entities_to_delete_;
 };
 }// namespace evie

@@ -10,6 +10,8 @@
 
 extern std::unique_ptr<evie::Application> CreateApplication();
 
+// I ACTUALLY HATE THIS ENTRYPOINT STUFF. FIX IT.
+//NOLINTNEXTLINE
 int main([[maybe_unused]] int argc, [[maybe_unused]] const char** argv)
 {
   auto app = CreateApplication();

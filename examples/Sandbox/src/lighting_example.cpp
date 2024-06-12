@@ -11,7 +11,6 @@
 #include "evie/application.h"
 #include "evie/camera.h"
 #include "evie/default_models.h"
-#include "evie/ecs/components/transform.hpp"
 #include "evie/ecs/components/velocity.hpp"
 #include "evie/ecs/ecs_controller.hpp"
 #include "evie/error.h"
@@ -37,7 +36,7 @@
 
 #include "GLFW/glfw3.h"
 
-//NOLINTBEGIN
+// NOLINTBEGIN
 namespace {
 glm::vec3 cubePositions[] = { glm::vec3(0.0f, 0.0f, 0.0f),
   glm::vec3(2.0f, 5.0f, -15.0f),
@@ -77,7 +76,7 @@ private:
 class RenderCubeSystem : public evie::System
 {
 public:
-virtual ~RenderCubeSystem() = default;
+  virtual ~RenderCubeSystem() = default;
   RenderCubeSystem(evie::Camera* camera,
     evie::ComponentID<evie::TransformRotationComponent> transform_componend_id,
     evie::ComponentID<evie::MeshComponent> mesh_component_id)
@@ -87,6 +86,7 @@ virtual ~RenderCubeSystem() = default;
 private:
   void Update(const float& delta_time)
   {
+    std::ignore = delta_time;
     for (const auto& entity : entities) {
       evie::mat4 model(1.0f);
       const auto& translate = entity.GetComponent(transform_component_id_);
@@ -120,17 +120,16 @@ private:
     }
   }
 
+  evie::Camera* camera_;
   evie::ComponentID<evie::TransformRotationComponent> transform_component_id_{ 0 };
   evie::ComponentID<evie::MeshComponent> mesh_component_id_{ 0 };
-  evie::Camera* camera_;
 };
 }// namespace
 
 class GameLayer : public evie::Layer
 {
 public:
-  GameLayer() = default;
-  explicit GameLayer(const evie::IInputManager* input_manager, evie::IWindow* window, evie::ECSController* ecs)
+  GameLayer(const evie::IInputManager* input_manager, evie::IWindow* window, evie::ECSController* ecs)
     : input_manager_(input_manager), window_(window), ecs_(ecs)
   {}
 
@@ -302,8 +301,8 @@ public:
 
     // Move light entity
     auto& light_transform = light_entity_->GetComponent(transform_component_id_);
-    light_transform.position.x = 2 * cos(glfwGetTime());
-    light_transform.position.z = 2 * sin(glfwGetTime());
+    light_transform.position.x = static_cast<float>(2 * cos(glfwGetTime()));
+    light_transform.position.z = static_cast<float>(2 * sin(glfwGetTime()));
 
     // Update cube entity with new light position
     auto& mesh = cube_entity_->GetComponent(mesh_component_id_);
@@ -418,8 +417,8 @@ private:
   evie::SystemID<PhysicsSystem> physics_system_id_{ 0 };
   RenderCubeSystem* cube_render_{ nullptr };
   PhysicsSystem* physics_system_{ nullptr };
-  evie::Entity* light_entity_;
-  evie::Entity* cube_entity_;
+  evie::Entity* light_entity_{ nullptr };
+  evie::Entity* cube_entity_{ nullptr };
   std::pair<const char*, evie::Material> current_material_index_{ *evie::material_map.begin() };
 };
 
@@ -440,12 +439,12 @@ public:
     ImGui::SetCurrentContext(GetImGuiContext());
     if (err.Good()) {
       APP_INFO("Creating GameLayer");
-      t_layer_ = GameLayer(GetInputManager(), GetWindow(), GetECSController());
+      t_layer_ = std::make_unique<GameLayer>(GetInputManager(), GetWindow(), GetECSController());
       APP_INFO("Initialising layer");
-      err = t_layer_.Initialise();
+      err = t_layer_->Initialise();
       if (err.Good()) {
         APP_INFO("Pushing layer");
-        PushLayerFront(t_layer_);
+        PushLayerFront(*t_layer_);
       }
     }
     return err;
@@ -453,7 +452,7 @@ public:
   ~Sandbox() override = default;
 
 private:
-  GameLayer t_layer_;
+  std::unique_ptr<GameLayer> t_layer_;
 };
 
 std::unique_ptr<evie::Application> CreateApplication()
@@ -471,4 +470,4 @@ std::unique_ptr<evie::Application> CreateApplication()
   }
 }
 
-//NOLINTEND
+// NOLINTEND

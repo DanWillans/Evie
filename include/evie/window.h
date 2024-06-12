@@ -13,6 +13,7 @@
 
 namespace evie {
 
+// NOLINTNEXTLINE
 class EVIE_API IWindow
 {
 public:

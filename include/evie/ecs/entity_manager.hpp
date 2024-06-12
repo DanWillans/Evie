@@ -3,17 +3,17 @@
 
 #include <queue>
 
+#include "evie/core.h"
 #include "evie/ids.h"
 #include "evie/result.h"
-#include "evie/core.h"
 
 namespace evie {
-class EVIE_API EntityManager
+class EntityManager
 {
 public:
-  Result<EntityID> CreateEntity();
-  void DestroyEntity(EntityID entity_id);
-  [[nodiscard]] uint64_t EntityCount() const;
+  Result<EntityID> EVIE_API CreateEntity();
+  void EVIE_API DestroyEntity(EntityID entity_id);
+  [[nodiscard]] uint64_t EVIE_API EntityCount() const;
 
 private:
   size_t entity_count_{ 1 };

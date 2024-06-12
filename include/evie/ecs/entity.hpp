@@ -15,7 +15,6 @@ namespace evie {
 class Entity
 {
 public:
-
   [[nodiscard]] EntityID GetID() const { return id_; }
 
   template<typename ComponentName>
@@ -59,15 +58,17 @@ public:
     entity_manager_->DestroyEntity(id_);
   }
 
+  // I don't like this. Fix it in the future.
   void MoveEntity(Entity*& other)
   {
-    void* mem = malloc(sizeof(Entity));
+    void* mem = malloc(sizeof(Entity)); //NOLINT
     memcpy(mem, this, sizeof(Entity));
     other = static_cast<Entity*>(mem);
   }
 
   bool operator==(const Entity& rhs) const { return rhs.id_ == this->id_; }
 
+  [[nodiscard]] bool IsValid() const { return valid_; }
 
 private:
   friend class ECSController;
@@ -77,13 +78,15 @@ private:
     EntityManager* entity_manager,
     EntityID entity_id)
     : id_(entity_id), system_manager_(system_manager), component_manager_(component_manager),
-      entity_manager_(entity_manager)
+      entity_manager_(entity_manager), valid_(true)
   {}
-  Entity(EntityID id) : id_(id) {}
+  // Default constructor, creates an INVALID entity.
+  Entity() : id_(0) {}
   EntityID id_;
-  ISystemManager* system_manager_;
-  ComponentManager* component_manager_;
-  EntityManager* entity_manager_;
+  ISystemManager* system_manager_{ nullptr };
+  ComponentManager* component_manager_{ nullptr };
+  EntityManager* entity_manager_{ nullptr };
+  bool valid_{ false };
 };
 
 }// namespace evie
@@ -91,7 +94,7 @@ private:
 namespace std {
 template<> struct hash<evie::Entity>
 {
-  uint64_t operator()(const evie::Entity& id) const noexcept { return id.GetID().Get(); }
+  uint64_t operator()(const evie::Entity& identifier) const noexcept { return identifier.GetID().Get(); }
 };
 }// namespace std
 

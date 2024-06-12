@@ -73,6 +73,7 @@ public:
 private:
   void Update(const float& delta_time)
   {
+    std::ignore = delta_time;
     int i = 0;
     for (const auto& entity : entities) {
       evie::mat4 model(1.0f);

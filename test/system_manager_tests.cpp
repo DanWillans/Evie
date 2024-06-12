@@ -1,33 +1,35 @@
 #include <doctest/doctest.h>
 
-#include "evie/ids.h"
 #include "evie/ecs/component_manager.hpp"
 #include "evie/ecs/entity_manager.hpp"
 #include "evie/ecs/system_manager.hpp"
+#include "evie/ids.h"
 
 using namespace evie;
+
+// NOLINTBEGIN
 
 TEST_CASE("Test system manager")
 {
   struct System1 : public System
   {
-    void Update(const float& delta_time){}
+    void Update(const float& delta_time) override { std::ignore = delta_time; }
   };
   struct System2 : public System
   {
-    void Update(const float& delta_time){}
+    void Update(const float& delta_time) override { std::ignore = delta_time; }
   };
   struct System3 : public System
   {
-    void Update(const float& delta_time){}
+    void Update(const float& delta_time) override { std::ignore = delta_time; }
   };
   struct System4 : public System
   {
-    void Update(const float& delta_time){}
+    void Update(const float& delta_time) override { std::ignore = delta_time; }
   };
   struct System5 : public System
   {
-    void Update(const float& delta_time){}
+    void Update(const float& delta_time) override { std::ignore = delta_time; }
   };
   struct TestComponent1
   {
@@ -128,3 +130,5 @@ TEST_CASE("Test system manager")
   REQUIRE_EQ(system_4.entities.size(), 5);
   REQUIRE_EQ(system_5.entities.size(), 1);
 }
+
+// NOLINTEND

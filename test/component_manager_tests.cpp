@@ -2,26 +2,25 @@
 
 #include <vector>
 
-#include "evie/ids.h"
 #include "evie/ecs/component_array.hpp"
 #include "evie/ecs/component_manager.hpp"
+#include "evie/ids.h"
+
+// NOLINTBEGIN
 
 namespace {
 struct TestComponent1
 {
   int a;
 };
-struct TestComponent2
+struct TestComponent2 : public TestComponent1
 {
-  int a;
 };
-struct TestComponent3
+struct TestComponent3 : public TestComponent1
 {
-  int a;
 };
-struct TestComponent4
+struct TestComponent4 : public TestComponent1
 {
-  int a;
 };
 }// namespace
 
@@ -40,9 +39,7 @@ TEST_CASE("Test ComponentArray")
   comp_array.AddComponent(id_2, { 2 });
   comp_array.AddComponent(id_3, { 3 });
   comp_array.AddComponent(id_4, { 4 });
-  auto ValidCheckAndNext = [&](EntityID id, int val) {
-    REQUIRE(comp_array.GetComponent(id).a ==  val);
-  };
+  auto ValidCheckAndNext = [&](EntityID id, int val) { REQUIRE(comp_array.GetComponent(id).a == val); };
   REQUIRE_EQ(comp_array.Size(), 5);
   // Check all components exist
   ValidCheckAndNext(id_0, 0);
@@ -55,9 +52,9 @@ TEST_CASE("Test ComponentArray")
   comp_array.RemoveComponent(id_2);
   REQUIRE_EQ(comp_array.Size(), 3);
   // Check left over components exist
-  ValidCheckAndNext(id_0, 0.0);
-  ValidCheckAndNext(id_4, 4.0);
-  ValidCheckAndNext(id_3, 3.0);
+  ValidCheckAndNext(id_0, 0);
+  ValidCheckAndNext(id_4, 4);
+  ValidCheckAndNext(id_3, 3);
   REQUIRE_EQ(comp_array.Size(), 3);
   // Add components back in a different order
   comp_array.AddComponent(id_2, { 2 });
@@ -67,20 +64,20 @@ TEST_CASE("Test ComponentArray")
   // Now get a new iterator and check that the order is 0,2,1,3,4
   // This order is because we removed 1, 2 and then put back 2, 1 and the free slots
   // would have been used up first before allocating new ones
-  ValidCheckAndNext(id_0, 0.0);
-  ValidCheckAndNext(id_4, 4.0);
-  ValidCheckAndNext(id_3, 3.0);
-  ValidCheckAndNext(id_2, 2.0);
-  ValidCheckAndNext(id_1, 1.0);
+  ValidCheckAndNext(id_0, 0);
+  ValidCheckAndNext(id_4, 4);
+  ValidCheckAndNext(id_3, 3);
+  ValidCheckAndNext(id_2, 2);
+  ValidCheckAndNext(id_1, 1);
   EntityID id_5{ 5 };
   comp_array.AddComponent(id_5, { 5 });
   REQUIRE_EQ(comp_array.Size(), 6);
-  ValidCheckAndNext(id_0, 0.0);
-  ValidCheckAndNext(id_4, 4.0);
-  ValidCheckAndNext(id_3, 3.0);
-  ValidCheckAndNext(id_2, 2.0);
-  ValidCheckAndNext(id_1, 1.0);
-  ValidCheckAndNext(id_5, 5.0);
+  ValidCheckAndNext(id_0, 0);
+  ValidCheckAndNext(id_4, 4);
+  ValidCheckAndNext(id_3, 3);
+  ValidCheckAndNext(id_2, 2);
+  ValidCheckAndNext(id_1, 1);
+  ValidCheckAndNext(id_5, 5);
 }
 
 TEST_CASE("Test ComponentManager")
@@ -173,3 +170,5 @@ TEST_CASE("Test ComponentManager")
   comp_manager.RemoveComponent(id_4, comp_id_2);
   REQUIRE(comp_manager.GetComponentCount(comp_id_2) == 0);
 }
+
+// NOLINTEND

@@ -18,7 +18,10 @@ class EVIE_API ComponentManager
 public:
   ComponentManager() = default;
   ComponentManager(const ComponentManager&) = delete;
+  ComponentManager(ComponentManager&&) = delete;
   ComponentManager& operator=(const ComponentManager&) = delete;
+  ComponentManager& operator=(ComponentManager&&) = delete;
+  ~ComponentManager() = default;
 
   // Chose to use ComponentID so that we don't have to do any fancy
   // type resolution with typeid to get the correct IComponentArray.
@@ -72,13 +75,11 @@ public:
     return comp_array->GetComponentVector();
   }
 
-  template<typename ComponentName>
-  bool HasComponent(EntityID id, ComponentID<ComponentName> component_id)
+  template<typename ComponentName> bool HasComponent(EntityID identifier, ComponentID<ComponentName> component_id)
   {
     auto* comp_array = static_cast<ComponentArray<ComponentName>*>(components_[component_id.Get()].get());
-    return comp_array->HasComponent(id);
+    return comp_array->HasComponent(identifier);
   }
-
 
 
 private:

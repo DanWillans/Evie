@@ -4,12 +4,14 @@
 #include <bitset>
 
 #include "ecs_constants.hpp"
+
 #include "evie/ids.h"
+#include "evie/core.h"
 
 namespace evie {
 
 // Wrap a bitset but make it easier for users to use the ComponentID etc.
-class SystemSignature
+class EVIE_API SystemSignature
 {
 public:
   SystemSignature() = default;
@@ -20,6 +22,8 @@ public:
 
 private:
   explicit SystemSignature(const std::bitset<MAX_COMPONENT_COUNT>& bitset) : bitset_(bitset) {}
+  // We don't expose std::bitset in the API so just disable the warning here.
+  #pragma warning( disable: 4251 )
   std::bitset<MAX_COMPONENT_COUNT> bitset_;
 };
 

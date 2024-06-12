@@ -92,6 +92,7 @@ public:
 private:
   void Update(const float& delta_time)
   {
+    std::ignore = delta_time;
     for (const auto& entity : entities) {
       evie::mat4 model(1.0f);
       const auto& translate = entity.GetComponent(transform_component_id_);
@@ -127,9 +128,9 @@ private:
     }
   }
 
+  evie::Camera* camera_;
   evie::ComponentID<evie::TransformRotationComponent> transform_component_id_{ 0 };
   evie::ComponentID<evie::MeshComponent> mesh_component_id_{ 0 };
-  evie::Camera* camera_;
 };
 ;
 }// namespace
@@ -137,7 +138,6 @@ private:
 class GameLayer : public evie::Layer
 {
 public:
-  GameLayer() = default;
   explicit GameLayer(const evie::IInputManager* input_manager, evie::IWindow* window, evie::ECSController* ecs)
     : input_manager_(input_manager), window_(window), ecs_(ecs)
   {}
@@ -427,8 +427,8 @@ private:
   evie::SystemID<PhysicsSystem> physics_system_id_{ 0 };
   RenderCubeSystem* cube_render_{ nullptr };
   PhysicsSystem* physics_system_{ nullptr };
-  evie::Entity* light_entity_;
-  evie::Entity* cube_entity_;
+  evie::Entity* light_entity_{ nullptr };
+  evie::Entity* cube_entity_{ nullptr };
   std::pair<const char*, evie::Material> current_material_index_{ *evie::material_map.begin() };
   evie::Texture2D diffuse_map_;
   evie::Texture2D specular_map_;
@@ -453,12 +453,12 @@ public:
     ImGui::SetCurrentContext(GetImGuiContext());
     if (err.Good()) {
       APP_INFO("Creating GameLayer");
-      t_layer_ = GameLayer(GetInputManager(), GetWindow(), GetECSController());
+      t_layer_ = std::make_unique<GameLayer>(GetInputManager(), GetWindow(), GetECSController());
       APP_INFO("Initialising layer");
-      err = t_layer_.Initialise();
+      err = t_layer_->Initialise();
       if (err.Good()) {
         APP_INFO("Pushing layer");
-        PushLayerFront(t_layer_);
+        PushLayerFront(*t_layer_);
       }
     }
     return err;
@@ -466,7 +466,7 @@ public:
   ~Sandbox() override = default;
 
 private:
-  GameLayer t_layer_;
+  std::unique_ptr<GameLayer> t_layer_;
 };
 
 std::unique_ptr<evie::Application> CreateApplication()

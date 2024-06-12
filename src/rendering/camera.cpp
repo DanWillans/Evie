@@ -7,22 +7,26 @@
 #include <glm/trigonometric.hpp>
 
 namespace evie {
+// NOLINTNEXTLINE
 void Camera::Rotate(const float& yaw_offset, const float& pitch_offset)
 {
-  yaw_ = std::fmodf(yaw_ += yaw_offset, 360.0);
-  pitch_ = std::fmodf(pitch_ += pitch_offset, 360.0);
-  pitch_ = std::min(pitch_, 89.0f);
-  pitch_ = std::max(pitch_, -89.0f);
-  direction_.x = cos(glm::radians(yaw_)) * cos(glm::radians(pitch_));
-  direction_.y = sin(glm::radians(pitch_));
-  direction_.z = sin(glm::radians(yaw_)) * cos(glm::radians(pitch_));
+  constexpr float pitch_max = 89.0F;
+  constexpr float pitch_min = -89.0F;
+  constexpr float full_circle_degrees = 360.0F;
+  yaw_ = std::fmodf(yaw_ += yaw_offset, full_circle_degrees);
+  pitch_ = std::fmodf(pitch_ += pitch_offset, full_circle_degrees);
+  pitch_ = std::min(pitch_, pitch_max);
+  pitch_ = std::max(pitch_, pitch_min);
+  direction_.x = cos(glm::radians(yaw_)) * cos(glm::radians(pitch_));// NOLINT
+  direction_.y = sin(glm::radians(pitch_));// NOLINT
+  direction_.z = sin(glm::radians(yaw_)) * cos(glm::radians(pitch_));// NOLINT
 }
 
 void Camera::Rotate(const MousePosition& mouse_pos)
 {
   if (first_mouse_) {
-    last_mouse_x_ = mouse_pos.x;
-    last_mouse_y_ = mouse_pos.y;
+    last_mouse_x_ = static_cast<float>(mouse_pos.x);
+    last_mouse_y_ = static_cast<float>(mouse_pos.y);
     first_mouse_ = false;
   }
   float x_offset = static_cast<float>(mouse_pos.x) - last_mouse_x_;
@@ -92,15 +96,18 @@ mat4 Camera::GetViewMatrix()
 }
 
 void Camera::ResetCameraPosition(const vec3& position) { position_ = position; }
-void FPSCamera::Rotate(const float& yaw_offset, const float& pitch_offset)
+void FPSCamera::Rotate(const float& yaw_offset, const float& pitch_offset)// NOLINT
 {
-  yaw_ = std::fmodf(yaw_ += yaw_offset, 360.0);
-  pitch_ = std::fmodf(pitch_ += pitch_offset, 360.0);
-  pitch_ = std::min(pitch_, 89.0f);
-  pitch_ = std::max(pitch_, -89.0f);
-  direction_.x = cos(glm::radians(yaw_)) * cos(glm::radians(pitch_));
-  direction_.y = sin(glm::radians(pitch_));
-  direction_.z = sin(glm::radians(yaw_)) * cos(glm::radians(pitch_));
+  constexpr float pitch_max = 89.0F;
+  constexpr float pitch_min = -89.0F;
+  constexpr float full_circle_degrees = 360.0F;
+  yaw_ = std::fmodf(yaw_ += yaw_offset, full_circle_degrees);
+  pitch_ = std::fmodf(pitch_ += pitch_offset, full_circle_degrees);
+  pitch_ = std::min(pitch_, pitch_max);
+  pitch_ = std::max(pitch_, pitch_min);
+  direction_.x = cos(glm::radians(yaw_)) * cos(glm::radians(pitch_));// NOLINT
+  direction_.y = sin(glm::radians(pitch_));// NOLINT
+  direction_.z = sin(glm::radians(yaw_)) * cos(glm::radians(pitch_));// NOLINT
 }
 
 void FPSCamera::Rotate(const MousePosition& mouse_pos, bool enable_cursor)
@@ -108,14 +115,14 @@ void FPSCamera::Rotate(const MousePosition& mouse_pos, bool enable_cursor)
   // Check if we should just update the last position or not. If enable_cursor is false then the cursor isn't currently
   // being used to update the camera.
   if (!enable_cursor) {
-    last_mouse_x_ = mouse_pos.x;
-    last_mouse_y_ = mouse_pos.y;
+    last_mouse_x_ = static_cast<float>(mouse_pos.x);
+    last_mouse_y_ = static_cast<float>(mouse_pos.y);
     return;
   }
 
   if (first_mouse_) {
-    last_mouse_x_ = mouse_pos.x;
-    last_mouse_y_ = mouse_pos.y;
+    last_mouse_x_ = static_cast<float>(mouse_pos.x);
+    last_mouse_y_ = static_cast<float>(mouse_pos.y);
     first_mouse_ = false;
   }
 
@@ -135,13 +142,13 @@ void FPSCamera::Rotate(const MousePosition& mouse_pos, bool enable_cursor)
 // We do this by adding onto the cameras view position.
 void FPSCamera::MoveForwards(const float& delta_time)
 {
-  position_ += camera_speed * delta_time * vec3{ direction_.x, 0.0, direction_.z };
+  position_ += camera_speed * delta_time * vec3{ direction_.x, 0.0, direction_.z }; //NOLINT(*-union-access)
 }
 
 // We move the camera position along the positive Z axis.
 void FPSCamera::MoveBackwards(const float& delta_time)
 {
-  position_ -= camera_speed * delta_time * vec3{ direction_.x, 0.0, direction_.z };
+  position_ -= camera_speed * delta_time * vec3{ direction_.x, 0.0, direction_.z }; //NOLINT(*-union-access)
 };
 
 // To strafe left we do a cross product. The cross product creates a perpendicular vector to the plane of the
@@ -150,13 +157,13 @@ void FPSCamera::MoveBackwards(const float& delta_time)
 // camera along the negative x axis.
 void FPSCamera::MoveLeft(const float& delta_time)
 {
-  position_ -= glm::normalize(glm::cross(vec3{ direction_.x, 0.0, direction_.z }, up_)) * camera_speed * delta_time;
+  position_ -= glm::normalize(glm::cross(vec3{ direction_.x, 0.0, direction_.z }, up_)) * camera_speed * delta_time; //NOLINT(*-union-access)
 }
 
 // We move the camera position to the right.
 void FPSCamera::MoveRight(const float& delta_time)
 {
-  position_ += glm::normalize(glm::cross(vec3{ direction_.x, 0.0, direction_.z }, up_)) * camera_speed * delta_time;
+  position_ += glm::normalize(glm::cross(vec3{ direction_.x, 0.0, direction_.z }, up_)) * camera_speed * delta_time; //NOLINT(*-union-access)
 }
 
 mat4 FPSCamera::GetViewMatrix()
