@@ -5,6 +5,7 @@
 #include "follow_system.hpp"
 #include "physics_system.hpp"
 #include "projectile_system.hpp"
+#include "dandan_system.hpp"
 #include "render.hpp"
 
 #include <evie/camera.h>
@@ -84,6 +85,9 @@ private:
   // VelocityComponent ID
   evie::ComponentID<VelocityComponent> velocity_cid_{0};
 
+  // EnemyComponent ID
+  evie::ComponentID<EnemyComponent> enemy_cid_{0};
+
   // Floor Vertex Shader
   evie::VertexShader floor_vertex_shader_;
 
@@ -101,6 +105,9 @@ private:
 
   // Physics System
   PhysicsSystem* physics_system_{nullptr};
+
+  // DanDan System
+  DanDanSystem* dandan_system_{nullptr};
 
   // Show cursor
   bool enable_cursor_{ false };

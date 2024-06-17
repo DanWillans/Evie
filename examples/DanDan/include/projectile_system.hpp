@@ -49,9 +49,9 @@ public:
   ProjectileSystem(ProjectileSystem&&) = delete;
   ProjectileSystem& operator=(const ProjectileSystem&) = delete;
   ProjectileSystem& operator=(ProjectileSystem&&) = delete;
-  virtual ~ProjectileSystem() = default;
+   ~ProjectileSystem() override = default;
 
-  static constexpr float ProjectileSpeed = 5.0F;
+  static constexpr float ProjectileSpeed = 20.0F;
 
   evie::Error Initialise()
   {
@@ -88,6 +88,8 @@ private:
 
     for (const auto& entity : entities) {
       const auto& transform = entity.GetComponent(transform_cid_);
+
+      // Delete projectiles if they go out of bounds.
       // NOLINTNEXTLINE(*-union-access)
       if (fabs(transform.position.x) > map_boundary_ || fabs(transform.position.y) > map_boundary_
           || fabs(transform.position.z) > map_boundary_) {// NOLINT(*-union-access)

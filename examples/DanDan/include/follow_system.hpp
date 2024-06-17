@@ -29,7 +29,7 @@ public:
 private:
   void Update(const float& delta_time) override
   {
-    // Should only ever be one target for now. Which mean vector size 2 :| :| :\. Fix this.
+    // Should only ever be one target for now. Which means vector size 2 :| :| :\. Fix this.
     if ((follow_target_vector_ != nullptr) && follow_target_vector_->size() == 2) {
       // Get the target EntityID
       const evie::EntityID& entity_id = (*follow_target_vector_)[1].id;

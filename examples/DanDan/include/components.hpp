@@ -18,8 +18,12 @@ class ProjectileComponent
 
 class VelocityComponent
 {
-  public:
+public:
   evie::vec3 velocity;
+};
+
+class EnemyComponent
+{
 };
 
 #endif// !INCLUDE_COMPONENTS_HPP_

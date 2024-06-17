@@ -6,6 +6,7 @@
 
 #include <GLFW/glfw3.h>
 
+#include <dandan_system.hpp>
 #include <evie/default_models.h>
 #include <evie/ecs/components/Transform.hpp>
 #include <evie/ecs/components/mesh_component.hpp>
@@ -57,6 +58,7 @@ evie::Error
   follower_cid_ = ecs_->RegisterComponent<FollowerComponent>();
   projectile_cid_ = ecs_->RegisterComponent<ProjectileComponent>();
   velocity_cid_ = ecs_->RegisterComponent<VelocityComponent>();
+  enemy_cid_ = ecs_->RegisterComponent<EnemyComponent>();
 
   // Register our render
   evie::SystemSignature signature;
@@ -79,6 +81,16 @@ evie::Error
   physics_signature.SetComponent(velocity_cid_);
   auto phys_sys_id = ecs_->RegisterSystem<PhysicsSystem>(physics_signature, velocity_cid_, transform_cid_);
   physics_system_ = &(ecs_->GetSystem(phys_sys_id));
+
+  // Register our DanDan system
+  evie::SystemSignature dan_dan_signature;
+  dan_dan_signature.SetComponent(enemy_cid_);
+  auto enemy_sys_id =
+    ecs_->RegisterSystem<DanDanSystem>(dan_dan_signature, enemy_cid_, mesh_cid_, transform_cid_, follower_cid_, projectile_cid_, ecs_);
+  dandan_system_ = &(ecs_->GetSystem(enemy_sys_id));
+  if (err.Good()) {
+    err = dandan_system_->Initialise();
+  }
 
   constexpr float map_scale = 30.0F;
 
@@ -114,9 +126,9 @@ evie::Error
     err = SetupWalls(map_scale);
   }
 
-  if (err.Good()) {
-    err = SetupDanDan();
-  }
+  // if (err.Good()) {
+  //   err = SetupDanDan();
+  // }
 
   // Disable cursor
   if (!enable_cursor_) {
@@ -151,6 +163,9 @@ void GameLayer::OnUpdate()
 
   // Update physics system
   physics_system_->UpdateSystem(delta_time);
+
+  // Update dandan system 
+  dandan_system_->UpdateSystem(delta_time);
 }
 
 void GameLayer::OnRender() { renderer_->UpdateSystem(0.0F); }
@@ -523,8 +538,8 @@ evie::Error GameLayer::SetupWalls(float map_scale)
       // transform the wall to the left of the map
       // NOLINTNEXTLINE(*-union-access)
       transform.position.x = -wall_offset;
-      transform.rotation =
-        glm::angleAxis(static_cast<float>(std::numbers::pi / half_cover_quat), glm::vec3{ 0.0F, 1.0F, 0.0F });
+      transform.rotation = glm::angleAxis(
+        static_cast<float>(static_cast<float>(std::numbers::pi) / half_cover_quat), glm::vec3{ 0.0F, 1.0F, 0.0F });
       err = floor_entity_left->AddComponent(transform_cid_, transform);
     }
   }
@@ -542,8 +557,8 @@ evie::Error GameLayer::SetupWalls(float map_scale)
       // transform the wall to the right of the map
       // NOLINTNEXTLINE(*-union-access)
       transform.position.x = wall_offset;
-      transform.rotation =
-        glm::angleAxis(static_cast<float>(std::numbers::pi / half_cover_quat), glm::vec3{ 0.0F, 1.0F, 0.0F });
+      transform.rotation = glm::angleAxis(
+        static_cast<float>(static_cast<float>(std::numbers::pi) / half_cover_quat), glm::vec3{ 0.0F, 1.0F, 0.0F });
       err = floor_entity_right->AddComponent(transform_cid_, transform);
     }
   }

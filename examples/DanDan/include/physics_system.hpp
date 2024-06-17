@@ -17,7 +17,7 @@ public:
   PhysicsSystem(PhysicsSystem&&) = delete;
   PhysicsSystem& operator=(const PhysicsSystem&) = delete;
   PhysicsSystem& operator=(PhysicsSystem&&) = delete;
-  virtual ~PhysicsSystem() = default;
+   ~PhysicsSystem() override = default;
 
 private:
   void Update(const float& delta_time) override
