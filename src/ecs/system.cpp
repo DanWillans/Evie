@@ -15,5 +15,5 @@ void System::UpdateSystem(const float& delta_time)
   entities_to_delete_.clear();
 }
 
-void System::MarkEntityForDeletion(const Entity& entity) { entities_to_delete_.push_back(entity); }
+void System::MarkEntityForDeletion(const Entity& entity) { entities_to_delete_.insert(entity); }
 }// namespace evie

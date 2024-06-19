@@ -49,7 +49,7 @@ public:
   ProjectileSystem(ProjectileSystem&&) = delete;
   ProjectileSystem& operator=(const ProjectileSystem&) = delete;
   ProjectileSystem& operator=(ProjectileSystem&&) = delete;
-   ~ProjectileSystem() override = default;
+  ~ProjectileSystem() override = default;
 
   static constexpr float ProjectileSpeed = 20.0F;
 
@@ -73,18 +73,20 @@ public:
     return err;
   }
 
-  evie::Error MousePressed() { return CreateProjectile(); }
+  evie::Error MousePressed()
+  {
+    APP_INFO("Mouse pressed");
+    auto err = CreateProjectile();
+    if (err.Bad()) {
+      APP_INFO("Error creating projectile: %s", err.Message());
+    }
+    return err;
+  }
 
 private:
   void Update(const float& delta_time) override
   {
     (void)delta_time;
-
-    if (input_manager_->IsMousePressed(evie::MouseCode::ButtonLeft)) {
-      // Only allow projectile creation every Update()
-      // Don't rate limit just yet.
-      CreateProjectile();
-    }
 
     for (const auto& entity : entities) {
       const auto& transform = entity.GetComponent(transform_cid_);
@@ -93,6 +95,7 @@ private:
       // NOLINTNEXTLINE(*-union-access)
       if (fabs(transform.position.x) > map_boundary_ || fabs(transform.position.y) > map_boundary_
           || fabs(transform.position.z) > map_boundary_) {// NOLINT(*-union-access)
+        APP_INFO("Delete entity {}", entity.GetID().Get());
         MarkEntityForDeletion(entity);
       }
     }
@@ -139,8 +142,11 @@ private:
         if (err.Good()) {
           err = entity->AddComponent(
             velocity_cid_, VelocityComponent{ .velocity = evie::vec3{ 0.0F, 0.0F, -ProjectileSpeed } });
+          APP_INFO("Made all");
         }
       }
+    } else {
+      err = entity.Error();
     }
     return err;
   }

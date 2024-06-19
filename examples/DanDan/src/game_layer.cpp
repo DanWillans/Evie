@@ -153,19 +153,15 @@ void GameLayer::OnUpdate()
     follower_system_->UpdateSystem(delta_time);
   }
 
-  // Check if mouse is pressed
-  if (input_manager_->IsMousePressed(evie::MouseCode::ButtonLeft)) {
-    projectile_system_->MousePressed();
-  }
+  // Update dandan system 
+  dandan_system_->UpdateSystem(delta_time);
 
   // Update projectile system
   projectile_system_->UpdateSystem(delta_time);
 
   // Update physics system
   physics_system_->UpdateSystem(delta_time);
-
-  // Update dandan system 
-  dandan_system_->UpdateSystem(delta_time);
+  APP_INFO("Entity count: {}", ecs_->EntityCount());
 }
 
 void GameLayer::OnRender() { renderer_->UpdateSystem(0.0F); }

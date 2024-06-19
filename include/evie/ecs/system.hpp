@@ -63,7 +63,7 @@ private:
 
   // We don't expose std::vector in the API so just disable the warning here.
   #pragma warning( disable: 4251 )
-  std::vector<Entity> entities_to_delete_;
+  ankerl::unordered_dense::set<Entity> entities_to_delete_;
 };
 }// namespace evie
 

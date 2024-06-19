@@ -84,6 +84,7 @@ private:
           const auto& dandan_transform = dandan.GetComponent(transform_cid_);
           if (Collides(transform, dandan_transform)) {
             MarkEntityForDeletion(dandan);
+            continue;
           }
         }
       }
@@ -95,11 +96,7 @@ private:
     auto diff_x = fabs(transform.position.x - dandan_transform.position.x);
     auto diff_y = fabs(transform.position.y - dandan_transform.position.y);
     auto diff_z = fabs(transform.position.z - dandan_transform.position.z);
-    if (diff_x < dandan_scale.x / 2.0F && diff_y < dandan_scale.y / 2.0F && diff_z < dandan_scale.z / 2.0F) {
-      return true;
-    } else {
-      return false;
-    }
+    return diff_x < dandan_scale.x / 2.0F && diff_y < dandan_scale.y / 2.0F && diff_z < dandan_scale.z / 2.0F;
   }
 
   evie::Error CreateDanDan()
