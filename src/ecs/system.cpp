@@ -1,6 +1,12 @@
 #include "evie/ecs/system.hpp"
 
 namespace evie {
+
+ankerl::unordered_dense::set<Entity>* System::RegisterSystemSignature(const SystemSignature& signature)
+{
+  return &entity_sets.emplace_back(signature, ankerl::unordered_dense::set<Entity>{}).second;
+}
+
 void System::UpdateSystem(const float& delta_time)
 {
   // Call user implemented Update() function first

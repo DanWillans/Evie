@@ -107,6 +107,7 @@ private:
     constexpr evie::vec3 projectile_scale{ 0.2F, 0.2F, 0.2F };
     constexpr evie::vec3 projectile_local_offset{ 0.1F, -0.2F, -0.4F };
     auto entity = ecs_->CreateEntity();
+    APP_INFO("Projectile ID: {}", entity->GetID().Get());
 
     if (entity) {
       // Create the transform for the projectile.

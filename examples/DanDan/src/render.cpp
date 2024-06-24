@@ -22,7 +22,7 @@ void Renderer::Initialise(evie::ComponentID<evie::MeshComponent> mesh_cid,
 void Renderer::Update(const float& delta_time)
 {
   std::ignore = delta_time;
-  APP_INFO("Render entity count: {}", entities.size());
+  // APP_INFO("Render entity count: {}", entities.size());
   for (const auto& entity : entities) {
     evie::mat4 model(1.0F);
     const auto& translate = entity.GetComponent(transform_cid_);

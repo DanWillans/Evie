@@ -44,6 +44,8 @@ public:
     const auto& system = systems_.emplace_back(std::make_unique<SystemName>(args...));
     system->signature = signature;
     system->component_manager = component_manager_;
+    system->system_manager = this;
+    system->entity_sets.emplace_back(signature, ankerl::unordered_dense::set<Entity>{});
     return system_id;
   }
 

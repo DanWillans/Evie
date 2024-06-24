@@ -73,6 +73,7 @@ public:
 private:
   friend class ECSController;
   friend class SystemManager;
+  friend class System;
   Entity(ISystemManager* system_manager,
     ComponentManager* component_manager,
     EntityManager* entity_manager,

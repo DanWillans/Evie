@@ -126,10 +126,6 @@ evie::Error
     err = SetupWalls(map_scale);
   }
 
-  // if (err.Good()) {
-  //   err = SetupDanDan();
-  // }
-
   // Disable cursor
   if (!enable_cursor_) {
     window_->DisableCursor();
@@ -161,7 +157,7 @@ void GameLayer::OnUpdate()
 
   // Update physics system
   physics_system_->UpdateSystem(delta_time);
-  APP_INFO("Entity count: {}", ecs_->EntityCount());
+  //APP_INFO("Entity count: {}", ecs_->EntityCount());
 }
 
 void GameLayer::OnRender() { renderer_->UpdateSystem(0.0F); }

@@ -1,6 +1,7 @@
 #ifndef INCLUDE_DANDAN_SYSTEM_HPP_
 #define INCLUDE_DANDAN_SYSTEM_HPP_
 
+#include <evie/ecs/system_signature.hpp>
 #include <vector>
 
 #include "components.hpp"
@@ -57,8 +58,9 @@ public:
     // Make the first DanDan
     CreateDanDan();
 
-    // Cash the projectile component vector for later
-    projectiles_ = &(component_manager->GetComponentVector(projectile_cid_));
+    evie::SystemSignature signature;
+    signature.SetComponent(projectile_cid_);
+    projectiles_ = RegisterSystemSignature(signature);
 
     if (!projectiles_) {
       err = evie::Error{ "Failed to get projectiles vector" };
@@ -71,21 +73,23 @@ private:
   void Update(const float& delta_time)
   {
     (void)delta_time;
-    if(entities.empty()){
+    if (entities.empty()) {
       CreateDanDan();
     }
     // Iterate over DanDans and check if any projectile entities have hit it
-    for (const auto& dandan : entities) {
+    for (const auto& dandan : GetEntities()) {
       // Iterate all projectiles and check if they intersect with DanDan
       for (const auto& projectile : *projectiles_) {
         // Check projectile has transform component first
-        if (component_manager->HasComponent(projectile.id, transform_cid_)) {
-          const auto& transform = component_manager->GetComponent(projectile.id, transform_cid_);
-          const auto& dandan_transform = dandan.GetComponent(transform_cid_);
-          if (Collides(transform, dandan_transform)) {
-            MarkEntityForDeletion(dandan);
-            continue;
-          }
+        // if (component_manager->HasComponent(projectile.id, transform_cid_)) {
+        const auto& transform = projectile.GetComponent(transform_cid_);
+        const auto& dandan_transform = dandan.GetComponent(transform_cid_);
+        if (Collides(transform, dandan_transform)) {
+          // Delete dandan
+          MarkEntityForDeletion(dandan);
+          // Delete projectile
+          MarkEntityForDeletion(projectile);
+          continue;
         }
       }
     }
@@ -123,6 +127,7 @@ private:
     mesh_component.texture = tex_;
 
     auto dandan = ecs_->CreateEntity();
+    APP_INFO("dandan id: {}", dandan->GetID().Get());
     if (dandan && err.Good()) {
       err = dandan->AddComponent(mesh_cid_, mesh_component);
       if (err.Good()) {
@@ -153,7 +158,7 @@ private:
   evie::ComponentID<FollowerComponent> follower_cid_{ 0 };
   evie::ComponentID<ProjectileComponent> projectile_cid_{ 0 };
   evie::ECSController* ecs_{ nullptr };
-  std::vector<evie::ComponentWrapper<ProjectileComponent>>* projectiles_{ nullptr };
+  ankerl::unordered_dense::set<evie::Entity>* projectiles_{ nullptr };
 };
 
 #endif// !INCLUDE_DANDAN_SYSTEM_HPP_

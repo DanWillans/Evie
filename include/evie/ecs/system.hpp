@@ -24,14 +24,24 @@ class EVIE_API System
 {
 public:
   virtual ~System() = default;
-
-  // A set of entities that this system is interested in based on the SystemSignature
+  // A handle to the system manager
+  SystemManager* system_manager{ nullptr };
+  // A set of entities that this system is interested in based on the main SystemSignature
   ankerl::unordered_dense::set<Entity> entities;
   // The signature of components this system cares about.
   SystemSignature signature;
   // A handle to the component manager
   // Do not use until the system has been registered.
   ComponentManager* component_manager{ nullptr };
+
+  /**
+   * @brief Register an additional SystemSignature to track in the ECS. Must be called prior to any entities being
+   * created. This function currently doesn't support adding existing entities to the set only entities made afterward
+   *
+   * @param signature The system signature of the components this system is interested in.
+   * @return ankerl::unordered_dense::set<Entity>* A handle to the entity set to iterate over.
+   */
+  ankerl::unordered_dense::set<Entity>* RegisterSystemSignature(const SystemSignature& signature);
 
   /**
    * @brief This should be called by the game. Internally it will call the user implemented Update() function.
@@ -49,10 +59,24 @@ public:
     return component_manager->GetComponentVector(identifier);
   }
 
+  /**
+   * @brief Get the main entities associated to the system signature initially registered.
+   *
+   * @return ankerl::unordered_dense::set<Entity>& entity set
+   */
+  ankerl::unordered_dense::set<Entity>& GetEntities()
+  {
+    assert(!entity_sets.empty());
+    return entity_sets[0].second;
+  }
+
 protected:
   void MarkEntityForDeletion(const Entity& entity);
 
 private:
+  // Let systemmanage access private members to set.
+  friend class SystemManager;
+
   /**
    * @brief This is for the developer to implement. This is where entities should be marked as deleted if they should be
    * removed.
@@ -61,8 +85,12 @@ private:
    */
   virtual void Update([[maybe_unused]] const float& delta_time) = 0;
 
-  // We don't expose std::vector in the API so just disable the warning here.
-  #pragma warning( disable: 4251 )
+  // A vector of additional entity sets registered via RegisterSystemSignature. This shouldn't be accessed directly, the
+  // handle should be kept from RegisterSystemSignature().
+  std::vector<std::pair<SystemSignature, ankerl::unordered_dense::set<Entity>>> entity_sets;
+
+// We don't expose std::vector in the API so just disable the warning here.
+#pragma warning(disable : 4251)
   ankerl::unordered_dense::set<Entity> entities_to_delete_;
 };
 }// namespace evie
