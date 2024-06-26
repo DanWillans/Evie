@@ -2,6 +2,7 @@
 #define INCLUDE_DANDAN_SYSTEM_HPP_
 
 #include <evie/ecs/system_signature.hpp>
+#include <optional>
 #include <vector>
 
 #include "components.hpp"
@@ -29,9 +30,10 @@ public:
     evie::ComponentID<evie::TransformComponent> transform_cid,
     evie::ComponentID<FollowerComponent> follower_cid,
     evie::ComponentID<ProjectileComponent> projectile_cid,
-    evie::ECSController* ecs)
+    evie::ECSController* ecs,
+    float map_scale)
     : enemy_cid_(enemy_cid), mesh_cid_(mesh_cid), transform_cid_(transform_cid), follower_cid_(follower_cid),
-      projectile_cid_(projectile_cid), ecs_(ecs)
+      projectile_cid_(projectile_cid), ecs_(ecs), map_scale_(map_scale)
   {}
 
   static constexpr evie::vec3 dandan_scale{ 2.0F, 2.0F, 2.0F };
@@ -76,6 +78,7 @@ private:
     if (entities.empty()) {
       CreateDanDan();
     }
+    static bool touched{ false };
     // Iterate over DanDans and check if any projectile entities have hit it
     for (const auto& dandan : GetEntities()) {
       // Iterate all projectiles and check if they intersect with DanDan
@@ -85,13 +88,26 @@ private:
         const auto& transform = projectile.GetComponent(transform_cid_);
         const auto& dandan_transform = dandan.GetComponent(transform_cid_);
         if (Collides(transform, dandan_transform)) {
+          touched = true;
           // Delete dandan
           MarkEntityForDeletion(dandan);
           // Delete projectile
           MarkEntityForDeletion(projectile);
+          // Increment the score as we've killed a DanDan
+          score_++;
+          // Create a new DanDan as a way to keep score
+          evie::TransformComponent score_transform;
+          score_transform.position.x = (-map_scale_ / 2.0F) + score_ * 2.0F;// NOLINT
+          score_transform.position.y = 5.0F;// NOLINT
+          score_transform.position.z = -map_scale_ / 2.0F;// NOLINT
+          next_dandan_transform_ = score_transform;
           continue;
         }
       }
+    }
+    if (next_dandan_transform_.has_value()) {
+      CreateDanDan(next_dandan_transform_.value(), false);
+      next_dandan_transform_ = std::nullopt;
     }
   }
 
@@ -103,7 +119,16 @@ private:
     return diff_x < dandan_scale.x / 2.0F && diff_y < dandan_scale.y / 2.0F && diff_z < dandan_scale.z / 2.0F;
   }
 
-  evie::Error CreateDanDan()
+  evie::Error CreateDanDan(bool enemy = true)
+  {
+    evie::TransformComponent transform;
+    // NOLINTNEXTLINE(*-union-access)
+    transform.position.y = dandan_height_offset;
+    transform.scale = dandan_scale;
+    return CreateDanDan(transform, enemy);
+  }
+
+  evie::Error CreateDanDan(const evie::TransformComponent& transform, bool enemy = true)
   {
     evie::Error err = evie::Error::OK();
     evie::MeshComponent mesh_component;
@@ -131,23 +156,19 @@ private:
     if (dandan && err.Good()) {
       err = dandan->AddComponent(mesh_cid_, mesh_component);
       if (err.Good()) {
-        evie::TransformComponent transform;
-        // NOLINTNEXTLINE(*-union-access)
-        transform.position.y = dandan_height_offset;
-        transform.scale = dandan_scale;
         err = dandan->AddComponent(transform_cid_, transform);
         if (err.Good()) {
           // Dan dan is a follower
           err = dandan->AddComponent(follower_cid_);
         }
-        if (err.Good()) {
+        if (err.Good() && enemy) {
           err = dandan->AddComponent(enemy_cid_);
         }
       }
     }
-
     return err;
   }
+
   evie::VertexShader vs_;
   evie::FragmentShader fs_;
   evie::Texture2D tex_;
@@ -159,6 +180,9 @@ private:
   evie::ComponentID<ProjectileComponent> projectile_cid_{ 0 };
   evie::ECSController* ecs_{ nullptr };
   ankerl::unordered_dense::set<evie::Entity>* projectiles_{ nullptr };
+  int score_{ 0 };
+  float map_scale_{ 0.0 };
+  std::optional<evie::TransformComponent> next_dandan_transform_;
 };
 
 #endif// !INCLUDE_DANDAN_SYSTEM_HPP_

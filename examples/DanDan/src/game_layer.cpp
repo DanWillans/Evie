@@ -50,6 +50,8 @@ evie::Error
     return evie::Error{ "Invalid window" };
   }
 
+  constexpr float map_scale = 30.0F;
+
   // Let's use ECS to add data to our models
   // Register our componenets
   mesh_cid_ = ecs_->RegisterComponent<evie::MeshComponent>();
@@ -86,13 +88,11 @@ evie::Error
   evie::SystemSignature dan_dan_signature;
   dan_dan_signature.SetComponent(enemy_cid_);
   auto enemy_sys_id =
-    ecs_->RegisterSystem<DanDanSystem>(dan_dan_signature, enemy_cid_, mesh_cid_, transform_cid_, follower_cid_, projectile_cid_, ecs_);
+    ecs_->RegisterSystem<DanDanSystem>(dan_dan_signature, enemy_cid_, mesh_cid_, transform_cid_, follower_cid_, projectile_cid_, ecs_, map_scale);
   dandan_system_ = &(ecs_->GetSystem(enemy_sys_id));
   if (err.Good()) {
     err = dandan_system_->Initialise();
   }
-
-  constexpr float map_scale = 30.0F;
 
   if (err.Good()) {
     err = SetupPlayer(map_scale);
@@ -157,7 +157,6 @@ void GameLayer::OnUpdate()
 
   // Update physics system
   physics_system_->UpdateSystem(delta_time);
-  //APP_INFO("Entity count: {}", ecs_->EntityCount());
 }
 
 void GameLayer::OnRender() { renderer_->UpdateSystem(0.0F); }
