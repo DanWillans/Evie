@@ -51,7 +51,7 @@ public:
   ProjectileSystem& operator=(ProjectileSystem&&) = delete;
   ~ProjectileSystem() override = default;
 
-  static constexpr float ProjectileSpeed = 20.0F;
+  static constexpr float ProjectileSpeed = 40.0F;
 
   evie::Error Initialise()
   {

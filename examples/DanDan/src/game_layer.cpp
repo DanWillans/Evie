@@ -50,7 +50,7 @@ evie::Error
     return evie::Error{ "Invalid window" };
   }
 
-  constexpr float map_scale = 30.0F;
+  constexpr float map_scale = 50.0F;
 
   // Let's use ECS to add data to our models
   // Register our componenets

@@ -6,6 +6,7 @@
 #include <evie/ecs/entity.hpp>
 #include <evie/ecs/system_signature.hpp>
 #include <optional>
+#include <random>
 #include <vector>
 
 #include "components.hpp"
@@ -85,12 +86,28 @@ public:
   }
 
 private:
+  evie::vec3 GetRandomTransform()
+  {
+    std::random_device rd;// obtain a random number from hardware
+    std::mt19937 gen(rd());// seed the generator
+    std::uniform_int_distribution<> distr(-map_scale_ / 2.0F, map_scale_ / 2.0F);// define the range
+    // float x_pos = distr(gen);
+    // const auto&
+    // if( x_pos)
+    return evie::vec3{ distr(gen), starting_offset.y, distr(gen) };
+  }
+
   void Update(const float& delta_time) override
   {
     (void)delta_time;
     if (GetEntities().empty()) {
       evie::TransformComponent transform;
-      transform.position = starting_offset;
+      if (!init_) {
+        init_ = true;
+        transform.position = starting_offset;
+      } else {
+        transform.position = GetRandomTransform();
+      }
       transform.scale = dandan_scale;
       CreateDanDan(transform, true, static_cast<float>(score_));
     }
@@ -110,9 +127,10 @@ private:
           score_++;
           // Create a new DanDan as a way to keep score
           evie::TransformComponent score_transform;
-          score_transform.position.x = (-map_scale_ / 2.0F) + score_ * 2.0F;// NOLINT
+          score_transform.position.x = (-map_scale_ / 2.0F) + score_ * 4.0F;// NOLINT
           score_transform.position.y = 5.0F;// NOLINT
           score_transform.position.z = -map_scale_ / 2.0F;// NOLINT
+          score_transform.scale = dandan_scale * 1.5F;
           next_dandan_transform_ = score_transform;
           continue;
         }
@@ -128,6 +146,9 @@ private:
           // Reduce the score
           if (score_ > 0) {
             score_--;
+          } else if (score_ == 0 && init_){
+            APP_INFO("You suck. You lose");
+            std::exit(EXIT_SUCCESS);
           }
           // Delete the DanDan scorers
           if (!score_dan_dans_.empty()) {
@@ -207,7 +228,7 @@ private:
         }
         if (err.Good() && enemy) {
           VelocityComponent vel_comp;
-          vel_comp.speed = speed * 4.0F;
+          vel_comp.speed = speed * 2.5F;
           err = dandan->AddComponent(velocity_cid_, vel_comp);
         }
         if (err.Good() && !enemy) {
@@ -237,6 +258,7 @@ private:
   float map_scale_{ 0.0 };
   std::optional<evie::TransformComponent> next_dandan_transform_{ std::nullopt };
   bool colliding_{ false };
+  bool init_{ false };
 };
 
 #endif// !INCLUDE_DANDAN_SYSTEM_HPP_
