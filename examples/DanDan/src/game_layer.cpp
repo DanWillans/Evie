@@ -112,7 +112,6 @@ evie::Error
   evie::SystemSignature project_signature;
   project_signature.SetComponent(projectile_cid_);
   auto projectile_sys_id = ecs_->RegisterSystem<ProjectileSystem>(project_signature,
-    input_manager_,
     ecs_,
     mesh_cid_,
     transform_cid_,

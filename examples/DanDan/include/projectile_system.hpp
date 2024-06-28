@@ -30,16 +30,15 @@
 class ProjectileSystem : public evie::System
 {
 public:
-  ProjectileSystem(evie::IInputManager* input_manager,
-    evie::ECSController* ecs,
+  ProjectileSystem(evie::ECSController* ecs,
     evie::ComponentID<evie::MeshComponent> mesh_cid,
     evie::ComponentID<evie::TransformComponent> transform_cid,
     evie::ComponentID<ProjectileComponent> projectile_cid,
     evie::ComponentID<VelocityComponent> velocity_cid,
     evie::Entity* player_entity,
     const float& map_boundary)
-    : input_manager_(input_manager), ecs_(ecs), mesh_cid_(mesh_cid), transform_cid_(transform_cid),
-      projectile_cid_(projectile_cid), velocity_cid_(velocity_cid), player_entity_(player_entity)
+    : ecs_(ecs), mesh_cid_(mesh_cid), transform_cid_(transform_cid), projectile_cid_(projectile_cid),
+      velocity_cid_(velocity_cid), player_entity_(player_entity)
   {
     constexpr float half_map_size = 2.0F;
     map_boundary_ = map_boundary / half_map_size;
@@ -151,7 +150,6 @@ private:
     }
     return err;
   }
-  evie::IInputManager* input_manager_{ nullptr };
   evie::ECSController* ecs_{ nullptr };
   evie::ComponentID<evie::MeshComponent> mesh_cid_{ 0 };
   evie::ComponentID<evie::TransformComponent> transform_cid_{ 0 };
