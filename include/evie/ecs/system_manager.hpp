@@ -45,7 +45,8 @@ public:
     system->signature = signature;
     system->component_manager = component_manager_;
     system->system_manager = this;
-    system->entity_sets.emplace_back(signature, ankerl::unordered_dense::set<Entity>{});
+    auto res = system->RegisterSystemSignature(signature);
+    assert(res);
     return system_id;
   }
 

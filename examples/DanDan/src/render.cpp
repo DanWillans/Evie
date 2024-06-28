@@ -7,6 +7,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/euler_angles.hpp>
 #include <glm/gtx/quaternion.hpp>
+#include <glm/gtx/string_cast.hpp>
 
 void Renderer::Initialise(evie::ComponentID<evie::MeshComponent> mesh_cid,
   evie::ComponentID<evie::TransformComponent> transform_cid,
@@ -22,7 +23,6 @@ void Renderer::Initialise(evie::ComponentID<evie::MeshComponent> mesh_cid,
 void Renderer::Update(const float& delta_time)
 {
   std::ignore = delta_time;
-  // APP_INFO("Render entity count: {}", entities.size());
   for (const auto& entity : entities) {
     evie::mat4 model(1.0F);
     const auto& translate = entity.GetComponent(transform_cid_);
@@ -31,6 +31,7 @@ void Renderer::Update(const float& delta_time)
     // Handle transforming the object first
     // This moves the object to where we want it in world space.
     model = glm::translate(model, translate.position);
+    // APP_INFO("Render entity {} with position {}", entity.GetID().Get(), glm::to_string(translate.position));
     // This rotates the object to where we want it in the world space.
     model = model * glm::toMat4(translate.rotation);
     model = glm::scale(model, translate.scale);

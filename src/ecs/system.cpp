@@ -2,9 +2,13 @@
 
 namespace evie {
 
-ankerl::unordered_dense::set<Entity>* System::RegisterSystemSignature(const SystemSignature& signature)
+[[nodiscard]] Result<EntitySet*> System::RegisterSystemSignature(const SystemSignature& signature)
 {
-  return &entity_sets.emplace_back(signature, ankerl::unordered_dense::set<Entity>{}).second;
+  if (entity_set_count_ > MAXIMUM_ENTITY_SETS) {
+    return Error{ "Maximum entity set" };
+  }
+  entity_sets[entity_set_count_].first = signature;
+  return &(entity_sets[entity_set_count_++].second);
 }
 
 void System::UpdateSystem(const float& delta_time)

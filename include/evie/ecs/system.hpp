@@ -11,6 +11,9 @@
 #include "ankerl/unordered_dense.h"
 
 namespace evie {
+
+using EntitySet = ankerl::unordered_dense::set<Entity>;
+
 // A system at the minute is a simple class that tracks a std::unordered_set of
 // EntityIDs and a SystemSignature that represents the types of components that the
 // system is interested in.
@@ -23,6 +26,7 @@ namespace evie {
 class EVIE_API System
 {
 public:
+  static constexpr uint8_t MAXIMUM_ENTITY_SETS{ 20 };
   virtual ~System() = default;
   // A handle to the system manager
   SystemManager* system_manager{ nullptr };
@@ -41,7 +45,7 @@ public:
    * @param signature The system signature of the components this system is interested in.
    * @return ankerl::unordered_dense::set<Entity>* A handle to the entity set to iterate over.
    */
-  ankerl::unordered_dense::set<Entity>* RegisterSystemSignature(const SystemSignature& signature);
+  [[nodiscard]] Result<EntitySet*> RegisterSystemSignature(const SystemSignature& signature);
 
   /**
    * @brief This should be called by the game. Internally it will call the user implemented Update() function.
@@ -87,11 +91,14 @@ private:
 
   // A vector of additional entity sets registered via RegisterSystemSignature. This shouldn't be accessed directly, the
   // handle should be kept from RegisterSystemSignature().
-  std::vector<std::pair<SystemSignature, ankerl::unordered_dense::set<Entity>>> entity_sets;
+  // Right now you can only have 20 maximum entity sets so that handles/pointers don't become invalidated.
+  std::array<std::pair<SystemSignature, EntitySet>, MAXIMUM_ENTITY_SETS> entity_sets;
 
 // We don't expose std::vector in the API so just disable the warning here.
 #pragma warning(disable : 4251)
   ankerl::unordered_dense::set<Entity> entities_to_delete_;
+
+  uint8_t entity_set_count_{ 0 };
 };
 }// namespace evie
 

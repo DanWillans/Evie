@@ -73,8 +73,10 @@ evie::Error
   // Register our follow system
   evie::SystemSignature follow_signature;
   follow_signature.SetComponent(follower_cid_);
-  auto fol_sys_id =
-    ecs_->RegisterSystem<FollowSystem>(follow_signature, follow_target_cid_, follower_cid_, transform_cid_);
+  follow_signature.SetComponent(velocity_cid_);
+  follow_signature.SetComponent(transform_cid_);
+  auto fol_sys_id = ecs_->RegisterSystem<FollowSystem>(
+    follow_signature, follow_target_cid_, follower_cid_, transform_cid_, velocity_cid_);
   follower_system_ = &(ecs_->GetSystem(fol_sys_id));
   follower_system_->Initialise();
 
@@ -87,8 +89,16 @@ evie::Error
   // Register our DanDan system
   evie::SystemSignature dan_dan_signature;
   dan_dan_signature.SetComponent(enemy_cid_);
-  auto enemy_sys_id =
-    ecs_->RegisterSystem<DanDanSystem>(dan_dan_signature, enemy_cid_, mesh_cid_, transform_cid_, follower_cid_, projectile_cid_, ecs_, map_scale);
+  auto enemy_sys_id = ecs_->RegisterSystem<DanDanSystem>(dan_dan_signature,
+    enemy_cid_,
+    mesh_cid_,
+    transform_cid_,
+    follower_cid_,
+    projectile_cid_,
+    follow_target_cid_,
+    velocity_cid_,
+    ecs_,
+    map_scale);
   dandan_system_ = &(ecs_->GetSystem(enemy_sys_id));
   if (err.Good()) {
     err = dandan_system_->Initialise();
@@ -111,7 +121,9 @@ evie::Error
     player_entity_,
     map_scale);
   projectile_system_ = &(ecs_->GetSystem(projectile_sys_id));
-  projectile_system_->Initialise();
+  if (err.Good()) {
+    err = projectile_system_->Initialise();
+  }
 
   if (err.Good()) {
     err = SetupFloor(map_scale);
@@ -145,11 +157,10 @@ void GameLayer::OnUpdate()
   HandlePlayerCameraMovement(delta_time);
 
   // Update follow system
-  if (follow_on_) {
-    follower_system_->UpdateSystem(delta_time);
-  }
+  follower_system_->FollowOn(follow_on_);
+  follower_system_->UpdateSystem(delta_time);
 
-  // Update dandan system 
+  // Update dandan system
   dandan_system_->UpdateSystem(delta_time);
 
   // Update projectile system
@@ -655,6 +666,9 @@ evie::Error GameLayer::SetupPlayer(float map_scale)
       err = player_entity_->AddComponent(transform_cid_);
       if (err.Good()) {
         err = player_entity_->AddComponent(follow_target_cid_);
+      }
+      if (err.Good()) {
+        err = player_entity_->AddComponent(velocity_cid_);
       }
     }
   } else {

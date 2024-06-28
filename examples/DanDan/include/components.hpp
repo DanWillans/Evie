@@ -19,7 +19,8 @@ class ProjectileComponent
 class VelocityComponent
 {
 public:
-  evie::vec3 velocity;
+  float speed{0.0F};
+  evie::vec3 velocity{};
 };
 
 class EnemyComponent
