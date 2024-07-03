@@ -7,6 +7,7 @@
 #include "entity.hpp"
 #include "evie/ids.h"
 #include "system_signature.hpp"
+#include "system_manager_interface.hpp"
 
 #include "ankerl/unordered_dense.h"
 
@@ -29,7 +30,7 @@ public:
   static constexpr uint8_t MAXIMUM_ENTITY_SETS{ 20 };
   virtual ~System() = default;
   // A handle to the system manager
-  SystemManager* system_manager{ nullptr };
+  ISystemManager* system_manager{ nullptr };
   // A set of entities that this system is interested in based on the main SystemSignature
   ankerl::unordered_dense::set<Entity> entities;
   // The signature of components this system cares about.

@@ -1,3 +1,5 @@
+#include <cmath>
+
 #include "evie/camera.h"
 #include "evie/types.h"
 
@@ -13,8 +15,8 @@ void Camera::Rotate(const float& yaw_offset, const float& pitch_offset)
   constexpr float pitch_max = 89.0F;
   constexpr float pitch_min = -89.0F;
   constexpr float full_circle_degrees = 360.0F;
-  yaw_ = std::fmodf(yaw_ += yaw_offset, full_circle_degrees);
-  pitch_ = std::fmodf(pitch_ += pitch_offset, full_circle_degrees);
+  yaw_ = std::fmod(yaw_ += yaw_offset, full_circle_degrees);
+  pitch_ = std::fmod(pitch_ += pitch_offset, full_circle_degrees);
   pitch_ = std::min(pitch_, pitch_max);
   pitch_ = std::max(pitch_, pitch_min);
   direction_.x = cos(glm::radians(yaw_)) * cos(glm::radians(pitch_));// NOLINT
@@ -101,8 +103,8 @@ void FPSCamera::Rotate(const float& yaw_offset, const float& pitch_offset)// NOL
   constexpr float pitch_max = 89.0F;
   constexpr float pitch_min = -89.0F;
   constexpr float full_circle_degrees = 360.0F;
-  yaw_ = std::fmodf(yaw_ += yaw_offset, full_circle_degrees);
-  pitch_ = std::fmodf(pitch_ += pitch_offset, full_circle_degrees);
+  yaw_ = std::fmod(yaw_ += yaw_offset, full_circle_degrees);
+  pitch_ = std::fmod(pitch_ += pitch_offset, full_circle_degrees);
   pitch_ = std::min(pitch_, pitch_max);
   pitch_ = std::max(pitch_, pitch_min);
   direction_.x = cos(glm::radians(yaw_)) * cos(glm::radians(pitch_));// NOLINT

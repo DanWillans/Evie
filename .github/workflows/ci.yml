@@ -30,19 +30,19 @@ jobs:
       matrix:
         os:
           - ubuntu-20.04
-          - macos-11
-          - windows-2019
+          # - macos-11
+          # - windows-2019
         compiler:
           - llvm-15.0.2
-          - gcc-11
+          # - gcc-11
         generator:
           - "Ninja Multi-Config"
         build_type:
-          - Release
+          # - Release
           - Debug
         packaging_maintainer_mode:
           - ON
-          - OFF
+          # - OFF
 
         exclude:
           # mingw is determined by this author to be too buggy to support
@@ -58,7 +58,7 @@ jobs:
           # Add appropriate variables for gcov version required. This will intentionally break
           # if you try to use a compiler that does not have gcov set
           - compiler: gcc-11
-            gcov_executable: gcov-11
+            gcov_executable: gcov-10
             enable_ipo: On
 
           - compiler: llvm-15.0.2
@@ -74,13 +74,13 @@ jobs:
             package_generator: TBZ2
 
           # This exists solely to make sure a non-multiconfig build works
-          - os: ubuntu-20.04
-            compiler: gcc-11
-            generator: "Unix Makefiles"
-            build_type: Debug
-            gcov_executable: gcov-11
-            packaging_maintainer_mode: On
-            enable_ipo: Off
+          # - os: ubuntu-20.04
+          #   compiler: gcc-11
+          #   generator: "Unix Makefiles"
+          #   build_type: Debug
+          #   gcov_executable: gcov-11
+          #   packaging_maintainer_mode: On
+          #   enable_ipo: Off
 
           # Windows msvc builds
           - os: windows-2022

@@ -10,12 +10,20 @@ RUN apt-get update -qq && export DEBIAN_FRONTEND=noninteractive && \
     apt-get install -y --no-install-recommends \
         software-properties-common wget apt-utils file zip \
         openssh-client gpg-agent socat rsync \
-        make ninja-build git \
-        python3 python3-pip
+        make ninja-build git curl xorg-dev
+
+# Install python
+RUN add-apt-repository ppa:deadsnakes/ppa && \
+    apt install -y --no-install-recommends \
+        python3.9 python3.9-distutils
+
+# Install pip
+RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
+    python3.9 get-pip.py
 
 # Install conan
-RUN python3 -m pip install --upgrade pip setuptools && \
-    python3 -m pip install conan && \
+RUN python3.9 -m pip install --upgrade pip setuptools && \
+    python3.9 -m pip install conan && \
     conan --version
 
 # By default, anything you run in Docker is done as superuser.

@@ -9,8 +9,11 @@ runs:
       if: runner.os == 'Linux'
       shell: bash
       run: |
+        # Make sure sudo is installed before running sudo calls
+        apt update
+        apt install sudo -y 
         sudo apt-get update
-        sudo apt-get install xorg-dev
+        sudo apt-get install xorg-dev dialog -y
 
     - name: Install macOS Dependencies
       if: runner.os == 'macOS'

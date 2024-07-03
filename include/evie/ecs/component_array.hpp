@@ -95,7 +95,7 @@ public:
 
   std::vector<ComponentWrapper<T>>& GetComponentVector() { return components_; }
 
-  ~ComponentArray<T>() override = default;
+  ~ComponentArray() override = default;
 
 private:
   std::array<size_t, MAX_ENTITY_COUNT + 1> entity_index_map_{};
