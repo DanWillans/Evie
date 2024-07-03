@@ -10,7 +10,7 @@ on:
       - develop
 
 env:
-  CLANG_TIDY_VERSION: "15.0.2"
+  CLANG_TIDY_VERSION: "18.1.6"
   VERBOSE: 1
 
 
@@ -33,7 +33,7 @@ jobs:
           - macos-11
           - windows-2019
         compiler:
-          - llvm-15.0.2
+          - llvm-18.1.6
           - gcc-11
         generator:
           - "Ninja Multi-Config"
