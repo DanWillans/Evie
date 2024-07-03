@@ -10,12 +10,13 @@ on:
       - develop
 
 env:
-  CLANG_TIDY_VERSION: "18.1.6"
+  CLANG_TIDY_VERSION: "15.0.2"
   VERBOSE: 1
 
 
 jobs:
   Test:
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
 
@@ -32,7 +33,7 @@ jobs:
           - macos-11
           - windows-2019
         compiler:
-          - llvm-18.1.6
+          - llvm-15.0.2
           - gcc-11
         generator:
           - "Ninja Multi-Config"
@@ -115,7 +116,6 @@ jobs:
             build_type: Release
             packaging_maintainer_mode: On
             enable_ipo: On
-    runs-on: ${{ matrix.os }}
 
 
     steps:
