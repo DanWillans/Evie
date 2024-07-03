@@ -16,7 +16,6 @@ env:
 
 jobs:
   Test:
-    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
 
@@ -116,6 +115,7 @@ jobs:
             build_type: Release
             packaging_maintainer_mode: On
             enable_ipo: On
+    runs-on: ${{ matrix.os }}
 
 
     steps:
