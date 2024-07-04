@@ -1,5 +1,4 @@
 
-#include <evie/ecs/components/Transform.hpp>
 #include <evie/ecs/system_manager.hpp>
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>

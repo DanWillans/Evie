@@ -9,7 +9,6 @@
 #include "render.hpp"
 
 #include <evie/camera.h>
-#include <evie/ecs/components/Transform.hpp>
 #include <evie/ecs/components/mesh_component.hpp>
 #include <evie/ecs/components/velocity.hpp>
 #include <evie/ecs/ecs_controller.hpp>

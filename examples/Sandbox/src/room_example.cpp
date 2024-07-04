@@ -1,5 +1,4 @@
 #include <evie/core.h>
-#include <evie/ecs/components/Transform.hpp>
 #include <evie/ecs/components/mesh_component.hpp>
 #include <evie/ecs/components/transform.hpp>
 #include <evie/ecs/system_manager.hpp>

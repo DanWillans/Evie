@@ -2,7 +2,6 @@
 #define INCLUDE_RENDER_HPP_
 
 #include <evie/camera.h>
-#include <evie/ecs/components/Transform.hpp>
 #include <evie/ecs/components/mesh_component.hpp>
 #include <evie/ecs/system.hpp>
 #include <evie/ids.h>

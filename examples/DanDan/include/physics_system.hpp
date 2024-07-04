@@ -2,7 +2,6 @@
 #define INCLUDE_DANDAN_PHYSICS_SYSTEM_HPP_
 
 #include "components.hpp"
-#include <evie/ecs/components/Transform.hpp>
 #include <evie/ecs/system.hpp>
 #include <evie/ids.h>
 

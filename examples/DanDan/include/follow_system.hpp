@@ -6,7 +6,6 @@
 
 #include "evie/ecs/system.hpp"
 #include <evie/ecs/component_array.hpp>
-#include <evie/ecs/components/Transform.hpp>
 #include <evie/ecs/components/velocity.hpp>
 #include <evie/logging.h>
 

@@ -3,7 +3,6 @@
 
 #include "components.hpp"
 #include <evie/default_models.h>
-#include <evie/ecs/components/Transform.hpp>
 #include <evie/ecs/components/mesh_component.hpp>
 #include <evie/ecs/ecs_controller.hpp>
 #include <evie/ecs/system.hpp>
