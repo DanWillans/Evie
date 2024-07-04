@@ -10,7 +10,7 @@ on:
       - develop
 
 env:
-  CLANG_TIDY_VERSION: "18.1.8"
+  CLANG_TIDY_VERSION: "18.1.6"
   VERBOSE: 1
 
 
@@ -30,10 +30,11 @@ jobs:
       matrix:
         os:
           - ubuntu-20.04
-          - macos-12
+          # Turn off macos for now. setup-cpp is broken for macos installing gcovr.
+          # - macos-12
           - windows-2019
         compiler:
-          - llvm-18.1.8
+          - llvm-18.1.6
           - gcc-11
         generator:
           - "Ninja Multi-Config"
@@ -60,7 +61,7 @@ jobs:
             gcov_executable: gcov-10
             enable_ipo: On
 
-          - compiler: llvm-18.1.8
+          - compiler: llvm-18.1.6
             enable_ipo: Off
             gcov_executable: "llvm-cov gcov"
 
@@ -143,8 +144,15 @@ jobs:
         with:
           envFile: '.github/constants.env'
 
+      - name: Install llvm
+        if: runner.os == 'Windows'
+        uses: crazy-max/ghaction-chocolatey@v3
+        with:
+          args: install llvm --version 18.1.6
+
 
       - name: Setup Cpp
+        if: runner.os != 'Windows'
         uses: aminya/setup-cpp@v1
         with:
           compiler: ${{ matrix.compiler }}
@@ -156,6 +164,22 @@ jobs:
           ccache: true
           clangtidy: ${{ env.CLANG_TIDY_VERSION }}
 
+
+          cppcheck: true
+
+          gcovr: true
+          opencppcoverage: true
+
+      - name: Setup Cpp
+        if: runner.os == 'Windows'
+        uses: aminya/setup-cpp@v1
+        with:
+          vcvarsall: ${{ contains(matrix.os, 'windows' )}}
+
+          cmake: true
+          ninja: true
+          vcpkg: false
+          ccache: true
 
           cppcheck: true
 
