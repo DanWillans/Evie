@@ -14,6 +14,7 @@ public:
   virtual void EntityDestroyed(EntityID entity) = 0;
   virtual void EntitySignatureChanged(EntityID entity_id, const SystemSignature& new_entity_signature) = 0;
   [[nodiscard]] virtual SystemSignature& GetEntitySystemSignature(EntityID entity_id) = 0;
+  virtual ~ISystemManager() = default;
 };
 }// namespace evie
 
