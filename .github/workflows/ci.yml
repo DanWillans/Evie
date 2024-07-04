@@ -30,7 +30,7 @@ jobs:
       matrix:
         os:
           - ubuntu-20.04
-          - macos-11
+          - macos-12
           - windows-2019
         compiler:
           - llvm-18.1.8
@@ -43,7 +43,6 @@ jobs:
         packaging_maintainer_mode:
           - ON
           - OFF
-
         exclude:
           # mingw is determined by this author to be too buggy to support
           - os: windows-2019
@@ -51,7 +50,7 @@ jobs:
 
           # gcc-11 on macos with glfw isn't compatible. Exclude for now.
           # Include g++-11 in the future as apparently that works - https://github.com/glfw/glfw/issues/1743
-          - os: macos-11
+          - os: macos-12
             compiler: gcc-11
 
         include:
@@ -65,7 +64,7 @@ jobs:
             enable_ipo: Off
             gcov_executable: "llvm-cov gcov"
 
-          - os: macos-11
+          - os: macos-12
             enable_ipo: Off
 
           # Set up preferred package generators, for given build configurations
