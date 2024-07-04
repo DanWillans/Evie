@@ -3,6 +3,7 @@
 
 #include <evie/camera.h>
 #include <evie/ecs/components/mesh_component.hpp>
+#include <evie/ecs/components/transform.hpp>
 #include <evie/ecs/system.hpp>
 #include <evie/ids.h>
 #include <evie/window.h>

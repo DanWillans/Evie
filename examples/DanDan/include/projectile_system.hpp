@@ -4,6 +4,7 @@
 #include "components.hpp"
 #include <evie/default_models.h>
 #include <evie/ecs/components/mesh_component.hpp>
+#include <evie/ecs/components/transform.hpp>
 #include <evie/ecs/ecs_controller.hpp>
 #include <evie/ecs/system.hpp>
 #include <evie/error.h>
@@ -16,8 +17,6 @@
 #include <evie/types.h>
 #include <evie/vertex_buffer.h>
 
-// #include <glm/matrix.hpp>
-// #include <glm/ext/quaternion_common.hpp>
 #include <glm/ext.hpp>
 #include <glm/ext/quaternion_common.hpp>
 #include <glm/glm.hpp>

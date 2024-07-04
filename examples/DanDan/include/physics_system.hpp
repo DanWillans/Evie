@@ -3,6 +3,7 @@
 
 #include "components.hpp"
 #include <evie/ecs/system.hpp>
+#include <evie/ecs/components/transform.hpp>
 #include <evie/ids.h>
 
 class PhysicsSystem : public evie::System

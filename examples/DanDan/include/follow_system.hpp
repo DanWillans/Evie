@@ -7,6 +7,7 @@
 #include "evie/ecs/system.hpp"
 #include <evie/ecs/component_array.hpp>
 #include <evie/ecs/components/velocity.hpp>
+#include <evie/ecs/components/transform.hpp>
 #include <evie/logging.h>
 
 #include <glm/geometric.hpp>
