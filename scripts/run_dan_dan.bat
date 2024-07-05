@@ -16,7 +16,10 @@ for /D %%D in ("%binaryPath%*") do (
     if exist "!binaryDir!\dan_dan_the_game.exe" (
         echo Running "dan_dan_the_game.exe" in !binaryDir!
         start "" "!binaryDir!\dan_dan_the_game.exe"
+        goto :endfor
     )
 )
+
+:endfor
 
 endlocal
