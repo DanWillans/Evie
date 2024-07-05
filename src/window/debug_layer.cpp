@@ -4,12 +4,16 @@
 #endif
 
 #include "window/debug_layer.h"
-#include "GLFW/glfw3.h"
 #include "evie/events.h"
 #include "evie/logging.h"
+
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
+
+#include "glad/glad.h"
+
+#include "GLFW/glfw3.h"
 
 
 namespace evie {
@@ -30,11 +34,10 @@ DebugLayer::DebugLayer([[maybe_unused]] void* window)
   EV_INFO("Initialised debug layer");
 }
 
-void DebugLayer::OnUpdate()
-{
-  // I don't think this should be here. I imagine the render should handle clearing the buffer.
-  glClear(GL_COLOR_BUFFER_BIT);
+void DebugLayer::OnUpdate(){}
 
+void DebugLayer::OnRender()
+{
   ImGui_ImplOpenGL3_NewFrame();
   ImGui_ImplGlfw_NewFrame();
   ImGui::NewFrame();

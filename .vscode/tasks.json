@@ -31,10 +31,43 @@
 			"detail": "Copy compile commands from build dir."
 		},
 		{
-			"label": "Run Sandbox App",
+			"label": "Run all lighting example",
 			"type": "shell",
 			"windows": {
-				"command": ".\\scripts\\run_sandbox.bat"
+				"command": ".\\scripts\\run_all_lighting_example.bat"
+			},
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "Run lighting example",
+			"type": "shell",
+			"windows": {
+				"command": ".\\scripts\\run_lighting_example.bat"
+			},
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "Run spinning box example",
+			"type": "shell",
+			"windows": {
+				"command": ".\\scripts\\run_spinning_box_example.bat"
+			},
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "Run DanDan",
+			"type": "shell",
+			"windows": {
+				"command": ".\\scripts\\run_dan_dan.bat"
 			},
 			"options": {
 				"cwd": "${workspaceFolder}"

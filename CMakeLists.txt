@@ -14,6 +14,8 @@ endif()
 # when compiling with PCH enabled
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+set(BUILD_SHARED_LIBS ON)
+
 # Set the project name and language
 project(
   Evie
@@ -61,6 +63,7 @@ add_subdirectory(configured_files)
 # Adding the src:
 add_subdirectory(src)
 
+
 # Don't even look at tests if we're not top level
 if(NOT PROJECT_IS_TOP_LEVEL)
   return()
@@ -105,16 +108,24 @@ Evie_package_project(
   TARGETS
   Logging
   Application
-  Utilities
   Window
+  Rendering
+  EntityComponentSystem
   Evie_options
   Evie_warnings
   ImGui
   glfw
   Glad
+  spdlog
+  fmt
 
   # Package up examples
-  sandbox
+  lighting_example
+  spinning_box_example
+  all_lighting_example
+
+  # Games
+  dan_dan_the_game
 
   # FIXME: this does not work! CK
   # PRIVATE_DEPENDENCIES_CONFIGURED project_options project_warnings

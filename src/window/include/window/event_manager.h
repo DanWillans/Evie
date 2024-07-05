@@ -5,7 +5,6 @@
 #include <memory>
 
 #include "evie/core.h"
-#include "evie/error.h"
 #include "evie/events.h"
 #include "evie/input_manager.h"
 #include "window/layer_queue.h"

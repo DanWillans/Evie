@@ -11,9 +11,9 @@ function(Evie_setup_dependencies)
       NAME
       fmt
       GIT_TAG
-      9.1.0
+      "b0c9ad189a9b0700cd0cd5d686c1d89dcafcc48f" # This has a fix for installing FMT.
       GITHUB_REPOSITORY
-      "fmtlib/fmt"
+      "DanWillans/fmt"
       OPTIONS
       "CMAKE_POSITION_INDEPENDENT_CODE ON"
       SYSTEM)
@@ -24,7 +24,7 @@ function(Evie_setup_dependencies)
       NAME
       spdlog
       VERSION
-      1.11.0
+      1.14.1
       GITHUB_REPOSITORY
       "gabime/spdlog"
       OPTIONS
@@ -49,7 +49,9 @@ function(Evie_setup_dependencies)
       GITHUB_REPOSITORY
       "glfw/glfw"
       OPTIONS
-      "BUILD_SHARED_LIBS ON"
+      "GLFW_BUILD_TESTS OFF"
+      "GLFW_BUILD_DOCS OFF"
+      "GLFW_BUILD_EXAMPLES OFF"
       SYSTEM)
   endif()
 
@@ -62,6 +64,20 @@ function(Evie_setup_dependencies)
       GITHUB_REPOSITORY
       "g-truc/glm"
       SYSTEM)
+
+    # This include is needed for global glm access
+    include_directories(SYSTEM ${glm_SOURCE_DIR})
   endif()
 
+  if(NOT TARGET ankerl::unordered_dense)
+    cpmaddpackage(
+      NAME
+      ankerl
+      GIT_TAG
+      v4.4.0
+      GITHUB_REPOSITORY
+      "martinus/unordered_dense"
+      SYSTEM)
+    include_directories(SYSTEM ${ankerl_SOURCE_DIR}/include)
+  endif()
 endfunction()

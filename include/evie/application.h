@@ -1,13 +1,16 @@
 #ifndef EVIE_APPLICATION_H_
 #define EVIE_APPLICATION_H_
 
+#include <imgui_internal.h>
 #include <memory>
 
 #include "evie/core.h"
+#include "evie/ecs/ecs_controller.hpp"
 #include "evie/error.h"
 #include "evie/input_manager.h"
 #include "evie/layer.h"
 #include "evie/types.h"
+#include "evie/window.h"
 
 namespace evie {
 class EVIE_API Application
@@ -22,7 +25,10 @@ public:
 
   void Run();
   [[nodiscard]] Error Initialise(const WindowProperties& props);
-  [[nodiscard]] const IInputManager* GetInputManager() const;
+  [[nodiscard]] IInputManager* GetInputManager() const;
+  [[nodiscard]] ECSController* GetECSController() const;
+  [[nodiscard]] IWindow* GetWindow() const;
+  [[nodiscard]] ImGuiContext* GetImGuiContext() const;
   void PushLayerFront(Layer& layer);
   void PushLayerBack(Layer& layer);
   void Shutdown();

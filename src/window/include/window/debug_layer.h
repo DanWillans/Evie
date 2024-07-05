@@ -15,6 +15,7 @@ public:
   explicit DebugLayer(void* window);
   ~DebugLayer() override = default;
   void OnUpdate() override;
+  void OnRender() override;
   void OnEvent(Event& event) override;
   void Shutdown() override;
 };

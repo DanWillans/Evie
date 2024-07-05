@@ -45,7 +45,7 @@ target_link_libraries(
 doctest_discover_tests(
   event_system_tests
   TEST_PREFIX
-  "unittests."
+  "EventSystemUnittests."
 )
 
 if(WIN32)
@@ -72,7 +72,7 @@ target_include_directories(error_tests PUBLIC $<BUILD_INTERFACE:${EVIE_PROJECT_R
 doctest_discover_tests(
   error_tests
   TEST_PREFIX
-  "unittests."
+  "ErrorUnittests."
 )
 
 # ###### Layer Queue Tests ########
@@ -99,7 +99,7 @@ endif()
 doctest_discover_tests(
   layer_queue_tests
   TEST_PREFIX
-  "unittests."
+  "LayerQueueUnittests."
 )
 
 # ###### Input Manager Tests ########
@@ -125,7 +125,7 @@ endif()
 doctest_discover_tests(
   input_manager_tests
   TEST_PREFIX
-  "unittests."
+  "InputManagerUnittests."
 )
 
 # ###### Result Tests ########
@@ -144,5 +144,109 @@ target_include_directories(result_tests PUBLIC $<BUILD_INTERFACE:${EVIE_PROJECT_
 doctest_discover_tests(
   result_tests
   TEST_PREFIX
-  "unittests."
+  "ResultUnittests."
+)
+
+###### Component Manager Tests ########
+add_executable(component_manager_tests main.cpp component_manager_tests.cpp)
+target_link_libraries(
+  component_manager_tests
+  PRIVATE
+  Evie::Evie_warnings
+  Evie::Evie_options
+  Evie::EntityComponentSystem
+  doctest::doctest)
+
+if(WIN32)
+  add_custom_command(
+    TARGET component_manager_tests
+    PRE_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:component_manager_tests> $<TARGET_FILE_DIR:component_manager_tests>
+    COMMAND_EXPAND_LISTS)
+endif()
+
+# automatically discover tests that are defined in catch based test files you can modify the unittests. Set TEST_PREFIX
+# to whatever you want, or use different for different binaries
+doctest_discover_tests(
+  component_manager_tests
+  TEST_PREFIX
+  "ComponentManagerUnittests."
+)
+
+###### System Manager Tests ########
+add_executable(system_manager_tests main.cpp system_manager_tests.cpp)
+target_link_libraries(
+  system_manager_tests
+  PRIVATE
+  Evie::Evie_warnings
+  Evie::Evie_options
+  Evie::EntityComponentSystem
+  doctest::doctest)
+
+if(WIN32)
+  add_custom_command(
+    TARGET system_manager_tests
+    PRE_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:system_manager_tests> $<TARGET_FILE_DIR:system_manager_tests>
+    COMMAND_EXPAND_LISTS)
+endif()
+
+# automatically discover tests that are defined in catch based test files you can modify the unittests. Set TEST_PREFIX
+# to whatever you want, or use different for different binaries
+doctest_discover_tests(
+  system_manager_tests
+  TEST_PREFIX
+  "SystemManagerUnittests."
+)
+
+###### Entity Manager Tests ########
+add_executable(entity_manager_tests main.cpp entity_manager_tests.cpp)
+target_link_libraries(
+  entity_manager_tests
+  PRIVATE
+  Evie::Evie_warnings
+  Evie::Evie_options
+  Evie::EntityComponentSystem
+  doctest::doctest)
+
+if(WIN32)
+  add_custom_command(
+    TARGET entity_manager_tests
+    PRE_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:entity_manager_tests> $<TARGET_FILE_DIR:entity_manager_tests>
+    COMMAND_EXPAND_LISTS)
+endif()
+
+# automatically discover tests that are defined in catch based test files you can modify the unittests. Set TEST_PREFIX
+# to whatever you want, or use different for different binaries
+doctest_discover_tests(
+  entity_manager_tests
+  TEST_PREFIX
+  "EntityManagerUnittests."
+)
+
+###### ECS Controller Tests ########
+add_executable(ecs_controller_tests main.cpp ecs_controller_tests.cpp)
+target_link_libraries(
+  ecs_controller_tests
+  PRIVATE
+  Evie::Evie_warnings
+  Evie::Evie_options
+  Evie::EntityComponentSystem
+  doctest::doctest)
+
+if(WIN32)
+  add_custom_command(
+    TARGET ecs_controller_tests
+    PRE_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:ecs_controller_tests> $<TARGET_FILE_DIR:ecs_controller_tests>
+    COMMAND_EXPAND_LISTS)
+endif()
+
+# automatically discover tests that are defined in catch based test files you can modify the unittests. Set TEST_PREFIX
+# to whatever you want, or use different for different binaries
+doctest_discover_tests(
+  ecs_controller_tests
+  TEST_PREFIX
+  "ECSControllerUnittests."
 )

@@ -1,17 +1,20 @@
 #include "window/glfw_window.h"
 #include "evie/error.h"
+#include "evie/key_events.h"
 #include "evie/logging.h"
+#include "evie/mouse_events.h"
+#include "evie/window.h"
+#include "evie/window_events.h"
 #include "window/event_manager.h"
-#include "window/key_events.h"
-#include "window/mouse_events.h"
-#include "window/window.h"
-#include "window/window_events.h"
+#include <evie/types.h>
 
 
 #ifdef EVIE_PLATFORM_WINDOWS
 #include <Windows.h>
 #endif
 // Need this space between glfw and windows otherwise there is a macro redefinition error
+
+#include "glad/glad.h"
 
 #include "GLFW/glfw3.h"
 
@@ -20,6 +23,15 @@ namespace {
   static void glfw_error_callback(int error, const char* description)
   {
     EV_ERROR("GLFW Error {}: {}", error, description);
+  }
+
+
+  void framebuffer_size_callback([[maybe_unused]] GLFWwindow* window, int width, int height)
+  {
+    WindowDimensions dimensions{ width, height };
+    static_cast<GLFWWindow*>(glfwGetWindowUserPointer(window))->UpdateWindowDimensions(dimensions);
+    EV_INFO("Resize {} {}", width, height);
+    glViewport(0, 0, width, height);
   }
 
   EventManager* GetEventManager(GLFWwindow* window)
@@ -120,7 +132,9 @@ namespace {
   {
     auto* event_manager = GetEventManager(window);
     if (event_manager != nullptr) {
-      DispatchEvent<WindowResizeEvent>(event_manager, WindowDimensions{ width, height });
+      WindowDimensions dimensions{ width, height };
+      EV_INFO("window size {} {}", width, height);
+      DispatchEvent<WindowResizeEvent>(event_manager, dimensions);
     }
   }
 
@@ -149,13 +163,31 @@ Error GLFWWindow::Initialise(const WindowProperties& props)
   if (glfwInit() == GLFW_FALSE) {
     return Error("glfw failed to initialise");
   }
+
+  // Set window hints
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#ifdef EVIE_PLATFORM_APPLE
+  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+#endif
+
   window_ = glfwCreateWindow(
     properties_.dimensions.width, properties_.dimensions.height, properties_.name.c_str(), nullptr, nullptr);
   if (window_ == nullptr) {
     return Error("glfw failed to create window");
   }
   glfwMakeContextCurrent(window_);
-  // If we use glad we should init it here.
+
+  if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress))) {// NOLINT
+    std::cout << "Failed to initialize GLAD" << std::endl;
+    EV_ERROR("Failed to initialise GLAD");
+    return Error("Failed to initaie GLAD");
+  }
+
+  glViewport(0, 0, properties_.dimensions.width, properties_.dimensions.height);
+  glfwSetFramebufferSizeCallback(window_, framebuffer_size_callback);
+
   SetVSync(true);
   // Setup the user window pointer
   glfwSetWindowUserPointer(window_, static_cast<void*>(this));
@@ -209,5 +241,26 @@ void GLFWWindow::Destroy()
 
 EventManager* GLFWWindow::GetEventManager() { return event_manager_; }
 
+void GLFWWindow::EnableCursor()
+{
+  glfwSetInputMode(window_, GLFW_RAW_MOUSE_MOTION, GLFW_FALSE);
+  glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+}
+
+void GLFWWindow::DisableCursor()
+{
+  glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+  glfwSetInputMode(window_, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+}
+
+void GLFWWindow::UpdateWindowDimensions(const WindowDimensions& dimensions) noexcept
+{
+  properties_.dimensions = dimensions;
+}
+
+float GLFWWindow::GetAspectRatio()
+{
+  return static_cast<float>(properties_.dimensions.width) / static_cast<float>(properties_.dimensions.height);
+}
 
 }// namespace evie

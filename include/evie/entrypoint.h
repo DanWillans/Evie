@@ -10,13 +10,15 @@
 
 extern std::unique_ptr<evie::Application> CreateApplication();
 
+// I ACTUALLY HATE THIS ENTRYPOINT STUFF. FIX IT.
+//NOLINTNEXTLINE
 int main([[maybe_unused]] int argc, [[maybe_unused]] const char** argv)
 {
   auto app = CreateApplication();
   if (app) {
     app->Run();
+    app->Shutdown();
   }
-  app->Shutdown();
   return 0;
 }
 
@@ -29,8 +31,8 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] const char** argv)
   auto app = CreateApplication();
   if (app) {
     app->Run();
+    app->Shutdown();
   }
-  app->Shutdown();
   return 0;
 }
 

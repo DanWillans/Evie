@@ -15,6 +15,7 @@ class TestLayer final : public evie::Layer
 {
 public:
   void OnUpdate() override {}
+  void OnRender() override {}
   void OnEvent([[maybe_unused]] evie::Event& event) override {}
   ~TestLayer() {}
   void Shutdown() override { shutdown = true; }

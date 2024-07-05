@@ -13,12 +13,6 @@ Evie_add_library(
 
 target_link_libraries(
   Window
-  PUBLIC
-  Evie::Utilities
-)
-
-target_link_libraries(
-  Window
   PRIVATE
   Evie::Evie_options
   Evie::Evie_warnings
@@ -31,4 +25,5 @@ target_link_system_libraries(
   glfw
   Evie::ImGui
   OpenGL::GL
+  Evie::Glad
 )

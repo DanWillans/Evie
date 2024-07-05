@@ -10,7 +10,7 @@ on:
       - develop
 
 env:
-  CLANG_TIDY_VERSION: "15.0.2"
+  CLANG_TIDY_VERSION: "18.1.6"
   VERBOSE: 1
 
 
@@ -30,10 +30,11 @@ jobs:
       matrix:
         os:
           - ubuntu-20.04
-          - macos-11
+          # Turn off macos for now. setup-cpp is broken for macos installing gcovr.
+          # - macos-12
           - windows-2019
         compiler:
-          - llvm-15.0.2
+          - llvm-18.1.6
           - gcc-11
         generator:
           - "Ninja Multi-Config"
@@ -43,7 +44,6 @@ jobs:
         packaging_maintainer_mode:
           - ON
           - OFF
-
         exclude:
           # mingw is determined by this author to be too buggy to support
           - os: windows-2019
@@ -51,22 +51,23 @@ jobs:
 
           # gcc-11 on macos with glfw isn't compatible. Exclude for now.
           # Include g++-11 in the future as apparently that works - https://github.com/glfw/glfw/issues/1743
-          - os: macos-11
+          - os: macos-12
             compiler: gcc-11
 
         include:
           # Add appropriate variables for gcov version required. This will intentionally break
           # if you try to use a compiler that does not have gcov set
           - compiler: gcc-11
-            gcov_executable: gcov-11
+            gcov_executable: gcov-10
             enable_ipo: On
 
-          - compiler: llvm-15.0.2
+          - compiler: llvm-18.1.6
             enable_ipo: Off
             gcov_executable: "llvm-cov gcov"
 
-          - os: macos-11
-            enable_ipo: Off
+          # Turn off macos for now. setup-cpp is broken for macos installing gcovr.
+          # - os: macos-12
+          #   enable_ipo: Off
 
           # Set up preferred package generators, for given build configurations
           - build_type: Release
@@ -144,8 +145,16 @@ jobs:
         with:
           envFile: '.github/constants.env'
 
+      # This is purely because setup-cpp can't install 18.1.6 for windows so we need to do it ourselves.
+      - name: Install llvm
+        if: runner.os == 'Windows'
+        uses: crazy-max/ghaction-chocolatey@v3
+        with:
+          args: install llvm --version 18.1.6
+
 
       - name: Setup Cpp
+        if: runner.os != 'Windows'
         uses: aminya/setup-cpp@v1
         with:
           compiler: ${{ matrix.compiler }}
@@ -163,9 +172,32 @@ jobs:
           gcovr: true
           opencppcoverage: true
 
+      - name: Setup Cpp
+        if: runner.os == 'Windows'
+        uses: aminya/setup-cpp@v1
+        with:
+          vcvarsall: ${{ contains(matrix.os, 'windows' )}}
+
+          cmake: true
+          ninja: true
+          vcpkg: false
+          ccache: true
+
+          cppcheck: true
+
+          gcovr: true
+          opencppcoverage: true
+
       - name: Configure CMake
         run: |
           cmake -S . -B ./build -G "${{matrix.generator}}" -D${{ env.PROJECT_NAME }}_ENABLE_IPO=${{matrix.enable_ipo }} -DCMAKE_BUILD_TYPE:STRING=${{matrix.build_type}} -D${{ env.PROJECT_NAME }}_PACKAGING_MAINTAINER_MODE:BOOL=${{matrix.packaging_maintainer_mode}} -D${{ env.PROJECT_NAME }}_ENABLE_COVERAGE:BOOL=${{ matrix.build_type == 'Debug' }} -DGIT_SHA:STRING=${{ github.sha }}
+
+      # Special case windows-2019 to use CMAKE_C_COMPILER AND CMAKE_CXX_COMPILER othewise msvc compiler is picked up.
+      - name: Configure CMake
+        if: ${{matrix.os == 'windows-2019' && matrix.compiler == 'llvm-18.1.6'}}
+        run: |
+          cmake -S . -B ./build -G "${{matrix.generator}}" -D${{ env.PROJECT_NAME }}_ENABLE_IPO=${{matrix.enable_ipo }} -DCMAKE_BUILD_TYPE:STRING=${{matrix.build_type}} -D${{ env.PROJECT_NAME }}_PACKAGING_MAINTAINER_MODE:BOOL=${{matrix.packaging_maintainer_mode}} -D${{ env.PROJECT_NAME }}_ENABLE_COVERAGE:BOOL=${{ matrix.build_type == 'Debug' }} -DGIT_SHA:STRING=${{ github.sha }} -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
+
 
       - name: Build
         # Execute the build.  You can specify a specific target with "--target <NAME>"
@@ -199,18 +231,19 @@ jobs:
       #   run: |
       #     OpenCppCoverage.exe --export_type cobertura:coverage.xml --cover_children --excluded_modules *\vendor\* --excluded_modules *\examples\* --excluded_modules *\fuzz_test\* --modules Evie -- ctest -C ${{matrix.build_type}}
 
-      - name: CPack
-        if: matrix.package_generator != ''
-        working-directory: ./build
-        run: |
-          cpack -C ${{matrix.build_type}} -G ${{matrix.package_generator}}
+      # Turn off packing and releasing for now. It's causing problems.
+      # - name: CPack
+      #   if: matrix.package_generator != ''
+      #   working-directory: ./build
+      #   run: |
+      #     cpack -C ${{matrix.build_type}} -G ${{matrix.package_generator}}
 
-      - name: Publish Tagged Release
-        uses: softprops/action-gh-release@v1
-        if: ${{ startsWith(github.ref, 'refs/tags/') && matrix.package_generator != '' }}
-        with:
-          files: |
-            build/*-*${{ matrix.build_type }}*-*.*
+      # - name: Publish Tagged Release
+      #   uses: softprops/action-gh-release@v1
+      #   if: ${{ startsWith(github.ref, 'refs/tags/') && matrix.package_generator != '' }}
+      #   with:
+      #     files: |
+      #       build/*-*${{ matrix.build_type }}*-*.*
 
 
       - name: Publish to codecov
