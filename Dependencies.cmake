@@ -24,7 +24,7 @@ function(Evie_setup_dependencies)
       NAME
       spdlog
       VERSION
-      1.12.0
+      1.14.1
       GITHUB_REPOSITORY
       "gabime/spdlog"
       OPTIONS
