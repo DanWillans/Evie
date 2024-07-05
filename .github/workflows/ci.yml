@@ -189,12 +189,12 @@ jobs:
           opencppcoverage: true
 
       - name: Configure CMake
-        if: runner.os != 'Windows' && matrix.compiler != 'llvm-18.1.6'
         run: |
           cmake -S . -B ./build -G "${{matrix.generator}}" -D${{ env.PROJECT_NAME }}_ENABLE_IPO=${{matrix.enable_ipo }} -DCMAKE_BUILD_TYPE:STRING=${{matrix.build_type}} -D${{ env.PROJECT_NAME }}_PACKAGING_MAINTAINER_MODE:BOOL=${{matrix.packaging_maintainer_mode}} -D${{ env.PROJECT_NAME }}_ENABLE_COVERAGE:BOOL=${{ matrix.build_type == 'Debug' }} -DGIT_SHA:STRING=${{ github.sha }}
 
+      # Special case windows-2019 to use CMAKE_C_COMPILER AND CMAKE_CXX_COMPILER othewise msvc compiler is picked up.
       - name: Configure CMake
-        if: runner.os == 'Windows' && matrix.compiler == 'llvm-18.1.6'
+        if: matrix.os == 'windows-2019' && matrix.compiler == 'llvm-18.1.6'
         run: |
           cmake -S . -B ./build -G "${{matrix.generator}}" -D${{ env.PROJECT_NAME }}_ENABLE_IPO=${{matrix.enable_ipo }} -DCMAKE_BUILD_TYPE:STRING=${{matrix.build_type}} -D${{ env.PROJECT_NAME }}_PACKAGING_MAINTAINER_MODE:BOOL=${{matrix.packaging_maintainer_mode}} -D${{ env.PROJECT_NAME }}_ENABLE_COVERAGE:BOOL=${{ matrix.build_type == 'Debug' }} -DGIT_SHA:STRING=${{ github.sha }} -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
 
