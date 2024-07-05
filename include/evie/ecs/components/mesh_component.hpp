@@ -11,8 +11,8 @@
 namespace evie {
 struct MeshComponent
 {
-  VertexBuffer model_data;
-  VertexArray vertex_array;
+  VertexBuffer<> model_data;
+  VertexArray<> vertex_array;
   ShaderProgram shader_program;
   Texture2D texture;
   // How do we handle cleaning up these resources?

@@ -11,12 +11,9 @@
 
 namespace evie {
 
-enum class TextureWrapping {
-  Repeat,
-  MirroredRepeat,
-  ClampToEdge,
-  ClampToBorder
-};
+enum class TextureType { Diffuse, Specular };
+
+enum class TextureWrapping { Repeat, MirroredRepeat, ClampToEdge, ClampToBorder };
 class EVIE_API Texture2D
 {
 public:
@@ -24,6 +21,8 @@ public:
   void SetSlot(int slot);
   void Bind();
   void Destroy();
+
+  TextureType type{ TextureType::Diffuse };
 
 private:
   TextureID id_{ 0 };

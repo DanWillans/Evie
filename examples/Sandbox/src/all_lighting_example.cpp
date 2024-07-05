@@ -412,7 +412,7 @@ private:
   evie::Camera camera_;
   evie::VertexShader lighting_vertex_shader_;
   evie::FragmentShader lighting_fragment_shader_;
-  evie::VertexArray lighting_vertex_array_;
+  evie::VertexArray<> lighting_vertex_array_;
   float last_frame_ = 0.0f;
   bool cursor_enabled_{ false };
   const evie::IInputManager* input_manager_{ nullptr };

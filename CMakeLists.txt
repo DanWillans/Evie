@@ -63,7 +63,6 @@ add_subdirectory(configured_files)
 # Adding the src:
 add_subdirectory(src)
 
-
 # Don't even look at tests if we're not top level
 if(NOT PROJECT_IS_TOP_LEVEL)
   return()
@@ -118,6 +117,10 @@ Evie_package_project(
   Glad
   spdlog
   fmt
+
+  # assimp exports
+  assimp
+  zlibstatic
 
   # Package up examples
   lighting_example

@@ -80,4 +80,18 @@ function(Evie_setup_dependencies)
       SYSTEM)
     include_directories(SYSTEM ${ankerl_SOURCE_DIR}/include)
   endif()
+
+  if(NOT TARGET assimp::assimp)
+  cpmaddpackage(
+    NAME
+    assimp
+    GIT_TAG
+    v5.4.2
+    GITHUB_REPOSITORY
+    "assimp/assimp"
+    OPTIONS
+    "ASSIMP_WARNINGS_AS_ERRORS OFF"
+    SYSTEM)
+  include_directories(SYSTEM ${Assimp_SOURCE_DIR}/include)
+  endif()
 endfunction()

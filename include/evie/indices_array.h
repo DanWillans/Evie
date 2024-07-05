@@ -3,20 +3,20 @@
 
 #include <vector>
 
-#include "evie/ids.h"
 #include "evie/core.h"
+#include "evie/ids.h"
 
 namespace evie {
 
 class EVIE_API IndicesArray
 {
 public:
-  void Initialise(const std::vector<int>& indices);
+  void Initialise(const std::vector<unsigned int>& indices);
   void Bind();
   void Destroy();
 
 private:
-  std::vector<int> indices_{};
+  std::vector<unsigned int> indices_{};
   IndicesArrayID id_{ 0 };
 };
 
