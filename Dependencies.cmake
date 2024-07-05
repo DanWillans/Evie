@@ -11,9 +11,9 @@ function(Evie_setup_dependencies)
       NAME
       fmt
       GIT_TAG
-      "13156e54bf91e44641ce3aac041d31f9a15a8042" # This has a fix for installing FMT.
+      "b0c9ad189a9b0700cd0cd5d686c1d89dcafcc48f" # This has a fix for installing FMT.
       GITHUB_REPOSITORY
-      "fmtlib/fmt"
+      "DanWillans/fmt"
       OPTIONS
       "CMAKE_POSITION_INDEPENDENT_CODE ON"
       SYSTEM)

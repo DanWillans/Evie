@@ -65,8 +65,9 @@ jobs:
             enable_ipo: Off
             gcov_executable: "llvm-cov gcov"
 
-          - os: macos-12
-            enable_ipo: Off
+          # Turn off macos for now. setup-cpp is broken for macos installing gcovr.
+          # - os: macos-12
+          #   enable_ipo: Off
 
           # Set up preferred package generators, for given build configurations
           - build_type: Release
@@ -144,6 +145,7 @@ jobs:
         with:
           envFile: '.github/constants.env'
 
+      # This is purely because setup-cpp can't install 18.1.6 for windows so we need to do it ourselves.
       - name: Install llvm
         if: runner.os == 'Windows'
         uses: crazy-max/ghaction-chocolatey@v3
