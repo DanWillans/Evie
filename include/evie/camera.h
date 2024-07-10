@@ -60,9 +60,11 @@ public:
   /**
    * @brief Rotate the camera. This is a helper that will use the mouse position to rotate the camera.
    *
-   * @param mouse_pos Current mouse position
+   * @param mouse_pos Current mouse position.
+   * @param enable_cursor If enabled then the cursor will rotate the camera. Use this flag to keep the camera up to date
+   * with the mouse position so that jump don't occur.
    */
-  void Rotate(const MousePosition& mouse_pos);
+  void Rotate(const MousePosition& mouse_pos, bool enable_cursor = true);
 
   /**
    * @brief Rotate the cameras direction by a raw yaw and pitch. This should be an offset not an absolute value.

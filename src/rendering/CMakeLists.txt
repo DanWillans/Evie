@@ -8,9 +8,8 @@ Evie_add_library(
   texture.cpp
   camera.cpp
   indices_array.cpp
-  vertex_array.cpp
-  vertex_buffer.cpp
   debug.cpp
+  model.cpp
 )
 
 target_link_libraries(
@@ -29,4 +28,11 @@ target_link_system_libraries(
   Evie::Logging
   OpenGL::GL
   glm::glm
+  assimp::assimp
+)
+
+target_include_directories(
+  Rendering
+  PRIVATE
+  assimp::assimp
 )

@@ -319,9 +319,9 @@ private:
   evie::VertexShader vertex_shader_;
   evie::ShaderProgram shader_program_;
   evie::FragmentShader fragment_shader_;
-  evie::VertexBuffer vertex_buffer_;
+  evie::VertexBuffer<> vertex_buffer_;
   evie::IndicesArray indices_array_;
-  evie::VertexArray vertex_array_;
+  evie::VertexArray<> vertex_array_;
   float last_frame_ = 0.0f;
   float mixer_{ 0.2f };
   bool cursor_enabled_{ false };

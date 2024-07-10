@@ -7,6 +7,7 @@
 #include "projectile_system.hpp"
 #include "dandan_system.hpp"
 #include "render.hpp"
+#include "rendering/model.hpp"
 
 #include <evie/camera.h>
 #include <evie/ecs/components/mesh_component.hpp>
@@ -18,6 +19,7 @@
 #include <evie/input_manager.h>
 #include <evie/layer.h>
 #include <evie/shader.h>
+#include <evie/shader_program.h>
 #include <evie/texture.h>
 #include <evie/vertex_array.h>
 #include <evie/vertex_buffer.h>

@@ -30,7 +30,7 @@ public:
 private:
   // No one should be able to construct a raw Error message unless using OK
   constexpr Error() : msg_(nullptr) {}
-  const char* msg_;
+  const char* msg_{"Undefined Error"};
 };
 }// namespace evie
 

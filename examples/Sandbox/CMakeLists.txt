@@ -62,4 +62,22 @@ target_link_libraries(
   glfw
 )
 
+add_executable(model_example src/model_example.cpp)
+
+target_link_libraries(
+  model_example
+  PRIVATE
+  Evie::Evie_options
+  Evie::Evie_warnings
+  Evie::Application
+  Evie::Logging
+  Evie::Rendering
+  Evie::EntityComponentSystem
+  Evie::ImGui
+  Evie::StbImage
+  PUBLIC
+  # This is just for Time. Make Evie::Time.
+  glfw
+)
+
 install(DIRECTORY assets DESTINATION ${CMAKE_INSTALL_PREFIX})

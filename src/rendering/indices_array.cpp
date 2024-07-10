@@ -1,12 +1,12 @@
 #include "evie/indices_array.h"
-#include "rendering/debug.h"
 #include "evie/ids.h"
+#include "rendering/debug.h"
 
 
 #include "glad/glad.h"
 
 namespace evie {
-void IndicesArray::Initialise(const std::vector<int>& indices)
+void IndicesArray::Initialise(const std::vector<unsigned int>& indices)
 {
   unsigned int EBO{ 0 };
   CallOpenGL(glGenBuffers, 1, &EBO);
