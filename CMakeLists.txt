@@ -126,6 +126,7 @@ Evie_package_project(
   lighting_example
   spinning_box_example
   all_lighting_example
+  model_example
 
   # Games
   dan_dan_the_game

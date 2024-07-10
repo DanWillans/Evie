@@ -24,13 +24,22 @@ void Camera::Rotate(const float& yaw_offset, const float& pitch_offset)
   direction_.z = sin(glm::radians(yaw_)) * cos(glm::radians(pitch_));// NOLINT
 }
 
-void Camera::Rotate(const MousePosition& mouse_pos)
+void Camera::Rotate(const MousePosition& mouse_pos, bool enable_cursor)
 {
+  // Check if we should just update the last position or not. If enable_cursor is false then the cursor isn't currently
+  // being used to update the camera.
+  if (!enable_cursor) {
+    last_mouse_x_ = static_cast<float>(mouse_pos.x);
+    last_mouse_y_ = static_cast<float>(mouse_pos.y);
+    return;
+  }
+
   if (first_mouse_) {
     last_mouse_x_ = static_cast<float>(mouse_pos.x);
     last_mouse_y_ = static_cast<float>(mouse_pos.y);
     first_mouse_ = false;
   }
+
   float x_offset = static_cast<float>(mouse_pos.x) - last_mouse_x_;
   float y_offset = last_mouse_y_ - static_cast<float>(mouse_pos.y);
   last_mouse_x_ = static_cast<float>(mouse_pos.x);

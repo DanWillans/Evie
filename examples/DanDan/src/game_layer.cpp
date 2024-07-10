@@ -18,6 +18,7 @@
 #include <evie/key_events.h>
 #include <evie/mouse_events.h>
 #include <evie/shader.h>
+#include <evie/shader_program.h>
 #include <evie/texture.h>
 #include <evie/vertex_buffer.h>
 #include <evie/window.h>
@@ -110,14 +111,8 @@ evie::Error
   // Register our projectile system - After player entity is created.
   evie::SystemSignature project_signature;
   project_signature.SetComponent(projectile_cid_);
-  auto projectile_sys_id = ecs_->RegisterSystem<ProjectileSystem>(project_signature,
-    ecs_,
-    mesh_cid_,
-    transform_cid_,
-    projectile_cid_,
-    velocity_cid_,
-    player_entity_,
-    map_scale);
+  auto projectile_sys_id = ecs_->RegisterSystem<ProjectileSystem>(
+    project_signature, ecs_, mesh_cid_, transform_cid_, projectile_cid_, velocity_cid_, player_entity_, map_scale);
   projectile_system_ = &(ecs_->GetSystem(projectile_sys_id));
   if (err.Good()) {
     err = projectile_system_->Initialise();

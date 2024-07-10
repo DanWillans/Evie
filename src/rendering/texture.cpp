@@ -52,6 +52,7 @@ Error Texture2D::Initialise(const std::string& filename, bool flip, TextureWrapp
   default:
     return Error{ "Unsupported conversion" };
   }
+  name_ = filename;
 
   if (data) {
     // Generate the texture

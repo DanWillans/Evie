@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 
+#include "rendering/debug.h"
+
 #include <evie/ids.h>
 #include <evie/indices_array.h>
 #include <evie/shader_program.h>
@@ -17,9 +19,9 @@ namespace evie {
 
 struct Vertex
 {
-  vec3 position;
-  vec3 normal;
-  vec2 tex_coords;
+  vec3 position{};
+  vec3 normal{};
+  vec2 tex_coords{};
 };
 
 template<typename VertexType = Vertex> class Mesh
@@ -35,7 +37,7 @@ public:
     : vertices(vertices), indices(indices), textures(textures)
   {}
 
-  Error Initialise() { SetupMesh(); }
+  Error Initialise() { return SetupMesh(); }
 
   void Draw(ShaderProgram& shader);
 
@@ -58,8 +60,11 @@ template<typename VertexType> void Mesh<VertexType>::Draw(ShaderProgram& shader_
       texture_name = "texture_diffuse" + std::to_string(diffuseNr++);
     } else if (type == TextureType::Specular) {
       texture_name = "texture_specular" + std::to_string(specularNr++);
+    } else {
+      EV_INFO("Unsupported texture type");
+      continue;
     }
-    shader_program.SetInt(("material." + texture_name).c_str(), i);
+    shader_program.SetInt("material." + texture_name, i);
     textures[i].Bind();
   }
   // Reset current active texture
@@ -69,7 +74,8 @@ template<typename VertexType> void Mesh<VertexType>::Draw(ShaderProgram& shader_
 
   // Draw mesh
   vertex_array_.Bind();
-  glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+  CallOpenGL(
+    glDrawElements, GL_TRIANGLES, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, static_cast<void*>(0));
 }
 
 template<typename VertexType> Error Mesh<VertexType>::SetupMesh()
@@ -78,11 +84,14 @@ template<typename VertexType> Error Mesh<VertexType>::SetupMesh()
   vertex_array_.Initialise();
 
   const BufferLayout mesh_layout{
-    sizeof(Vertex),
+    sizeof(Vertex::position) / sizeof(float) + sizeof(Vertex::normal) / sizeof(float)
+      + sizeof(Vertex::tex_coords) / sizeof(float),
     // Be careful here with VertexDataType::Float if Vertex has anything other than a float type the
     // AssociateVertexBuffer will fail. This will need fixing if we change the Vertex struct in the future.
     VertexDataType::Float,
-    { sizeof(Vertex::position), sizeof(Vertex::normal), sizeof(Vertex::tex_coords) },
+    { sizeof(Vertex::position) / sizeof(float),
+      sizeof(Vertex::normal) / sizeof(float),
+      sizeof(Vertex::tex_coords) / sizeof(float) },
   };
 
   if (err.Good()) {
@@ -94,12 +103,13 @@ template<typename VertexType> Error Mesh<VertexType>::SetupMesh()
   }
 
   if (err.Good()) {
-    err = vertex_array_.AssociateVertexBuffer(vertex_array_);
+    err = vertex_array_.AssociateVertexBuffer(vertex_buffer_);
   }
 
   if (err.Good()) {
-    err = vertex_array_.AssociateIndicesArray(indices_array_);
+    vertex_array_.AssociateIndicesArray(indices_array_);
   }
+  return err;
 }
 
 }// namespace evie

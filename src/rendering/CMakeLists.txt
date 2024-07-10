@@ -30,3 +30,9 @@ target_link_system_libraries(
   glm::glm
   assimp::assimp
 )
+
+target_include_directories(
+  Rendering
+  PRIVATE
+  assimp::assimp
+)

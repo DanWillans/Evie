@@ -93,5 +93,7 @@ function(Evie_setup_dependencies)
     "ASSIMP_WARNINGS_AS_ERRORS OFF"
     SYSTEM)
   include_directories(SYSTEM ${Assimp_SOURCE_DIR}/include)
+  # Shouldn't have to do this. I should just be able to link to assimp::assimp
+  include_directories(SYSTEM ${Assimp_BINARY_DIR}/include)
   endif()
 endfunction()

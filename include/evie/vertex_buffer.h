@@ -1,6 +1,7 @@
 #ifndef EVIE_INCLUDE_VERTEX_BUFFER_H_
 #define EVIE_INCLUDE_VERTEX_BUFFER_H_
 
+#include <evie/logging.h>
 #include <numeric>
 #include <vector>
 
@@ -60,7 +61,7 @@ Error VertexBuffer<T>::Initialise(const std::vector<T>& vertices_data, const Buf
     return Error{ "The sum of the elements in the buffer layout don't match the stride" };
   }
   // Check that the vertices data size is a multiple of buffer layout size
-  if (vertices_data.size() % buffer_layout.stride != 0) {
+  if (vertices_data.size() * sizeof(T) % buffer_layout.stride != 0) {
     return Error{ "Vertices data size isn't a multiple of the buffer layout" };
   }
   buffer_layout_ = buffer_layout;

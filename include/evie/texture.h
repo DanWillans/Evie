@@ -24,12 +24,17 @@ public:
 
   TextureType type{ TextureType::Diffuse };
 
+  const std::string& GetName() const { return name_; }
+
+  TextureID GetID() const { return id_; }
+
 private:
   TextureID id_{ 0 };
   int texture_slot_{ 0 };
   int width_{ 0 };
   int height_{ 0 };
   int number_of_channels_{ 0 };
+  std::string name_{};
 };
 }// namespace evie
 
