@@ -91,6 +91,8 @@ function(Evie_setup_dependencies)
     "assimp/assimp"
     OPTIONS
     "ASSIMP_WARNINGS_AS_ERRORS OFF"
+    "ASSIMP_INSTALL OFF"
+    "ASSIMP_BUILD_ZLIB ON"
     SYSTEM)
   include_directories(SYSTEM ${Assimp_SOURCE_DIR}/include)
   # Shouldn't have to do this. I should just be able to link to assimp::assimp
