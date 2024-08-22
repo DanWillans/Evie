@@ -11,6 +11,7 @@ target_link_libraries(
   Evie::Rendering
   Evie::StbImage
   Evie::EntityComponentSystem
+  Evie::AssetManager
 )
 
 target_link_system_libraries(

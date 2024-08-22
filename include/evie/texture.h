@@ -7,8 +7,6 @@
 #include "evie/error.h"
 #include "evie/ids.h"
 
-#include "glad/glad.h"
-
 namespace evie {
 
 enum class TextureType { Diffuse, Specular };

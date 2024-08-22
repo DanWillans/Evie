@@ -117,6 +117,8 @@ Evie_package_project(
   Glad
   spdlog
   fmt
+  AssetManager
+  WhereAmI
 
   # assimp exports
   assimp

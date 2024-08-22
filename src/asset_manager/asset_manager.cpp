@@ -1,0 +1,77 @@
+#include "asset_manager/asset_manager.hpp"
+#include "asset_manager/asset_types.hpp"
+#include "whereami/whereami.h"
+#include <filesystem>
+
+
+namespace evie {
+AssetManager::AssetManager()
+{
+  char* path = NULL;
+  int length, dirname_length;
+  int i;
+
+  length = wai_getExecutablePath(NULL, 0, &dirname_length);
+  if (length > 0) {
+    path = (char*)malloc(length + 1);
+    if (!path)
+      abort();
+    wai_getExecutablePath(path, length, &dirname_length);
+    path[length] = '\0';
+
+    EV_INFO("executable path: {}", path);
+    path[dirname_length] = '\0';
+    EV_INFO("  dirname: {}", path);
+    EV_INFO("  basename: {}", path + dirname_length + 1);
+    free(path);
+  } else {
+    EV_INFO("length {}", length);
+  }
+}
+
+Texture2DAsset AssetManager::GetTexture2D(const std::string& texture_name)
+{
+  size_t hash = std::hash<std::string>{}(texture_name);
+  if (auto it = texture_2d_map_.find(hash); it != texture_2d_map_.end()) {
+    // Return a new AssetProxy. This doesn't reload the data just constructs a new proxy with a reference to the
+    // already loaded assets, which in turn will increase the reference count on this asset.
+    Texture2D& texture_2d = it->second.asset;
+    return Texture2DAsset{ this, { AssetType::Texture2D, hash }, &texture_2d };
+  } else {
+    // Read texture from file system and insert into texture_2d_map_.
+    // Check if this file exists or not.
+    if (std::filesystem::exists(texture_name)) {
+      // File exists. Let's load it
+      Texture2D texture;
+      // texture.Initialise(const std::string& filename)
+    } else {
+      EV_WARN("Texture {} doesn't exist. Using default engine texture.", texture_name);
+    }
+  }
+}
+
+void AssetManager::IncreaseReference(AssetMetadata metadata)
+{
+  switch (metadata.type) {
+  case AssetType::Texture2D:
+    texture_2d_map_[metadata.hash].reference_count++;
+    break;
+  default:
+    EV_ERROR("Unknown asset type %d", static_cast<uint16_t>(metadata.type));
+  }
+}
+
+void AssetManager::DecreaseReference(AssetMetadata metadata)
+{
+  switch (metadata.type) {
+  case AssetType::Texture2D:
+    auto& asset = texture_2d_map_[metadata.hash];
+    asset.reference_count--;
+    if (asset.reference_count == 0) {
+      // Reference above is invalid after this erase. DO NOT USE IT anymore.
+      texture_2d_map_.erase(metadata.hash);
+    }
+  }
+}
+
+}// namespace evie

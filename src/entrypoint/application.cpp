@@ -15,6 +15,7 @@
 #include "window/event_manager.h"
 #include "window/input_manager_impl.h"
 #include "window/layer_queue.h"
+#include "asset_manager/asset_manager.hpp"
 
 #include "glad/glad.h"
 
@@ -113,6 +114,10 @@ Error Application::Initialise(const WindowProperties& props)
       true);// Second param install_callback=true will install GLFW callbacks and chain to existing ones.
     ImGui_ImplOpenGL3_Init();
   }
+
+  EV_INFO("Asset");
+  AssetManager manager;
+  EV_INFO("Assetafter");
 
   if (err.Good()) {
     initialised_ = true;
