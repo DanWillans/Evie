@@ -2,13 +2,13 @@
 #define INCLUDE_GAME_LAYER_HPP_
 
 #include "components.hpp"
+#include "dandan_system.hpp"
 #include "follow_system.hpp"
 #include "physics_system.hpp"
 #include "projectile_system.hpp"
-#include "dandan_system.hpp"
 #include "render.hpp"
-#include "rendering/model.hpp"
 
+#include <evie/asset_manager_interface.hpp>
 #include <evie/camera.h>
 #include <evie/ecs/components/mesh_component.hpp>
 #include <evie/ecs/components/velocity.hpp>
@@ -31,8 +31,10 @@ public:
   static constexpr float DefaultPlayerSpeed = 5.0F;
   static constexpr float SprintPlayerSpeed = 10.0F;
 
-  evie::Error
-    Initialise(evie::IInputManager* input_manager, evie::ECSController* ecs_controller, evie::IWindow* window);
+  evie::Error Initialise(evie::IInputManager* input_manager,
+    evie::ECSController* ecs_controller,
+    evie::IWindow* window,
+    evie::IAssetManager* asset_manager);
   void OnUpdate() override;
   void OnRender() override;
   void OnEvent(evie::Event& event) override;
@@ -65,6 +67,9 @@ private:
   // Window interface
   evie::IWindow* window_{ nullptr };
 
+  // AssetManager Interface
+  evie::IAssetManager* asset_manager_{ nullptr };
+
   // Floor Texture
   evie::Texture2D floor_texture_;
 
@@ -81,13 +86,13 @@ private:
   evie::ComponentID<FollowerComponent> follower_cid_{ 0 };
 
   // ProjectComponent ID
-  evie::ComponentID<ProjectileComponent> projectile_cid_{0};
+  evie::ComponentID<ProjectileComponent> projectile_cid_{ 0 };
 
   // VelocityComponent ID
-  evie::ComponentID<VelocityComponent> velocity_cid_{0};
+  evie::ComponentID<VelocityComponent> velocity_cid_{ 0 };
 
   // EnemyComponent ID
-  evie::ComponentID<EnemyComponent> enemy_cid_{0};
+  evie::ComponentID<EnemyComponent> enemy_cid_{ 0 };
 
   // Floor Vertex Shader
   evie::VertexShader floor_vertex_shader_;
@@ -105,10 +110,10 @@ private:
   ProjectileSystem* projectile_system_{ nullptr };
 
   // Physics System
-  PhysicsSystem* physics_system_{nullptr};
+  PhysicsSystem* physics_system_{ nullptr };
 
   // DanDan System
-  DanDanSystem* dandan_system_{nullptr};
+  DanDanSystem* dandan_system_{ nullptr };
 
   // Show cursor
   bool enable_cursor_{ false };
@@ -120,7 +125,7 @@ private:
   evie::Entity* player_entity_{ nullptr };
 
   // Followers follow
-  bool follow_on_{false};
+  bool follow_on_{ false };
 };
 
 #endif// !INCLUDE_GAME_LAYER_HPP_

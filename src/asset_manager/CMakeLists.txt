@@ -7,10 +7,5 @@ target_link_libraries(
   Evie::Evie_warnings
   Evie::Logging
   Evie::WhereAmI
+  Evie::Rendering
 )
-
-# target_link_system_libraries(
-#   AssetManager
-#   PRIVATE
-#   Evie::Glad
-# )

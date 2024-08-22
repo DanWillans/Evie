@@ -2,7 +2,9 @@
 #include <memory>
 #include <thread>
 
+#include "asset_manager/asset_manager.hpp"
 #include "evie/application.h"
+#include "evie/asset_manager_interface.hpp"
 #include "evie/camera.h"
 #include "evie/ecs/ecs_controller.hpp"
 #include "evie/error.h"
@@ -15,7 +17,6 @@
 #include "window/event_manager.h"
 #include "window/input_manager_impl.h"
 #include "window/layer_queue.h"
-#include "asset_manager/asset_manager.hpp"
 
 #include "glad/glad.h"
 
@@ -44,6 +45,7 @@ private:
   std::unique_ptr<Layer> debug_layer_;
   std::unique_ptr<IInputManager> input_manager_;
   std::unique_ptr<ECSController> ecs_controller_;
+  std::unique_ptr<IAssetManager> asset_manager_;
   LayerQueue layer_queue_;
   Camera camera_;
 };
@@ -62,6 +64,8 @@ IWindow* Application::GetWindow() const { return impl_->window_.get(); }
 ECSController* Application::GetECSController() const { return impl_->ecs_controller_.get(); }
 
 ImGuiContext* Application::GetImGuiContext() const { return ImGui::GetCurrentContext(); }
+
+IAssetManager* Application::GetAssetManager() const { return impl_->asset_manager_.get(); }
 
 Error Application::Initialise(const WindowProperties& props)
 {
@@ -115,9 +119,9 @@ Error Application::Initialise(const WindowProperties& props)
     ImGui_ImplOpenGL3_Init();
   }
 
-  EV_INFO("Asset");
-  AssetManager manager;
-  EV_INFO("Assetafter");
+  if (err.Good()) {
+    impl_->asset_manager_ = std::make_unique<AssetManager>();
+  }
 
   if (err.Good()) {
     initialised_ = true;

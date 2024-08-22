@@ -2,8 +2,8 @@
 #define EVIE_APPLICATION_H_
 
 #include <imgui_internal.h>
-#include <memory>
 
+#include "evie/asset_manager_interface.hpp"
 #include "evie/core.h"
 #include "evie/ecs/ecs_controller.hpp"
 #include "evie/error.h"
@@ -29,6 +29,7 @@ public:
   [[nodiscard]] ECSController* GetECSController() const;
   [[nodiscard]] IWindow* GetWindow() const;
   [[nodiscard]] ImGuiContext* GetImGuiContext() const;
+  [[nodiscard]] IAssetManager* GetAssetManager() const;
   void PushLayerFront(Layer& layer);
   void PushLayerBack(Layer& layer);
   void Shutdown();

@@ -20,6 +20,18 @@ public:
   void Bind();
   void Destroy();
 
+  Texture2D& operator=(const Texture2D& other)
+  {
+    id_ = other.id_;
+    texture_slot_ = other.texture_slot_;
+    width_ = other.width_;
+    height_ = other.height_;
+    number_of_channels_ = other.number_of_channels_;
+    printf("other.name_ size: %d\n", other.name_.size());
+    name_ = other.name_;
+    return *this;
+  }
+
   TextureType type{ TextureType::Diffuse };
 
   const std::string& GetName() const { return name_; }

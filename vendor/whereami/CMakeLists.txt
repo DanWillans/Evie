@@ -4,4 +4,5 @@ Evie_add_library(
     WhereAmI
   SRCS
     whereami.c
+  STATIC
 )

@@ -11,6 +11,7 @@
 
 #include "components.hpp"
 
+#include <evie/asset_manager_interface.hpp>
 #include <evie/default_models.h>
 #include <evie/ecs/components/mesh_component.hpp>
 #include <evie/ecs/components/transform.hpp>
@@ -37,10 +38,11 @@ public:
     evie::ComponentID<FollowTargetComponent> target_cid,
     evie::ComponentID<VelocityComponent> velocity_cid,
     evie::ECSController* ecs,
-    float map_scale)
+    float map_scale,
+    evie::IAssetManager* asset_manager)
     : enemy_cid_(enemy_cid), mesh_cid_(mesh_cid), transform_cid_(transform_cid), follower_cid_(follower_cid),
       projectile_cid_(projectile_cid), target_cid_(target_cid), velocity_cid_(velocity_cid), ecs_(ecs),
-      map_scale_(map_scale)
+      map_scale_(map_scale), asset_manager_(asset_manager)
   {}
 
   static constexpr evie::vec3 dandan_scale{ 2.0F, 2.0F, 2.0F };
@@ -59,9 +61,15 @@ public:
     }
     // DanDan texture
     if (err.Good()) {
-      err = tex_.Initialise(
-        R"(C:\Users\willa\devel\Evie\out\install\windows-msvc-debug-developer-mode\assets\textures\dandan.png)", true);
+      auto dandan_proxy = asset_manager_->GetTexture2D("dandan.png");
+      if (dandan_proxy.IsValid()) {
+        tex_ = dandan_proxy.Get();
+      } else {
+        EV_ERROR("UH OH Something went wrong");
+        std::terminate();
+      }
     }
+
     if (err.Good()) {
       err = shader_program_.Initialise(&vs_, &fs_);
     }
@@ -146,7 +154,7 @@ private:
           // Reduce the score
           if (score_ > 0) {
             score_--;
-          } else if (score_ == 0 && init_){
+          } else if (score_ == 0 && init_) {
             APP_INFO("You suck. You lose");
             std::exit(EXIT_SUCCESS);
           }
@@ -212,7 +220,7 @@ private:
     mesh_component.shader_program = shader_program_;
     mesh_component.shader_program.Use();
     mesh_component.shader_program.SetInt("Texture1", 0);
-    mesh_component.texture = tex_;
+    mesh_component.texture = *tex_;
 
     auto dandan = ecs_->CreateEntity();
     if (dandan && err.Good()) {
@@ -241,7 +249,7 @@ private:
 
   evie::VertexShader vs_;
   evie::FragmentShader fs_;
-  evie::Texture2D tex_;
+  const evie::Texture2D* tex_;
   evie::ShaderProgram shader_program_;
   evie::ComponentID<EnemyComponent> enemy_cid_{ 0 };
   evie::ComponentID<evie::MeshComponent> mesh_cid_{ 0 };
@@ -259,6 +267,7 @@ private:
   std::optional<evie::TransformComponent> next_dandan_transform_{ std::nullopt };
   bool colliding_{ false };
   bool init_{ false };
+  evie::IAssetManager* asset_manager_;
 };
 
 #endif// !INCLUDE_DANDAN_SYSTEM_HPP_

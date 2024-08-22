@@ -7,6 +7,7 @@
 #include <GLFW/glfw3.h>
 
 #include <dandan_system.hpp>
+#include <evie/asset_manager_interface.hpp>
 #include <evie/default_models.h>
 #include <evie/ecs/components/mesh_component.hpp>
 #include <evie/ecs/ecs_controller.hpp>
@@ -22,6 +23,7 @@
 #include <evie/texture.h>
 #include <evie/vertex_buffer.h>
 #include <evie/window.h>
+#include <exception>
 #include <glm/ext/quaternion_trigonometric.hpp>
 #include <glm/ext/scalar_constants.hpp>
 #include <glm/fwd.hpp>
@@ -30,8 +32,10 @@
 #include <imgui.h>
 #include <numbers>
 
-evie::Error
-  GameLayer::Initialise(evie::IInputManager* input_manager, evie::ECSController* ecs_controller, evie::IWindow* window)
+evie::Error GameLayer::Initialise(evie::IInputManager* input_manager,
+  evie::ECSController* ecs_controller,
+  evie::IWindow* window,
+  evie::IAssetManager* asset_manager)
 {
   evie::Error err = evie::Error::OK();
   // Initialise our variables
@@ -48,6 +52,11 @@ evie::Error
   window_ = window;
   if (window_ == nullptr) {
     return evie::Error{ "Invalid window" };
+  }
+
+  asset_manager_ = asset_manager;
+  if (asset_manager_ == nullptr) {
+    return evie::Error{ "Invalid asset manager" };
   }
 
   constexpr float map_scale = 50.0F;
@@ -98,7 +107,9 @@ evie::Error
     follow_target_cid_,
     velocity_cid_,
     ecs_,
-    map_scale);
+    map_scale,
+    asset_manager_);
+
   dandan_system_ = &(ecs_->GetSystem(enemy_sys_id));
   if (err.Good()) {
     err = dandan_system_->Initialise();
@@ -596,12 +607,16 @@ evie::Error GameLayer::SetupDanDan()
   if (err.Good()) {
     err = frag_shader.Initialise(R"(C:\Users\willa\devel\Evie\shaders\fragment_shader.fs)");
   }
-
-  evie::Texture2D tex;
+  const evie::Texture2D* tex{ nullptr };
   // Floor texture
   if (err.Good()) {
-    err = tex.Initialise(
-      R"(C:\Users\willa\devel\Evie\out\install\windows-msvc-debug-developer-mode\assets\textures\dandan.png)");
+    auto dandan_proxy = asset_manager_->GetTexture2D("dandan.png");
+    if (dandan_proxy.IsValid()) {
+      tex = dandan_proxy.Get();
+    } else {
+      EV_ERROR("UH OH Something went wrong");
+      std::terminate();
+    }
   }
 
   evie::MeshComponent wall_component;
@@ -625,7 +640,7 @@ evie::Error GameLayer::SetupDanDan()
   }
   wall_component.shader_program.Use();
   wall_component.shader_program.SetInt("Texture1", 0);
-  wall_component.texture = tex;
+  wall_component.texture = *tex;
 
   auto dandan = ecs_->CreateEntity();
   if (dandan && err.Good()) {

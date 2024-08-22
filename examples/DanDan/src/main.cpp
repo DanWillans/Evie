@@ -17,7 +17,7 @@ public:
     APP_INFO("Initialising engine");
     evie::Error err = Initialise(props);
     if (err.Good()) {
-      err = game_layer_.Initialise(GetInputManager(), GetECSController(), GetWindow());
+      err = game_layer_.Initialise(GetInputManager(), GetECSController(), GetWindow(), GetAssetManager());
       if (err.Good()) {
         PushLayerBack(game_layer_);
       }

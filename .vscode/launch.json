@@ -6,7 +6,7 @@
   "configurations": [
     {
       "name": "Debug Sandbox Windows",
-      "type": "cppvsdbg",
+      "type": "lldb",
       "request": "launch",
       "program": "${workspaceFolder}/out/install/windows-msvc-debug-developer-mode/bin/dan_dan_the_game.exe",
       "args": [],
