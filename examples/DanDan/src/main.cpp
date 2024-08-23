@@ -24,7 +24,7 @@ public:
     }
     return err;
   }
-  ~DanDanTheGame() override = default;
+  ~DanDanTheGame() override { APP_INFO("DanDanTheGame Destructor"); }
 
 private:
   GameLayer game_layer_;

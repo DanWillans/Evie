@@ -61,10 +61,8 @@ public:
     }
     // DanDan texture
     if (err.Good()) {
-      auto dandan_proxy = asset_manager_->GetTexture2D("dandan.png");
-      if (dandan_proxy.IsValid()) {
-        tex_ = dandan_proxy.Get();
-      } else {
+      tex_ = asset_manager_->GetTexture2D("dandan.png");
+      if (!tex_.IsValid()) {
         EV_ERROR("UH OH Something went wrong");
         std::terminate();
       }
@@ -220,7 +218,7 @@ private:
     mesh_component.shader_program = shader_program_;
     mesh_component.shader_program.Use();
     mesh_component.shader_program.SetInt("Texture1", 0);
-    mesh_component.texture = *tex_;
+    mesh_component.texture = *tex_.Get();
 
     auto dandan = ecs_->CreateEntity();
     if (dandan && err.Good()) {
@@ -249,7 +247,7 @@ private:
 
   evie::VertexShader vs_;
   evie::FragmentShader fs_;
-  const evie::Texture2D* tex_;
+  evie::AssetProxy<evie::Texture2D> tex_;
   evie::ShaderProgram shader_program_;
   evie::ComponentID<EnemyComponent> enemy_cid_{ 0 };
   evie::ComponentID<evie::MeshComponent> mesh_cid_{ 0 };

@@ -44,8 +44,8 @@ private:
   std::unique_ptr<EventManager> event_manager_;
   std::unique_ptr<Layer> debug_layer_;
   std::unique_ptr<IInputManager> input_manager_;
-  std::unique_ptr<ECSController> ecs_controller_;
   std::unique_ptr<IAssetManager> asset_manager_;
+  std::unique_ptr<ECSController> ecs_controller_;
   LayerQueue layer_queue_;
   Camera camera_;
 };
@@ -55,7 +55,11 @@ void Application::Impl::PushLayerBack(Layer& layer) { layer_queue_.PushBack(laye
 // =========================
 
 Application::Application() : impl_(new Impl()) {}
-Application::~Application() { delete impl_; }
+Application::~Application()
+{
+  EV_INFO("Application destructor");
+  delete impl_;
+}
 
 IInputManager* Application::GetInputManager() const { return impl_->input_manager_.get(); }
 

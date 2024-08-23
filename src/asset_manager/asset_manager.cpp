@@ -37,7 +37,6 @@ Texture2DAsset AssetManager::GetTexture2D(const std::string& texture_name)
   if (auto it = texture_2d_map_.find(hash); it != texture_2d_map_.end()) {
     // Return a new AssetProxy. This doesn't reload the data just constructs a new proxy with a reference to the
     // already loaded assets, which in turn will increase the reference count on this asset.
-    EV_INFO("Exists, returning existing asset");
     Texture2D& texture_2d = it->second.asset;
     EV_INFO("Exists, returning existing asset");
     return Texture2DAsset{ this, { AssetType::Texture2D, hash }, &texture_2d };
@@ -67,6 +66,7 @@ void AssetManager::IncreaseReference(AssetMetadata metadata)
 {
   switch (metadata.type) {
   case AssetType::Texture2D:
+    EV_INFO("Increasing reference count");
     texture_2d_map_[metadata.hash].reference_count++;
     break;
   default:
@@ -79,8 +79,10 @@ void AssetManager::DecreaseReference(AssetMetadata metadata)
   switch (metadata.type) {
   case AssetType::Texture2D:
     auto& asset = texture_2d_map_[metadata.hash];
+    EV_INFO("Decreasing reference count");
     asset.reference_count--;
     if (asset.reference_count == 0) {
+      EV_INFO("Erasing texture");
       // Reference above is invalid after this erase. DO NOT USE IT anymore.
       texture_2d_map_.erase(metadata.hash);
     }
