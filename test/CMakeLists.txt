@@ -267,11 +267,6 @@ if(WIN32)
     PRE_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:asset_manager_tests> $<TARGET_FILE_DIR:asset_manager_tests>
     COMMAND_EXPAND_LISTS)
-  add_custom_command(
-    TARGET asset_manager_tests
-    PRE_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_LIST_DIR}/test_files" "$<TARGET_FILE_DIR:asset_manager_tests>/../assets/textures"
-    COMMAND_EXPAND_LISTS)
 endif()
 
 # automatically discover tests that are defined in catch based test files you can modify the unittests. Set TEST_PREFIX

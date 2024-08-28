@@ -44,7 +44,7 @@ public:
     : asset_(other.asset_), metadata_(other.metadata_), asset_manager_(other.asset_manager_), valid_(other.valid_)
   {
     EV_INFO("Copy constructor");
-    // Only incrase reference if this is a valid asset.
+    // Only increase reference if this is a valid asset.
     if (valid_) {
       asset_manager_->IncreaseReference(metadata_);
     }
@@ -70,6 +70,10 @@ public:
     metadata_ = other.metadata_;
     asset_manager_ = other.asset_manager_;
     valid_ = other.valid_;
+    // Only incrase reference if this is a valid asset.
+    if (valid_) {
+      asset_manager_->IncreaseReference(metadata_);
+    }
     return *this;
   }
   AssetProxy(AssetProxy&& other) noexcept
@@ -79,8 +83,8 @@ public:
     other.asset_manager_ = nullptr;
     other.asset_ = nullptr;
     // Don't touch metadata
-    other.valid_ = false;
     // Don't decrease or increase reference. We're moving the proxy so "other" is on longer useable anymore.
+    other.valid_ = false;
   }
   ~AssetProxy()
   {
@@ -90,13 +94,14 @@ public:
       asset_manager_->DecreaseReference(metadata_);
     }
   }
-  const AssetType* Get() { return asset_; }
-  bool IsValid() { return valid_; }
+  const AssetType* Get() const { return asset_; }
+  bool IsValid() const { return valid_; }
 
   bool operator()() { return valid_; }
 
 private:
   friend class AssetManager;
+  friend class AssetManagerTest; // Only for test. Not the nicest solution but I wanted to move on.
   AssetProxy(IAssetManager* asset_manager, AssetMetadata metadata, AssetType* asset, bool valid = true)
     : asset_manager_(asset_manager), metadata_(metadata), asset_(asset), valid_(valid)
   {
@@ -113,4 +118,4 @@ using Texture2DAsset = AssetProxy<Texture2D>;
 
 }// namespace evie
 
-#endif EVIE_ASSET_MANAGER_INCLUDE_ASSET_MANAGER_INTERFACE_HPP_
+#endif // EVIE_ASSET_MANAGER_INCLUDE_ASSET_MANAGER_INTERFACE_HPP_
