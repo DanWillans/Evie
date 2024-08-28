@@ -4,23 +4,36 @@
 #include <evie/texture.h>
 #include <string>
 
-#include "logging.h"
-
 namespace evie {
 
+/**
+ * @brief All supported asset types in Evie.
+ *
+ */
 enum class AssetType : uint16_t {
   Texture2D,
 };
 
+/**
+ * @brief A struct that stores information/metadata about a particular asset. Used by the AssetManager to link
+ * AssetProxy instances back to particular assets.
+ *
+ */
 struct AssetMetadata
 {
   AssetType type;
+  // A unique identifier for a particular asset
   size_t hash;
 };
 
+// Forward declaration
 template<typename AssetType> class AssetProxy;
 struct AssetMetadata;
 
+/**
+ * @brief Pure abstract class for AssetManager. Any AssetManager implementation must derive from this interface.
+ *
+ */
 class IAssetManager
 {
 public:
@@ -36,22 +49,39 @@ private:
 };
 
 
+/**
+ * @brief This class provides proxy access to assets loaded via an AssetManager. The intention behind this class is to
+ * allow multiple non owning references to an asset. This AssetProxy will be returned by an AssetManager to a loaded
+ * asset.
+ *
+ * The design decision behind an AssetProxy is so that the AssetManager owns all the assets and can control what to do
+ * with those assets. The AssetManager can decide to lazy-load assets, deallocate/destroy the asset if there are no more
+ * references etc.
+ *
+ * The AssetProxy can be safely copied or moved around and will interact with the AssetManager appropriately to
+ * increse/decrease reference counts.
+ *
+ * @tparam AssetType The type of the asset that this class exposes.
+ */
 template<typename AssetType> class AssetProxy
 {
 public:
-  AssetProxy() { EV_INFO("Default constructor"); };
+  // Default constructor
+  AssetProxy() = default;
+
+  // Copy constructor
   AssetProxy(const AssetProxy& other)
     : asset_(other.asset_), metadata_(other.metadata_), asset_manager_(other.asset_manager_), valid_(other.valid_)
   {
-    EV_INFO("Copy constructor");
     // Only increase reference if this is a valid asset.
     if (valid_) {
       asset_manager_->IncreaseReference(metadata_);
     }
   }
-  AssetProxy& operator=(AssetProxy&& other)
+
+  // Move assignment
+  AssetProxy& operator=(AssetProxy&& other) noexcept
   {
-    EV_INFO("Move assignment");
     asset_ = other.asset_;
     metadata_ = other.metadata_;
     asset_manager_ = other.asset_manager_;
@@ -63,9 +93,13 @@ public:
     // Don't decrease or increase reference. We're moving the proxy so "other" is on longer useable anymore.
     return *this;
   }
+
+  // Copy assignment
   AssetProxy& operator=(const AssetProxy& other)
   {
-    EV_INFO("Copy assignment");
+    if (this == &other) {
+      return *this;
+    }
     asset_ = other.asset_;
     metadata_ = other.metadata_;
     asset_manager_ = other.asset_manager_;
@@ -76,19 +110,21 @@ public:
     }
     return *this;
   }
+
+  // Move constructor
   AssetProxy(AssetProxy&& other) noexcept
     : asset_(other.asset_), metadata_(other.metadata_), asset_manager_(other.asset_manager_), valid_(other.valid_)
   {
-    EV_INFO("Move constructor");
     other.asset_manager_ = nullptr;
     other.asset_ = nullptr;
     // Don't touch metadata
-    // Don't decrease or increase reference. We're moving the proxy so "other" is on longer useable anymore.
+    // Don't decrease or increase reference. We're moving the AssetProxy so "other" is no longer useable anymore.
     other.valid_ = false;
   }
+
+  // Destructor
   ~AssetProxy()
   {
-    EV_INFO("Destructor");
     // Only decrease reference if this is a valid asset
     if (valid_) {
       asset_manager_->DecreaseReference(metadata_);
@@ -101,15 +137,25 @@ public:
 
 private:
   friend class AssetManager;
-  friend class AssetManagerTest; // Only for test. Not the nicest solution but I wanted to move on.
+  friend class AssetManagerTest;// Only for test. Not the nicest solution but I wanted to move on.
+
+  /**
+   * @brief Construct a new AssetProxy object. This constructor is only to be called by friend classes and is the only
+   * way to create a valid AssetProxy object.
+   *
+   * @param asset_manager An instance of an IAssetManager that owns the asset
+   * @param metadata Metadata about this AssetProxy
+   * @param asset A pointer to the asset that this Proxy will expose.
+   * @param valid Determines where this proxy is valid or not
+   */
   AssetProxy(IAssetManager* asset_manager, AssetMetadata metadata, AssetType* asset, bool valid = true)
     : asset_manager_(asset_manager), metadata_(metadata), asset_(asset), valid_(valid)
   {
-    EV_INFO("Private construtor");
     asset_manager_->IncreaseReference(metadata_);
   }
+
   AssetType* asset_{ nullptr };
-  AssetMetadata metadata_;
+  AssetMetadata metadata_{};
   IAssetManager* asset_manager_{ nullptr };
   bool valid_{ false };
 };
@@ -118,4 +164,4 @@ using Texture2DAsset = AssetProxy<Texture2D>;
 
 }// namespace evie
 
-#endif // EVIE_ASSET_MANAGER_INCLUDE_ASSET_MANAGER_INTERFACE_HPP_
+#endif// EVIE_ASSET_MANAGER_INCLUDE_ASSET_MANAGER_INTERFACE_HPP_

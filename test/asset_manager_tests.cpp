@@ -45,7 +45,7 @@ private:
 };
 }// namespace evie
 
-TEST_CASE("Test AssetManager")
+TEST_CASE("Test AssetManager and AssetProxy interaction")
 {
   evie::AssetManagerTest asset_manager;
   {

@@ -12,8 +12,7 @@
 
 namespace evie {
 
-
-class EVIE_API AssetManager : public IAssetManager
+class EVIE_API AssetManager final : public IAssetManager
 {
 public:
   static constexpr const char* TexturesDirectory = "textures";
@@ -36,7 +35,32 @@ private:
   {
     AssetHandle() = default;
     AssetHandle(const AssetHandle& other) : asset(other.asset) { reference_count.store(other.reference_count); }
+
+    AssetHandle(AssetHandle&& other) noexcept : asset(std::move(other.asset))
+    {
+      reference_count.store(other.reference_count);
+    }
+
+    AssetHandle& operator=(const AssetHandle& other)
+    {
+      if (this == &other) {
+        return *this;
+      }
+      asset = other.asset;
+      reference_count.store(other.reference_count);
+      return *this;
+    }
+
+    AssetHandle& operator=(AssetHandle&& other) noexcept
+    {
+      asset = std::move(asset);
+      reference_count.store(other.reference_count);
+    }
+
+    ~AssetHandle() = default;
+
     explicit AssetHandle(const Asset& asset_in) : asset(asset_in) {}
+
     // The actual asset data
     Asset asset;
     // The reference count to see the usage of this asset.
@@ -46,8 +70,8 @@ private:
   void IncreaseReference(AssetMetadata metadata) override;
   void DecreaseReference(AssetMetadata metadata) override;
 
-  std::unordered_map<size_t, AssetHandle<Texture2D>> texture_2d_map_{};
-  std::filesystem::path asset_directory_{};
+  std::unordered_map<size_t, AssetHandle<Texture2D>> texture_2d_map_;
+  std::filesystem::path asset_directory_;
 };
 
 }// namespace evie
