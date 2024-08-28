@@ -5,7 +5,8 @@ target_link_libraries(
   PRIVATE
   Evie::Evie_options
   Evie::Evie_warnings
-  Evie::Logging
   Evie::WhereAmI
   Evie::Rendering
+  PUBLIC
+  Evie::Logging
 )

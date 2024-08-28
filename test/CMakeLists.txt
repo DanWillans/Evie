@@ -250,3 +250,34 @@ doctest_discover_tests(
   TEST_PREFIX
   "ECSControllerUnittests."
 )
+
+###### Asset Manager Tests ########
+add_executable(asset_manager_tests main.cpp asset_manager_tests.cpp)
+target_link_libraries(
+  asset_manager_tests
+  PRIVATE
+  Evie::Evie_warnings
+  Evie::Evie_options
+  Evie::AssetManager
+  doctest::doctest)
+
+if(WIN32)
+  add_custom_command(
+    TARGET asset_manager_tests
+    PRE_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:asset_manager_tests> $<TARGET_FILE_DIR:asset_manager_tests>
+    COMMAND_EXPAND_LISTS)
+  add_custom_command(
+    TARGET asset_manager_tests
+    PRE_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_LIST_DIR}/test_files" "$<TARGET_FILE_DIR:asset_manager_tests>/../assets/textures"
+    COMMAND_EXPAND_LISTS)
+endif()
+
+# automatically discover tests that are defined in catch based test files you can modify the unittests. Set TEST_PREFIX
+# to whatever you want, or use different for different binaries
+doctest_discover_tests(
+  asset_manager_tests
+  TEST_PREFIX
+  "AssetManagerUnitTests."
+)

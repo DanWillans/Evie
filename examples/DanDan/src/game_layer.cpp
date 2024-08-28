@@ -122,8 +122,15 @@ evie::Error GameLayer::Initialise(evie::IInputManager* input_manager,
   // Register our projectile system - After player entity is created.
   evie::SystemSignature project_signature;
   project_signature.SetComponent(projectile_cid_);
-  auto projectile_sys_id = ecs_->RegisterSystem<ProjectileSystem>(
-    project_signature, ecs_, mesh_cid_, transform_cid_, projectile_cid_, velocity_cid_, player_entity_, map_scale);
+  auto projectile_sys_id = ecs_->RegisterSystem<ProjectileSystem>(project_signature,
+    ecs_,
+    mesh_cid_,
+    transform_cid_,
+    projectile_cid_,
+    velocity_cid_,
+    player_entity_,
+    map_scale,
+    asset_manager_);
   projectile_system_ = &(ecs_->GetSystem(projectile_sys_id));
   if (err.Good()) {
     err = projectile_system_->Initialise();
@@ -292,12 +299,12 @@ evie::Error GameLayer::SetupFloor(float map_scale)
     err = floor_fragment_shader_.Initialise(R"(C:\Users\willa\devel\Evie\shaders\fragment_shader.fs)");
   }
 
-  // Floor texture
   if (err.Good()) {
-    err = floor_texture_.Initialise(
-      R"(C:\Users\willa\devel\Evie\out\install\windows-msvc-debug-developer-mode\assets\textures\stone-wall.jpg)",
-      false,
-      evie::TextureWrapping::MirroredRepeat);
+    floor_texture_ = asset_manager_->GetTexture2D("stone-wall.jpg");
+    if (!floor_texture_.IsValid()) {
+      EV_ERROR("UH OH Something went wrong");
+      std::terminate();
+    }
   }
 
   evie::MeshComponent floor_mesh_component;
@@ -322,7 +329,7 @@ evie::Error GameLayer::SetupFloor(float map_scale)
   // Now setup the texture slots and bind them to our shader program.
   floor_mesh_component.shader_program.Use();
   floor_mesh_component.shader_program.SetInt("Texture1", 0);
-  floor_mesh_component.texture = floor_texture_;
+  floor_mesh_component.texture = *floor_texture_.Get();
 
   // Create floor
   auto floor_entity = ecs_->CreateEntity();
@@ -343,10 +350,13 @@ evie::Error GameLayer::SetupSkybox(float map_scale)
   evie::Error err = evie::Error::OK();
 
   // Sky box texture
-  evie::Texture2D sky_texture;
+  static evie::Texture2DAsset sky_texture;
   if (err.Good()) {
-    err = sky_texture.Initialise(
-      R"(C:\Users\willa\devel\Evie\out\install\windows-msvc-debug-developer-mode\assets\textures\skybox.png)", true);
+    sky_texture = asset_manager_->GetTexture2D("skybox.png");
+    if (!sky_texture.IsValid()) {
+      EV_ERROR("UH OH Something went wrong");
+      std::terminate();
+    }
   }
 
   evie::VertexShader vert_shader;
@@ -437,7 +447,7 @@ std::vector<float> sky_cube {
   if (err.Good()) {
     mesh_component.shader_program.Use();
     mesh_component.shader_program.SetInt("Texture1", 0);
-    mesh_component.texture = sky_texture;
+    mesh_component.texture = *sky_texture.Get();
 
     err = entity->AddComponent(mesh_cid_, mesh_component);
     if (err.Good()) {
@@ -479,11 +489,14 @@ evie::Error GameLayer::SetupWalls(float map_scale)
     err = frag_shader.Initialise(R"(C:\Users\willa\devel\Evie\shaders\fragment_shader.fs)");
   }
 
-  evie::Texture2D tex;
-  // Floor texture
+  static evie::Texture2DAsset tex;
+  // Wall texture
   if (err.Good()) {
-    err = tex.Initialise(
-      R"(C:\Users\willa\devel\Evie\out\install\windows-msvc-debug-developer-mode\assets\textures\my-wall2.png)");
+    tex = asset_manager_->GetTexture2D("my-wall2.png");
+    if (!tex.IsValid()) {
+      EV_ERROR("UH OH Something went wrong");
+      std::terminate();
+    }
   }
 
   evie::MeshComponent wall_component;
@@ -508,7 +521,7 @@ evie::Error GameLayer::SetupWalls(float map_scale)
   // Now setup the texture slots and bind them to our shader program.
   wall_component.shader_program.Use();
   wall_component.shader_program.SetInt("Texture1", 0);
-  wall_component.texture = tex;
+  wall_component.texture = *tex.Get();
 
   constexpr float wall_height_offset = 0.5F;
   const float wall_offset = map_scale / 2.0F;

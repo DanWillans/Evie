@@ -22,9 +22,10 @@ public:
   AssetManager(AssetManager&&) = delete;
   AssetManager& operator=(const AssetManager&) = delete;
   AssetManager& operator=(AssetManager&&) = delete;
-  virtual ~AssetManager() = default;
+  ~AssetManager() override = default;
 
-  Texture2DAsset GetTexture2D(const std::string& texture) override;
+  Texture2DAsset GetTexture2D(const std::string& texture,
+    TextureWrapping texture_wrapping = TextureWrapping::Repeat) override;
 
 private:
   // Friend all AssetProxy types
@@ -45,7 +46,7 @@ private:
   void IncreaseReference(AssetMetadata metadata) override;
   void DecreaseReference(AssetMetadata metadata) override;
 
-  std::unordered_map<size_t, AssetHandle<Texture2D>> texture_2d_map_;
+  std::unordered_map<size_t, AssetHandle<Texture2D>> texture_2d_map_{};
   std::filesystem::path asset_directory_{};
 };
 

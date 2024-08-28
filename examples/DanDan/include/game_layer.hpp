@@ -71,7 +71,7 @@ private:
   evie::IAssetManager* asset_manager_{ nullptr };
 
   // Floor Texture
-  evie::Texture2D floor_texture_;
+  evie::AssetProxy<evie::Texture2D> floor_texture_;
 
   // MeshComponent ID
   evie::ComponentID<evie::MeshComponent> mesh_cid_{ 0 };

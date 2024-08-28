@@ -66,8 +66,8 @@ Error Texture2D::Initialise(const std::string& filename, bool flip, TextureWrapp
     // in the future to allow customisation of this.
     CallOpenGL(glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GetOpenGLTextureWrapping(wrapping));
     CallOpenGL(glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GetOpenGLTextureWrapping(wrapping));
-    CallOpenGL(glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    CallOpenGL(glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    CallOpenGL(glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    CallOpenGL(glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     // Generate the 2D Texture Image in openGL
     CallOpenGL(glTexImage2D, GL_TEXTURE_2D, 0, ogl_format, width_, height_, 0, ogl_format, GL_UNSIGNED_BYTE, data);

@@ -1,6 +1,7 @@
 #ifndef EVIE_ASSET_MANAGER_INCLUDE_ASSET_MANAGER_INTERFACE_HPP_
 #define EVIE_ASSET_MANAGER_INCLUDE_ASSET_MANAGER_INTERFACE_HPP_
 
+#include <evie/texture.h>
 #include <string>
 
 #include "logging.h"
@@ -18,14 +19,14 @@ struct AssetMetadata
 };
 
 template<typename AssetType> class AssetProxy;
-class Texture2D;
-class AssetMetadata;
+struct AssetMetadata;
 
 class IAssetManager
 {
 public:
   virtual ~IAssetManager() = default;
-  virtual AssetProxy<Texture2D> GetTexture2D(const std::string& texture_name) = 0;
+  virtual AssetProxy<Texture2D> GetTexture2D(const std::string& texture_name,
+    TextureWrapping texture_wrapping = TextureWrapping::Repeat) = 0;
 
 private:
   template<typename AssetType> friend class AssetProxy;
@@ -91,6 +92,8 @@ public:
   }
   const AssetType* Get() { return asset_; }
   bool IsValid() { return valid_; }
+
+  bool operator()() { return valid_; }
 
 private:
   friend class AssetManager;

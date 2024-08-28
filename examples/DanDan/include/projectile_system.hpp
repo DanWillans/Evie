@@ -2,6 +2,7 @@
 #define INCLUDE_DANDAN_PROJECTILE_SYSTEM_HPP_
 
 #include "components.hpp"
+#include <evie/asset_manager_interface.hpp>
 #include <evie/default_models.h>
 #include <evie/ecs/components/mesh_component.hpp>
 #include <evie/ecs/components/transform.hpp>
@@ -34,9 +35,10 @@ public:
     evie::ComponentID<ProjectileComponent> projectile_cid,
     evie::ComponentID<VelocityComponent> velocity_cid,
     evie::Entity* player_entity,
-    const float& map_boundary)
+    const float& map_boundary,
+    evie::IAssetManager* asset_manager)
     : ecs_(ecs), mesh_cid_(mesh_cid), transform_cid_(transform_cid), projectile_cid_(projectile_cid),
-      velocity_cid_(velocity_cid), player_entity_(player_entity)
+      velocity_cid_(velocity_cid), player_entity_(player_entity), asset_manager_(asset_manager)
   {
     constexpr float half_map_size = 2.0F;
     map_boundary_ = map_boundary / half_map_size;
@@ -59,10 +61,12 @@ public:
     if (err.Good()) {
       err = fs_.Initialise(R"(C:\Users\willa\devel\Evie\shaders\fragment_shader.fs)");
     }
-    // Floor texture
     if (err.Good()) {
-      err = tex_.Initialise(
-        R"(C:\Users\willa\devel\Evie\out\install\windows-msvc-debug-developer-mode\assets\textures\grass.jpg)");
+      tex_ = asset_manager_->GetTexture2D("grass.jpg");
+      if (!tex_.IsValid()) {
+        EV_ERROR("UH OH Something went wrong");
+        std::terminate();
+      }
     }
     if (err.Good()) {
       err = shader_program_.Initialise(&vs_, &fs_);
@@ -131,7 +135,7 @@ private:
         if (err.Good()) {
           mesh_component.shader_program.Use();
           mesh_component.shader_program.SetInt("Texture1", 0);
-          mesh_component.texture = tex_;
+          mesh_component.texture = *tex_.Get();
           err = entity->AddComponent(mesh_cid_, mesh_component);
         }
         if (err.Good()) {
@@ -156,9 +160,10 @@ private:
   evie::Entity* player_entity_{ nullptr };
   evie::VertexShader vs_;
   evie::FragmentShader fs_;
-  evie::Texture2D tex_;
+  evie::AssetProxy<evie::Texture2D> tex_;
   evie::ShaderProgram shader_program_;
   float map_boundary_;
+  evie::IAssetManager* asset_manager_;
 };
 
 #endif// !INCLUDE_DANDAN_PROJECTILE_SYSTEM_HPP_
