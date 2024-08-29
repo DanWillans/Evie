@@ -70,11 +70,6 @@ private:
   // AssetManager Interface
   evie::IAssetManager* asset_manager_{ nullptr };
 
-  // Floor Texture
-  // We shouldn't really keep asset proxy references outside of ECS components because they cause a use after free when
-  // closing the game down.
-  evie::AssetProxy<evie::Texture2D> floor_texture_;
-
   // MeshComponent ID
   evie::ComponentID<evie::MeshComponent> mesh_cid_{ 0 };
 

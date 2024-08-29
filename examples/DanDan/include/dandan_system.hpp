@@ -56,16 +56,24 @@ public:
     // DanDan texture
     if (err.Good()) {
       tex_ = asset_manager_->GetTexture2D("dandan.png");
-      if (!tex_.IsValid()) {
-        EV_ERROR("UH OH Something went wrong");
-        std::terminate();
+      if (tex_.Good()) {
+        if (!tex_->IsValid()) {
+          EV_ERROR("UH OH Something went wrong");
+          std::terminate();
+        }
+      } else {
+        err = tex_.Error();
       }
     }
     if (err.Good()) {
       shader_prog_ = asset_manager_->GetShaderProgram("shader");
-      if (!shader_prog_.IsValid()) {
-        EV_ERROR("UH OH Something went wrong");
-        std::terminate();
+      if (shader_prog_.Good()) {
+        if (!shader_prog_->IsValid()) {
+          EV_ERROR("UH OH Something went wrong");
+          std::terminate();
+        }
+      } else {
+        err = shader_prog_.Error();
       }
     }
 
@@ -89,15 +97,14 @@ public:
   }
 
 private:
-  evie::vec3 GetRandomTransform()
+  evie::vec3 GetRandomTransform() const
   {
-    std::random_device rd;// obtain a random number from hardware
-    std::mt19937 gen(rd());// seed the generator
-    std::uniform_int_distribution<> distr(-map_scale_ / 2.0F, map_scale_ / 2.0F);// define the range
-    // float x_pos = distr(gen);
-    // const auto&
-    // if( x_pos)
-    return evie::vec3{ distr(gen), starting_offset.y, distr(gen) };
+    std::random_device rand;// obtain a random number from hardware
+    std::mt19937 gen(rand());// seed the generator
+    constexpr float half_scale = 2.0F;
+    std::uniform_int_distribution<> distr(
+      static_cast<int>(-map_scale_ / half_scale), static_cast<int>(map_scale_ / half_scale));// define the range
+    return evie::vec3{ distr(gen), starting_offset.y, distr(gen) };// NOLINT
   }
 
   void Update(const float& delta_time) override
@@ -133,7 +140,7 @@ private:
           score_transform.position.x = (-map_scale_ / 2.0F) + score_ * 4.0F;// NOLINT
           score_transform.position.y = 5.0F;// NOLINT
           score_transform.position.z = -map_scale_ / 2.0F;// NOLINT
-          score_transform.scale = dandan_scale * 1.5F;
+          score_transform.scale = dandan_scale * 1.5F;// NOLINT
           next_dandan_transform_ = score_transform;
           continue;
         }
@@ -151,7 +158,7 @@ private:
             score_--;
           } else if (score_ == 0 && init_) {
             APP_INFO("You suck. You lose");
-            std::exit(EXIT_SUCCESS);
+            std::exit(EXIT_SUCCESS);// NOLINT
           }
           // Delete the DanDan scorers
           if (!score_dan_dans_.empty()) {
@@ -172,7 +179,7 @@ private:
       }
       if (score_ == score_to_win) {
         APP_INFO("You win!");
-        std::exit(EXIT_SUCCESS);
+        std::exit(EXIT_SUCCESS);// NOLINT
       }
     }
   }
@@ -212,10 +219,10 @@ private:
       mesh_component.vertex_array.Initialise();
       err = mesh_component.vertex_array.AssociateVertexBuffer(mesh_component.model_data);
     }
-    mesh_component.shader_program = *shader_prog_.Get();
+    mesh_component.shader_program = *shader_prog_->Get();
     mesh_component.shader_program.Use();
     mesh_component.shader_program.SetInt("Texture1", 0);
-    mesh_component.texture = *tex_.Get();
+    mesh_component.texture = *tex_->Get();
 
     auto dandan = ecs_->CreateEntity();
     if (dandan && err.Good()) {
@@ -231,7 +238,7 @@ private:
         }
         if (err.Good() && enemy) {
           VelocityComponent vel_comp;
-          vel_comp.speed = speed * 2.5F;
+          vel_comp.speed = speed * 2.5F;// NOLINT
           err = dandan->AddComponent(velocity_cid_, vel_comp);
         }
         if (err.Good() && !enemy) {
@@ -244,8 +251,8 @@ private:
 
   evie::VertexShader vs_;
   evie::FragmentShader fs_;
-  evie::AssetProxy<evie::Texture2D> tex_;
-  evie::ShaderProgramAsset shader_prog_;
+  evie::Result<evie::Texture2DAsset> tex_;
+  evie::Result<evie::ShaderProgramAsset> shader_prog_;
   evie::ComponentID<EnemyComponent> enemy_cid_{ 0 };
   evie::ComponentID<evie::MeshComponent> mesh_cid_{ 0 };
   evie::ComponentID<evie::TransformComponent> transform_cid_{ 0 };

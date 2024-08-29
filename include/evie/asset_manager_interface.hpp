@@ -32,6 +32,10 @@ struct AssetMetadata
 template<typename AssetType> class AssetProxy;
 struct AssetMetadata;
 
+// AssetProxy aliases
+using Texture2DAsset = AssetProxy<Texture2D>;
+using ShaderProgramAsset = AssetProxy<ShaderProgram>;
+
 /**
  * @brief Pure abstract class for AssetManager. Any AssetManager implementation must derive from this interface.
  *
@@ -40,11 +44,11 @@ class IAssetManager
 {
 public:
   virtual ~IAssetManager() = default;
-  virtual AssetProxy<Texture2D> GetTexture2D(const std::string& texture_name,
+  virtual Result<Texture2DAsset> GetTexture2D(const std::string& texture_name,
     TextureWrapping texture_wrapping = TextureWrapping::Repeat) = 0;
 
   // This is just temporary until Renderer code is written. No need for users to get shader programs at the moment.
-  virtual AssetProxy<ShaderProgram> GetShaderProgram(const std::string& shader_name) = 0;
+  virtual Result<ShaderProgramAsset> GetShaderProgram(const std::string& shader_name) = 0;
 
 private:
   template<typename AssetType> friend class AssetProxy;
@@ -167,10 +171,6 @@ private:
   bool valid_{ false };
 };
 
-// AssetProxy aliases
-
-using Texture2DAsset = AssetProxy<Texture2D>;
-using ShaderProgramAsset = AssetProxy<ShaderProgram>;
 
 }// namespace evie
 

@@ -289,20 +289,18 @@ evie::Error GameLayer::SetupFloor(float map_scale)
   player_camera_.ResetCameraPosition({ 0.0, 1.0, 0.0 });
   player_camera_.camera_speed = DefaultPlayerSpeed;
 
+  evie::Result<evie::Texture2DAsset> floor_texture;
   if (err.Good()) {
-    floor_texture_ = asset_manager_->GetTexture2D("stone-wall.jpg");
-    if (!floor_texture_.IsValid()) {
-      EV_ERROR("UH OH Something went wrong");
-      std::terminate();
-    }
-
-  if (err.Good()) {
-      shader_prog_ = asset_manager_->GetShaderProgram("shader");
-      if (!shader_prog_.IsValid()) {
+    floor_texture = asset_manager_->GetTexture2D("stone-wall.jpg");
+    if (floor_texture.Good()) {
+      if (!floor_texture->IsValid()) {
         EV_ERROR("UH OH Something went wrong");
         std::terminate();
       }
+    } else {
+      err = floor_texture.Error();
     }
+  }
 
   evie::MeshComponent floor_mesh_component;
   // We need to create the layout for our model/vertex data
@@ -321,16 +319,22 @@ evie::Error GameLayer::SetupFloor(float map_scale)
   }
   if (err.Good()) {
     auto shader_prog_ = asset_manager_->GetShaderProgram("shader");
-    if (!shader_prog_.IsValid()) {
-      EV_ERROR("UH OH Something went wrong");
-      std::terminate();
+    if (shader_prog_.Good()) {
+      if (!shader_prog_->IsValid()) {
+        EV_ERROR("UH OH Something went wrong");
+        std::terminate();
+      }
+    } else {
+      err = shader_prog_.Error();
     }
-    floor_mesh_component.shader_program = *shader_prog_.Get();
+    if (err.Good()) {
+      floor_mesh_component.shader_program = *shader_prog_->Get();
+    }
   }
   // Now setup the texture slots and bind them to our shader program.
   floor_mesh_component.shader_program.Use();
   floor_mesh_component.shader_program.SetInt("Texture1", 0);
-  floor_mesh_component.texture = *floor_texture_.Get();
+  floor_mesh_component.texture = *floor_texture->Get();
 
   // Create floor
   auto floor_entity = ecs_->CreateEntity();
@@ -351,12 +355,16 @@ evie::Error GameLayer::SetupSkybox(float map_scale)
   evie::Error err = evie::Error::OK();
 
   // Sky box texture
-  static evie::Texture2DAsset sky_texture;
+  evie::Result<evie::Texture2DAsset> sky_texture;
   if (err.Good()) {
     sky_texture = asset_manager_->GetTexture2D("skybox.png");
-    if (!sky_texture.IsValid()) {
-      EV_ERROR("UH OH Something went wrong");
-      std::terminate();
+    if (sky_texture.Good()) {
+      if (!sky_texture->IsValid()) {
+        EV_ERROR("UH OH Something went wrong");
+        std::terminate();
+      }
+    } else {
+      err = sky_texture.Error();
     }
   }
 
@@ -431,17 +439,23 @@ std::vector<float> sky_cube {
 
   if (err.Good()) {
     auto shader_prog_ = asset_manager_->GetShaderProgram("shader");
-    if (!shader_prog_.IsValid()) {
-      EV_ERROR("UH OH Something went wrong");
-      std::terminate();
+    if (shader_prog_.Good()) {
+      if (!shader_prog_->IsValid()) {
+        EV_ERROR("UH OH Something went wrong");
+        std::terminate();
+      }
+    } else {
+      err = shader_prog_.Error();
     }
-    mesh_component.shader_program = *shader_prog_.Get();
+    if (err.Good()) {
+      mesh_component.shader_program = *shader_prog_->Get();
+    }
   }
 
   if (err.Good()) {
     mesh_component.shader_program.Use();
     mesh_component.shader_program.SetInt("Texture1", 0);
-    mesh_component.texture = *sky_texture.Get();
+    mesh_component.texture = *sky_texture->Get();
 
     err = entity->AddComponent(mesh_cid_, mesh_component);
     if (err.Good()) {
@@ -471,13 +485,17 @@ evie::Error GameLayer::SetupWalls(float map_scale)
   };
   // clang-format on
 
-  static evie::Texture2DAsset tex;
+  evie::Result<evie::Texture2DAsset> tex;
   // Wall texture
   if (err.Good()) {
     tex = asset_manager_->GetTexture2D("my-wall2.png");
-    if (!tex.IsValid()) {
-      EV_ERROR("UH OH Something went wrong");
-      std::terminate();
+    if (tex.Good()) {
+      if (!tex->IsValid()) {
+        EV_ERROR("UH OH Something went wrong");
+        std::terminate();
+      }
+    } else {
+      err = tex.Error();
     }
   }
 
@@ -498,16 +516,23 @@ evie::Error GameLayer::SetupWalls(float map_scale)
   }
   if (err.Good()) {
     auto shader_prog_ = asset_manager_->GetShaderProgram("shader");
-    if (!shader_prog_.IsValid()) {
-      EV_ERROR("UH OH Something went wrong");
-      std::terminate();
+    if (shader_prog_.Good()) {
+      if (!shader_prog_->IsValid()) {
+        EV_ERROR("UH OH Something went wrong");
+        std::terminate();
+      }
+    } else {
+      err = shader_prog_.Error();
     }
-    wall_component.shader_program = *shader_prog_.Get();
+
+    if (err.Good()) {
+      wall_component.shader_program = *shader_prog_->Get();
+    }
   }
   // Now setup the texture slots and bind them to our shader program.
   wall_component.shader_program.Use();
   wall_component.shader_program.SetInt("Texture1", 0);
-  wall_component.texture = *tex.Get();
+  wall_component.texture = *tex->Get();
 
   constexpr float wall_height_offset = 0.5F;
   const float wall_offset = map_scale / 2.0F;

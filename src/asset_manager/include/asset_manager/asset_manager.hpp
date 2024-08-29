@@ -24,10 +24,10 @@ public:
   AssetManager& operator=(AssetManager&&) = delete;
   ~AssetManager() override = default;
 
-  Texture2DAsset GetTexture2D(const std::string& texture,
+  Result<Texture2DAsset> GetTexture2D(const std::string& texture,
     TextureWrapping texture_wrapping = TextureWrapping::Repeat) override;
 
-  ShaderProgramAsset GetShaderProgram(const std::string& shader_name) override;
+  Result<ShaderProgramAsset> GetShaderProgram(const std::string& shader_name) override;
 
 private:
   // Friend all AssetProxy types
@@ -36,42 +36,7 @@ private:
   // A helper struct to encapsulate the asset alongside a reference count.
   template<typename Asset> struct AssetHandle
   {
-    // AssetHandle() = default;
-    // AssetHandle(const AssetHandle& other) : asset(other.asset) { reference_count.store(other.reference_count); }
-
-    // AssetHandle(AssetHandle&& other) noexcept : asset(std::move(other.asset))
-    // {
-    //   reference_count.store(other.reference_count);
-    // }
-
-    // AssetHandle& operator=(const AssetHandle& other)
-    // {
-    //   if (this == &other) {
-    //     return *this;
-    //   }
-    //   asset = other.asset;
-    //   reference_count.store(other.reference_count);
-    //   return *this;
-    // }
-
-    // AssetHandle& operator=(AssetHandle&& other) noexcept
-    // {
-    //   if (this == &other) {
-    //     return *this;
-    //   }
-    //   asset = other.asset;
-    //   reference_count.store(other.reference_count);
-    //   return *this;
-    // }
-    // AssetHandle() = delete;
-    // AssetHandle(const AssetHandle& other) = delete;
-    // AssetHandle(AssetHandle&& other) = delete;
-    // AssetHandle& operator=(AssetHandle&& other) = delete;
-    // AssetHandle& operator=(const AssetHandle& other) = delete;
-    // ~AssetHandle() = default;
-
-    AssetHandle(const Asset& asset_in) : asset(asset_in) {}
-
+    explicit AssetHandle(const Asset& asset_in) : asset(asset_in) {}
     // The actual asset data
     Asset asset;
     // The reference count to see the usage of this asset.

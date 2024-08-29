@@ -13,13 +13,13 @@ class AssetManagerTest : public IAssetManager
 {
 public:
   virtual ~AssetManagerTest() = default;
-  AssetProxy<Texture2D> GetTexture2D(const std::string& texture_name,
+  Result<Texture2DAsset> GetTexture2D(const std::string& texture_name,
     TextureWrapping texture_wrapping = TextureWrapping::Repeat) override
   {
     return AssetProxy<Texture2D>{ this, { AssetType::Texture2D, 0 }, &texture_2d };
   }
 
-  AssetProxy<ShaderProgram> GetShaderProgram(const std::string& shader_name) override
+  Result<ShaderProgramAsset> GetShaderProgram(const std::string& shader_name) override
   {
     return AssetProxy<ShaderProgram>{ this, { AssetType::ShaderProgram, 0 }, nullptr };
   }
@@ -55,9 +55,10 @@ TEST_CASE("Test AssetManager and AssetProxy interaction")
 {
   evie::AssetManagerTest asset_manager;
   {
-    evie::Texture2DAsset texture_asset = asset_manager.GetTexture2D("dandan.png");
-    REQUIRE(texture_asset.IsValid());
-    REQUIRE(texture_asset.Get() != nullptr);
+    evie::Result<evie::Texture2DAsset> texture_asset = asset_manager.GetTexture2D("dandan.png");
+    REQUIRE(texture_asset.Good());
+    REQUIRE(texture_asset->IsValid());
+    REQUIRE(texture_asset->Get() != nullptr);
     REQUIRE(asset_manager.GetTextureRefCount() == 1);
 
     // Test copy assignment reference counting
@@ -68,28 +69,28 @@ TEST_CASE("Test AssetManager and AssetProxy interaction")
       REQUIRE(asset_manager.GetTextureRefCount() == 1);
 
       // Now copy assign the texture_asset;
-      texture_asset_copy_assignment = texture_asset;
+      texture_asset_copy_assignment = *texture_asset;
       REQUIRE(texture_asset_copy_assignment.IsValid());
       REQUIRE(texture_asset_copy_assignment.Get() != nullptr);
       REQUIRE(asset_manager.GetTextureRefCount() == 2);
     }
 
     // Check we're back now that the copy has been destructed
-    REQUIRE(texture_asset.IsValid());
-    REQUIRE(texture_asset.Get() != nullptr);
+    REQUIRE(texture_asset->IsValid());
+    REQUIRE(texture_asset->Get() != nullptr);
     REQUIRE(asset_manager.GetTextureRefCount() == 1);
 
     // Test copy constructor reference counting
     {
-      evie::Texture2DAsset texture_asset_copy_constructor(texture_asset);
+      evie::Texture2DAsset texture_asset_copy_constructor(*texture_asset);
       REQUIRE(texture_asset_copy_constructor.IsValid());
       REQUIRE(texture_asset_copy_constructor.Get() != nullptr);
       REQUIRE(asset_manager.GetTextureRefCount() == 2);
     }
 
     // Check we're back now that the copy has been destructed
-    REQUIRE(texture_asset.IsValid());
-    REQUIRE(texture_asset.Get() != nullptr);
+    REQUIRE(texture_asset->IsValid());
+    REQUIRE(texture_asset->Get() != nullptr);
     REQUIRE(asset_manager.GetTextureRefCount() == 1);
 
     // Test move constructor reference counting
@@ -100,14 +101,14 @@ TEST_CASE("Test AssetManager and AssetProxy interaction")
     REQUIRE(asset_manager.GetTextureRefCount() == 1);
 
     // OK now move the texture_asset
-    texture_asset_move_assignment = std::move(texture_asset);
+    texture_asset_move_assignment = std::move(*texture_asset);
     REQUIRE(texture_asset_move_assignment.IsValid());
     REQUIRE(texture_asset_move_assignment.Get() != nullptr);
     REQUIRE(asset_manager.GetTextureRefCount() == 1);
 
     // The moved texture_asset should now no longer be valid
-    REQUIRE(!texture_asset.IsValid());
-    REQUIRE(texture_asset.Get() == nullptr);
+    REQUIRE(!texture_asset->IsValid());
+    REQUIRE(texture_asset->Get() == nullptr);
     REQUIRE(asset_manager.GetTextureRefCount() == 1);
 
     // Let's move construct from the move assignment
@@ -122,10 +123,11 @@ TEST_CASE("Test AssetManager and AssetProxy interaction")
 
   // Let's create a bunch of copies and ensure reference counting is working
   std::vector<evie::Texture2DAsset> texture_copies{};
-  evie::Texture2DAsset texture_asset = asset_manager.GetTexture2D("dandan.png");
+  evie::Result<evie::Texture2DAsset> texture_asset = asset_manager.GetTexture2D("dandan.png");
+  REQUIRE(texture_asset.Good());
   size_t copy_amount = 100;
   for (size_t i = 0; i < copy_amount; ++i) {
-    texture_copies.push_back(texture_asset);
+    texture_copies.push_back(*texture_asset);
   }
 
   // Check all the texture assets are valid.

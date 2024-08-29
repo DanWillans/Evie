@@ -8,35 +8,30 @@
 #include "evie/logging.h"
 #include "evie/result.h"
 
-#include "evie/shader.h"
 #include "evie/shader_program.h"
 #include "whereami/whereami.h"
 
 namespace evie {
 AssetManager::AssetManager()
 {
-  char* path{ nullptr };
   int length{ 0 };
   int dirname_length{ 0 };
 
-  length = wai_getExecutablePath(NULL, 0, &dirname_length);
+  length = wai_getExecutablePath(nullptr, 0, &dirname_length);
   if (length > 0) {
-    path = (char*)malloc(length + 1);
-    if (!path) {
-      abort();
-    }
-    wai_getExecutablePath(path, length, &dirname_length);
+    std::vector<char> path;
+    path.resize(length + 1);
+    wai_getExecutablePath(path.data(), length, &dirname_length);
     path[length] = '\0';
     path[dirname_length] = '\0';
-    asset_directory_ = std::filesystem::path(std::string(path) + "/../assets");
-    free(path);
+    asset_directory_ = std::filesystem::path(std::string(path.data()) + "/../assets");
   } else {
     EV_ERROR("AssetManager failed");
     assertm(false, "AssetManager failed");
   }
 }
 
-Texture2DAsset AssetManager::GetTexture2D(const std::string& texture_name, TextureWrapping texture_wrapping)
+Result<Texture2DAsset> AssetManager::GetTexture2D(const std::string& texture_name, TextureWrapping texture_wrapping)
 {
   size_t hash = std::hash<std::string>{}(texture_name);
   if (auto it = texture_2d_map_.find(hash); it != texture_2d_map_.end()) {
@@ -63,13 +58,12 @@ Texture2DAsset AssetManager::GetTexture2D(const std::string& texture_name, Textu
       return Texture2DAsset{ this, { AssetType::Texture2D, hash }, &texture_2d };
     } else {
       EV_WARN("Texture {} doesn't exist. Using default engine texture.", texture_name);
-      EV_ERROR("AssetManager failed");
-      return Texture2DAsset{};
+      return Error{ "Texture doesn't exist for AssetManager to Load" };
     }
   }
 }
 
-ShaderProgramAsset AssetManager::GetShaderProgram(const std::string& shader_name)
+Result<ShaderProgramAsset> AssetManager::GetShaderProgram(const std::string& shader_name)
 {
   Error err = Error::OK();
   size_t hash = std::hash<std::string>{}(shader_name);
@@ -81,34 +75,32 @@ ShaderProgramAsset AssetManager::GetShaderProgram(const std::string& shader_name
     std::filesystem::path asset_path = asset_directory_;
     asset_path /= "shaders";
     asset_path /= shader_name;
-    // Do fragment first
+
+    // Load fragment shader
     std::filesystem::path fragment_path = asset_path;
     fragment_path += ".fs";
-    EV_INFO("Path {}", fragment_path.string());
     FragmentShader frag_shader;
-    VertexShader vert_shader;
     if (std::filesystem::exists(fragment_path)) {
       EV_INFO("Doesn't exist, creating asset");
       err = frag_shader.Initialise(fragment_path.string());
     } else {
       EV_WARN("Shader {} doesn't exist.", shader_name);
-      EV_ERROR("AssetManager failed");
-      return ShaderProgramAsset{};
+      return Error{ "Fragment shader doesn't exist" };
     }
+
+    // Load vertex shader
     std::filesystem::path vertex_path = asset_path;
     vertex_path += ".vs";
-    EV_INFO("Path {}", vertex_path.string());
+    VertexShader vert_shader;
     if (std::filesystem::exists(vertex_path) && err.Good()) {
       EV_INFO("Doesn't exist, creating asset");
       err = vert_shader.Initialise(vertex_path.string());
     } else {
       EV_WARN("Shader {} doesn't exist.", shader_name);
-      EV_ERROR("AssetManager failed");
-      if (err.Bad()) {
-        EV_ERROR("err msg: {}", err.Message());
-      }
-      return ShaderProgramAsset{};
+      return Error{ "Vertex shader doesn't exist" };
     }
+
+    // Compile the shader program
     if (err.Good()) {
       ShaderProgram shader_program;
       err = shader_program.Initialise(&vert_shader, &frag_shader);
@@ -116,9 +108,12 @@ ShaderProgramAsset AssetManager::GetShaderProgram(const std::string& shader_name
         auto shader_program_asset = shader_program_map_.emplace(hash, shader_program);
         ShaderProgram& shader_prog = shader_program_asset.first->second.asset;
         return ShaderProgramAsset{ this, { AssetType::ShaderProgram, hash }, &shader_prog };
+      } else {
+        return Error{ "Shader program failed to initialise" };
       }
     }
-    return ShaderProgramAsset{};
+
+    return err;
   }
 }
 
@@ -132,10 +127,6 @@ void AssetManager::IncreaseReference(AssetMetadata metadata)
   case AssetType::ShaderProgram:
     EV_INFO("Increasing reference count");
     shader_program_map_.at(metadata.hash).reference_count++;
-    break;
-  case AssetType::ShaderProgram:
-    EV_INFO("Increasing reference count");
-    shader_program_map_[metadata.hash].reference_count++;
     break;
   default:
     EV_ERROR("Unknown asset type %d", static_cast<uint16_t>(metadata.type));

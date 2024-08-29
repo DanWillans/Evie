@@ -57,16 +57,24 @@ public:
     evie::Error err = evie::Error::OK();
     if (err.Good()) {
       tex_ = asset_manager_->GetTexture2D("grass.jpg");
-      if (!tex_.IsValid()) {
-        EV_ERROR("UH OH Something went wrong");
-        std::terminate();
+      if (tex_.Good()) {
+        if (!tex_->IsValid()) {
+          EV_ERROR("UH OH Something went wrong");
+          std::terminate();
+        }
+      } else {
+        err = tex_.Error();
       }
     }
     if (err.Good()) {
       shader_prog_ = asset_manager_->GetShaderProgram("shader");
-      if (!shader_prog_.IsValid()) {
-        EV_ERROR("UH OH Something went wrong");
-        std::terminate();
+      if (shader_prog_.Good()) {
+        if (!shader_prog_->IsValid()) {
+          EV_ERROR("UH OH Something went wrong");
+          std::terminate();
+        }
+      } else {
+        err = shader_prog_.Error();
       }
     }
     return err;
@@ -117,7 +125,9 @@ private:
       transform.position = player_transform.position + player_transform.rotation * projectile_local_offset;
       transform.scale = projectile_scale;
       transform.rotation = player_transform.rotation;
-      err = entity->AddComponent(transform_cid_, transform);
+      if (err.Good()) {
+        err = entity->AddComponent(transform_cid_, transform);
+      }
       if (err.Good()) {
         evie::MeshComponent mesh_component;
         evie::BufferLayout layout;
@@ -129,11 +139,11 @@ private:
           mesh_component.vertex_array.Initialise();
           err = mesh_component.vertex_array.AssociateVertexBuffer(mesh_component.model_data);
         }
-        mesh_component.shader_program = *shader_prog_.Get();
+        mesh_component.shader_program = *shader_prog_->Get();
         if (err.Good()) {
           mesh_component.shader_program.Use();
           mesh_component.shader_program.SetInt("Texture1", 0);
-          mesh_component.texture = *tex_.Get();
+          mesh_component.texture = *tex_->Get();
           err = entity->AddComponent(mesh_cid_, mesh_component);
         }
         if (err.Good()) {
@@ -158,9 +168,8 @@ private:
   evie::Entity* player_entity_{ nullptr };
   evie::VertexShader vs_;
   evie::FragmentShader fs_;
-  evie::AssetProxy<evie::Texture2D> tex_;
-  evie::ShaderProgramAsset shader_prog_;
-  // evie::ShaderProgram shader_program_;
+  evie::Result<evie::AssetProxy<evie::Texture2D>> tex_;
+  evie::Result<evie::ShaderProgramAsset> shader_prog_;
   float map_boundary_;
   evie::IAssetManager* asset_manager_;
 };
