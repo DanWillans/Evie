@@ -8,6 +8,7 @@
 
 #include "evie/asset_manager_interface.hpp"
 #include "evie/core.h"
+#include "evie/shader_program.h"
 #include "evie/texture.h"
 
 namespace evie {
@@ -25,6 +26,8 @@ public:
 
   Texture2DAsset GetTexture2D(const std::string& texture,
     TextureWrapping texture_wrapping = TextureWrapping::Repeat) override;
+
+  ShaderProgramAsset GetShaderProgram(const std::string& shader_name) override;
 
 private:
   // Friend all AssetProxy types
@@ -53,8 +56,12 @@ private:
 
     AssetHandle& operator=(AssetHandle&& other) noexcept
     {
-      asset = std::move(asset);
+      if (this == &other) {
+        return *this;
+      }
+      asset = other.asset;
       reference_count.store(other.reference_count);
+      return *this;
     }
 
     ~AssetHandle() = default;
@@ -71,6 +78,7 @@ private:
   void DecreaseReference(AssetMetadata metadata) override;
 
   std::unordered_map<size_t, AssetHandle<Texture2D>> texture_2d_map_;
+  std::unordered_map<size_t, AssetHandle<ShaderProgram>> shader_program_map_;
   std::filesystem::path asset_directory_;
 };
 

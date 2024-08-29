@@ -305,7 +305,14 @@ evie::Error GameLayer::SetupFloor(float map_scale)
       EV_ERROR("UH OH Something went wrong");
       std::terminate();
     }
-  }
+
+  if (err.Good()) {
+      shader_prog_ = asset_manager_->GetShaderProgram("shader");
+      if (!shader_prog_.IsValid()) {
+        EV_ERROR("UH OH Something went wrong");
+        std::terminate();
+      }
+    }
 
   evie::MeshComponent floor_mesh_component;
   // We need to create the layout for our model/vertex data

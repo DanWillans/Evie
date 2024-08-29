@@ -10,3 +10,9 @@ target_link_libraries(
   PUBLIC
   Evie::Logging
 )
+
+target_link_system_libraries(
+  AssetManager
+  PUBLIC
+  Evie::Glad
+)

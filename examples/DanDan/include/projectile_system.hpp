@@ -56,12 +56,6 @@ public:
   {
     evie::Error err = evie::Error::OK();
     if (err.Good()) {
-      err = vs_.Initialise(R"(C:\Users\willa\devel\Evie\shaders\vertex_shader.vs)");
-    }
-    if (err.Good()) {
-      err = fs_.Initialise(R"(C:\Users\willa\devel\Evie\shaders\fragment_shader.fs)");
-    }
-    if (err.Good()) {
       tex_ = asset_manager_->GetTexture2D("grass.jpg");
       if (!tex_.IsValid()) {
         EV_ERROR("UH OH Something went wrong");
@@ -69,7 +63,11 @@ public:
       }
     }
     if (err.Good()) {
-      err = shader_program_.Initialise(&vs_, &fs_);
+      shader_prog_ = asset_manager_->GetShaderProgram("shader");
+      if (!shader_prog_.IsValid()) {
+        EV_ERROR("UH OH Something went wrong");
+        std::terminate();
+      }
     }
     return err;
   }
@@ -131,7 +129,7 @@ private:
           mesh_component.vertex_array.Initialise();
           err = mesh_component.vertex_array.AssociateVertexBuffer(mesh_component.model_data);
         }
-        mesh_component.shader_program = shader_program_;
+        mesh_component.shader_program = *shader_prog_.Get();
         if (err.Good()) {
           mesh_component.shader_program.Use();
           mesh_component.shader_program.SetInt("Texture1", 0);
@@ -161,7 +159,8 @@ private:
   evie::VertexShader vs_;
   evie::FragmentShader fs_;
   evie::AssetProxy<evie::Texture2D> tex_;
-  evie::ShaderProgram shader_program_;
+  evie::ShaderProgramAsset shader_prog_;
+  // evie::ShaderProgram shader_program_;
   float map_boundary_;
   evie::IAssetManager* asset_manager_;
 };

@@ -1,6 +1,7 @@
 #ifndef EVIE_ASSET_MANAGER_INCLUDE_ASSET_MANAGER_INTERFACE_HPP_
 #define EVIE_ASSET_MANAGER_INCLUDE_ASSET_MANAGER_INTERFACE_HPP_
 
+#include <evie/shader_program.h>
 #include <evie/texture.h>
 #include <string>
 
@@ -12,6 +13,7 @@ namespace evie {
  */
 enum class AssetType : uint16_t {
   Texture2D,
+  ShaderProgram,
 };
 
 /**
@@ -40,6 +42,9 @@ public:
   virtual ~IAssetManager() = default;
   virtual AssetProxy<Texture2D> GetTexture2D(const std::string& texture_name,
     TextureWrapping texture_wrapping = TextureWrapping::Repeat) = 0;
+
+  // This is just temporary until Renderer code is written. No need for users to get shader programs at the moment.
+  virtual AssetProxy<ShaderProgram> GetShaderProgram(const std::string& shader_name) = 0;
 
 private:
   template<typename AssetType> friend class AssetProxy;
@@ -160,7 +165,10 @@ private:
   bool valid_{ false };
 };
 
+// AssetProxy aliases
+
 using Texture2DAsset = AssetProxy<Texture2D>;
+using ShaderProgramAsset = AssetProxy<ShaderProgram>;
 
 }// namespace evie
 

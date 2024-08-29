@@ -2,6 +2,7 @@
 
 #include "asset_manager/asset_manager.hpp"
 #include "evie/asset_manager_interface.hpp"
+#include "evie/shader_program.h"
 #include "evie/texture.h"
 
 
@@ -16,6 +17,11 @@ public:
     TextureWrapping texture_wrapping = TextureWrapping::Repeat) override
   {
     return AssetProxy<Texture2D>{ this, { AssetType::Texture2D, 0 }, &texture_2d };
+  }
+
+  AssetProxy<ShaderProgram> GetShaderProgram(const std::string& shader_name) override
+  {
+    return AssetProxy<ShaderProgram>{ this, { AssetType::ShaderProgram, 0 }, nullptr };
   }
 
   int GetTextureRefCount() { return texture_ref_count_; };
@@ -123,7 +129,7 @@ TEST_CASE("Test AssetManager and AssetProxy interaction")
   }
 
   // Check all the texture assets are valid.
-  for(const auto& texture : texture_copies){
+  for (const auto& texture : texture_copies) {
     REQUIRE(texture.IsValid());
     REQUIRE(texture.Get() != nullptr);
   }
