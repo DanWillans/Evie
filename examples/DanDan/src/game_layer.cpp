@@ -289,7 +289,10 @@ evie::Error GameLayer::SetupFloor(float map_scale)
   player_camera_.ResetCameraPosition({ 0.0, 1.0, 0.0 });
   player_camera_.camera_speed = DefaultPlayerSpeed;
 
-  evie::Result<evie::Texture2DAsset> floor_texture;
+  // A bit cheaty but keep it static so that it doesn't deallocate/destroy by the asset manager.
+  // This would be fixed by the mesh component taking an AssetProxy instead of a copy.
+  // Do this next.
+  static evie::Result<evie::Texture2DAsset> floor_texture;
   if (err.Good()) {
     floor_texture = asset_manager_->GetTexture2D("stone-wall.jpg");
     if (floor_texture.Good()) {
@@ -355,7 +358,7 @@ evie::Error GameLayer::SetupSkybox(float map_scale)
   evie::Error err = evie::Error::OK();
 
   // Sky box texture
-  evie::Result<evie::Texture2DAsset> sky_texture;
+  static evie::Result<evie::Texture2DAsset> sky_texture;
   if (err.Good()) {
     sky_texture = asset_manager_->GetTexture2D("skybox.png");
     if (sky_texture.Good()) {
@@ -485,7 +488,7 @@ evie::Error GameLayer::SetupWalls(float map_scale)
   };
   // clang-format on
 
-  evie::Result<evie::Texture2DAsset> tex;
+  static evie::Result<evie::Texture2DAsset> tex;
   // Wall texture
   if (err.Good()) {
     tex = asset_manager_->GetTexture2D("my-wall2.png");
