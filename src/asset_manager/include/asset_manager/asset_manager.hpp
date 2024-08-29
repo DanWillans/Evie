@@ -36,37 +36,41 @@ private:
   // A helper struct to encapsulate the asset alongside a reference count.
   template<typename Asset> struct AssetHandle
   {
-    AssetHandle() = default;
-    AssetHandle(const AssetHandle& other) : asset(other.asset) { reference_count.store(other.reference_count); }
+    // AssetHandle() = default;
+    // AssetHandle(const AssetHandle& other) : asset(other.asset) { reference_count.store(other.reference_count); }
 
-    AssetHandle(AssetHandle&& other) noexcept : asset(std::move(other.asset))
-    {
-      reference_count.store(other.reference_count);
-    }
+    // AssetHandle(AssetHandle&& other) noexcept : asset(std::move(other.asset))
+    // {
+    //   reference_count.store(other.reference_count);
+    // }
 
-    AssetHandle& operator=(const AssetHandle& other)
-    {
-      if (this == &other) {
-        return *this;
-      }
-      asset = other.asset;
-      reference_count.store(other.reference_count);
-      return *this;
-    }
+    // AssetHandle& operator=(const AssetHandle& other)
+    // {
+    //   if (this == &other) {
+    //     return *this;
+    //   }
+    //   asset = other.asset;
+    //   reference_count.store(other.reference_count);
+    //   return *this;
+    // }
 
-    AssetHandle& operator=(AssetHandle&& other) noexcept
-    {
-      if (this == &other) {
-        return *this;
-      }
-      asset = other.asset;
-      reference_count.store(other.reference_count);
-      return *this;
-    }
+    // AssetHandle& operator=(AssetHandle&& other) noexcept
+    // {
+    //   if (this == &other) {
+    //     return *this;
+    //   }
+    //   asset = other.asset;
+    //   reference_count.store(other.reference_count);
+    //   return *this;
+    // }
+    // AssetHandle() = delete;
+    // AssetHandle(const AssetHandle& other) = delete;
+    // AssetHandle(AssetHandle&& other) = delete;
+    // AssetHandle& operator=(AssetHandle&& other) = delete;
+    // AssetHandle& operator=(const AssetHandle& other) = delete;
+    // ~AssetHandle() = default;
 
-    ~AssetHandle() = default;
-
-    explicit AssetHandle(const Asset& asset_in) : asset(asset_in) {}
+    AssetHandle(const Asset& asset_in) : asset(asset_in) {}
 
     // The actual asset data
     Asset asset;

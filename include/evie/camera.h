@@ -180,7 +180,7 @@ public:
    * @return const vec3&  Vec3 of euler angles.
    */
   // Add 90.0F to align with z axis.
-  const vec3& GetEulerAngles() const { return { pitch_, -(yaw_ + 90.0F), 0.0F }; }
+  const vec3 GetEulerAngles() const { return { pitch_, -(yaw_ + 90.0F), 0.0F }; }
 
 private:
   // Fix this. This last mouse position should be the centre of the

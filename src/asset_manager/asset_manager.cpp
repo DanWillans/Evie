@@ -58,7 +58,7 @@ Texture2DAsset AssetManager::GetTexture2D(const std::string& texture_name, Textu
       Texture2D texture;
       texture.Initialise(asset_path.string(), true, texture_wrapping);
       // Add to map
-      auto texture_2d_asset = texture_2d_map_.try_emplace(hash, texture);
+      auto texture_2d_asset = texture_2d_map_.emplace(hash, texture);
       Texture2D& texture_2d = texture_2d_asset.first->second.asset;
       return Texture2DAsset{ this, { AssetType::Texture2D, hash }, &texture_2d };
     } else {
@@ -113,7 +113,7 @@ ShaderProgramAsset AssetManager::GetShaderProgram(const std::string& shader_name
       ShaderProgram shader_program;
       err = shader_program.Initialise(&vert_shader, &frag_shader);
       if (err.Good()) {
-        auto shader_program_asset = shader_program_map_.try_emplace(hash, shader_program);
+        auto shader_program_asset = shader_program_map_.emplace(hash, shader_program);
         ShaderProgram& shader_prog = shader_program_asset.first->second.asset;
         return ShaderProgramAsset{ this, { AssetType::ShaderProgram, hash }, &shader_prog };
       }
@@ -127,7 +127,11 @@ void AssetManager::IncreaseReference(AssetMetadata metadata)
   switch (metadata.type) {
   case AssetType::Texture2D:
     EV_INFO("Increasing reference count");
-    texture_2d_map_[metadata.hash].reference_count++;
+    texture_2d_map_.at(metadata.hash).reference_count++;
+    break;
+  case AssetType::ShaderProgram:
+    EV_INFO("Increasing reference count");
+    shader_program_map_.at(metadata.hash).reference_count++;
     break;
   case AssetType::ShaderProgram:
     EV_INFO("Increasing reference count");
@@ -142,24 +146,24 @@ void AssetManager::DecreaseReference(AssetMetadata metadata)
 {
   switch (metadata.type) {
   case AssetType::Texture2D: {
-    auto& asset = texture_2d_map_[metadata.hash];
+    auto& asset_handle = texture_2d_map_.at(metadata.hash);
     EV_INFO("Decreasing reference count");
-    asset.reference_count--;
-    if (asset.reference_count == 0) {
+    asset_handle.reference_count--;
+    if (asset_handle.reference_count == 0) {
       EV_INFO("Erasing texture");
-      texture_2d_map_[metadata.hash].asset.Destroy();
+      asset_handle.asset.Destroy();
       // Reference above is invalid after this erase. DO NOT USE IT anymore.
       texture_2d_map_.erase(metadata.hash);
     }
     break;
   }
   case AssetType::ShaderProgram: {
-    auto& asset = shader_program_map_[metadata.hash];
+    auto& asset_handle = shader_program_map_.at(metadata.hash);
     EV_INFO("Decreasing reference count");
-    asset.reference_count--;
-    if (asset.reference_count == 0) {
+    asset_handle.reference_count--;
+    if (asset_handle.reference_count == 0) {
       EV_INFO("Erasing Shader Program");
-      shader_program_map_[metadata.hash].asset.Destroy();
+      asset_handle.asset.Destroy();
       // Reference above is invalid after this erase. DO NOT USE IT anymore.
       shader_program_map_.erase(metadata.hash);
     }

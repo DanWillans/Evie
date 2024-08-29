@@ -79,7 +79,7 @@ public:
     : asset_(other.asset_), metadata_(other.metadata_), asset_manager_(other.asset_manager_), valid_(other.valid_)
   {
     // Only increase reference if this is a valid asset.
-    if (valid_) {
+    if (valid_ && asset_manager_) {
       asset_manager_->IncreaseReference(metadata_);
     }
   }
@@ -110,7 +110,7 @@ public:
     asset_manager_ = other.asset_manager_;
     valid_ = other.valid_;
     // Only incrase reference if this is a valid asset.
-    if (valid_) {
+    if (valid_ && asset_manager_) {
       asset_manager_->IncreaseReference(metadata_);
     }
     return *this;
@@ -131,7 +131,7 @@ public:
   ~AssetProxy()
   {
     // Only decrease reference if this is a valid asset
-    if (valid_) {
+    if (valid_ && asset_manager_) {
       asset_manager_->DecreaseReference(metadata_);
     }
   }
@@ -156,7 +156,9 @@ private:
   AssetProxy(IAssetManager* asset_manager, AssetMetadata metadata, AssetType* asset, bool valid = true)
     : asset_manager_(asset_manager), metadata_(metadata), asset_(asset), valid_(valid)
   {
-    asset_manager_->IncreaseReference(metadata_);
+    if (valid_ && asset_manager_) {
+      asset_manager_->IncreaseReference(metadata_);
+    }
   }
 
   AssetType* asset_{ nullptr };

@@ -289,16 +289,6 @@ evie::Error GameLayer::SetupFloor(float map_scale)
   player_camera_.ResetCameraPosition({ 0.0, 1.0, 0.0 });
   player_camera_.camera_speed = DefaultPlayerSpeed;
 
-  // Vertex Shader
-  if (err.Good()) {
-    err = floor_vertex_shader_.Initialise(R"(C:\Users\willa\devel\Evie\shaders\vertex_shader.vs)");
-  }
-
-  // Fragment Shader
-  if (err.Good()) {
-    err = floor_fragment_shader_.Initialise(R"(C:\Users\willa\devel\Evie\shaders\fragment_shader.fs)");
-  }
-
   if (err.Good()) {
     floor_texture_ = asset_manager_->GetTexture2D("stone-wall.jpg");
     if (!floor_texture_.IsValid()) {
@@ -330,8 +320,12 @@ evie::Error GameLayer::SetupFloor(float map_scale)
     err = floor_mesh_component.vertex_array.AssociateVertexBuffer(floor_mesh_component.model_data);
   }
   if (err.Good()) {
-    // Initialise the shader program with our vert/frag shaders
-    err = floor_mesh_component.shader_program.Initialise(&floor_vertex_shader_, &floor_fragment_shader_);
+    auto shader_prog_ = asset_manager_->GetShaderProgram("shader");
+    if (!shader_prog_.IsValid()) {
+      EV_ERROR("UH OH Something went wrong");
+      std::terminate();
+    }
+    floor_mesh_component.shader_program = *shader_prog_.Get();
   }
   // Now setup the texture slots and bind them to our shader program.
   floor_mesh_component.shader_program.Use();
@@ -364,18 +358,6 @@ evie::Error GameLayer::SetupSkybox(float map_scale)
       EV_ERROR("UH OH Something went wrong");
       std::terminate();
     }
-  }
-
-  evie::VertexShader vert_shader;
-  evie::FragmentShader frag_shader;
-  // Vertex Shader
-  if (err.Good()) {
-    err = vert_shader.Initialise(R"(C:\Users\willa\devel\Evie\shaders\vertex_shader.vs)");
-  }
-
-  // Fragment Shader
-  if (err.Good()) {
-    err = frag_shader.Initialise(R"(C:\Users\willa\devel\Evie\shaders\fragment_shader.fs)");
   }
 
   // Create skybox entity
@@ -448,7 +430,12 @@ std::vector<float> sky_cube {
   }
 
   if (err.Good()) {
-    err = mesh_component.shader_program.Initialise(&vert_shader, &frag_shader);
+    auto shader_prog_ = asset_manager_->GetShaderProgram("shader");
+    if (!shader_prog_.IsValid()) {
+      EV_ERROR("UH OH Something went wrong");
+      std::terminate();
+    }
+    mesh_component.shader_program = *shader_prog_.Get();
   }
 
   if (err.Good()) {
@@ -484,18 +471,6 @@ evie::Error GameLayer::SetupWalls(float map_scale)
   };
   // clang-format on
 
-  // Vertex Shader
-  evie::VertexShader vert_shader;
-  evie::FragmentShader frag_shader;
-  if (err.Good()) {
-    err = vert_shader.Initialise(R"(C:\Users\willa\devel\Evie\shaders\vertex_shader.vs)");
-  }
-
-  // Fragment Shader
-  if (err.Good()) {
-    err = frag_shader.Initialise(R"(C:\Users\willa\devel\Evie\shaders\fragment_shader.fs)");
-  }
-
   static evie::Texture2DAsset tex;
   // Wall texture
   if (err.Good()) {
@@ -522,8 +497,12 @@ evie::Error GameLayer::SetupWalls(float map_scale)
     err = wall_component.vertex_array.AssociateVertexBuffer(wall_component.model_data);
   }
   if (err.Good()) {
-    // Initialise the shader program with our vert/frag shaders
-    err = wall_component.shader_program.Initialise(&vert_shader, &frag_shader);
+    auto shader_prog_ = asset_manager_->GetShaderProgram("shader");
+    if (!shader_prog_.IsValid()) {
+      EV_ERROR("UH OH Something went wrong");
+      std::terminate();
+    }
+    wall_component.shader_program = *shader_prog_.Get();
   }
   // Now setup the texture slots and bind them to our shader program.
   wall_component.shader_program.Use();
