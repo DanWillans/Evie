@@ -39,6 +39,7 @@ Result<Texture2DAsset> AssetManager::GetTexture2D(const std::string& texture_nam
   if (auto it = texture_2d_map_.find(hash); it != texture_2d_map_.end()) {
     // Return a new AssetProxy. This doesn't reload the data just constructs a new proxy with a reference to the
     // already loaded assets, which in turn will increase the reference count on this asset.
+    EV_DEBUG("Texture \"{}\" exists. Reusing", texture_name);
     Texture2D& texture_2d = it->second.asset;
     return Texture2DAsset{ shared_from_this(), { AssetType::Texture2D, hash }, &texture_2d };
   } else {
@@ -48,6 +49,7 @@ Result<Texture2DAsset> AssetManager::GetTexture2D(const std::string& texture_nam
     asset_path /= "textures";
     asset_path /= texture_name;
     if (std::filesystem::exists(asset_path)) {
+      EV_DEBUG("Creating texture asset from path {}", asset_path.string());
       Texture2D texture;
       texture.Initialise(asset_path.string(), true, texture_wrapping);
       // Add to map
@@ -66,6 +68,7 @@ Result<ShaderProgramAsset> AssetManager::GetShaderProgram(const std::string& sha
   Error err = Error::OK();
   size_t hash = std::hash<std::string>{}(shader_name);
   if (auto it = shader_program_map_.find(hash); it != shader_program_map_.end()) {
+    EV_DEBUG("ShaderProgram \"{}\" exists. Reusing", shader_name);
     ShaderProgram& shader_program = it->second.asset;
     return ShaderProgramAsset{ shared_from_this(), { AssetType::ShaderProgram, hash }, &shader_program };
   } else {
@@ -100,6 +103,9 @@ Result<ShaderProgramAsset> AssetManager::GetShaderProgram(const std::string& sha
       ShaderProgram shader_program;
       err = shader_program.Initialise(&vert_shader, &frag_shader);
       if (err.Good()) {
+        EV_DEBUG("Creating shader asset from vertex path {} and fragment path {}",
+          vertex_path.string(),
+          fragment_path.string());
         auto shader_program_asset = shader_program_map_.emplace(hash, shader_program);
         ShaderProgram& shader_prog = shader_program_asset.first->second.asset;
         return ShaderProgramAsset{ shared_from_this(), { AssetType::ShaderProgram, hash }, &shader_prog };
