@@ -119,7 +119,7 @@ private:
   bool sprint_{ false };
 
   // Player entity
-  evie::Entity* player_entity_{ nullptr };
+  std::unique_ptr<evie::Entity> player_entity_{ nullptr };
 
   // Followers follow
   bool follow_on_{ false };

@@ -19,7 +19,7 @@
       "name": "Debug Sandbox",
       "type": "cppdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/out/install/unixlike-clang-debug/bin/sandbox",
+      "program": "/home/ANT.AMAZON.COM/dwillans/devel/Evie/out/build/unixlike-gcc-debug/test/asset_manager_tests",
       "args": [],
       "stopAtEntry": false,
       "cwd": "${fileDirname}",

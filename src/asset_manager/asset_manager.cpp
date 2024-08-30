@@ -1,5 +1,7 @@
 #include <cstdlib>
 #include <filesystem>
+#include <memory>
+#include <utility>
 
 #include "asset_manager/asset_manager.hpp"
 
@@ -38,24 +40,20 @@ Result<Texture2DAsset> AssetManager::GetTexture2D(const std::string& texture_nam
     // Return a new AssetProxy. This doesn't reload the data just constructs a new proxy with a reference to the
     // already loaded assets, which in turn will increase the reference count on this asset.
     Texture2D& texture_2d = it->second.asset;
-    EV_INFO("Exists, returning existing asset");
-    return Texture2DAsset{ this, { AssetType::Texture2D, hash }, &texture_2d };
+    return Texture2DAsset{ shared_from_this(), { AssetType::Texture2D, hash }, &texture_2d };
   } else {
     // Read texture from file system and insert into texture_2d_map_.
     // Check if this file exists or not.
     std::filesystem::path asset_path = asset_directory_;
     asset_path /= "textures";
     asset_path /= texture_name;
-    EV_INFO("Path {}", asset_path.string());
     if (std::filesystem::exists(asset_path)) {
-      // File exists. Let's create our texture.
-      EV_INFO("Doesn't exist, creating asset");
       Texture2D texture;
       texture.Initialise(asset_path.string(), true, texture_wrapping);
       // Add to map
       auto texture_2d_asset = texture_2d_map_.emplace(hash, texture);
       Texture2D& texture_2d = texture_2d_asset.first->second.asset;
-      return Texture2DAsset{ this, { AssetType::Texture2D, hash }, &texture_2d };
+      return Texture2DAsset{ shared_from_this(), { AssetType::Texture2D, hash }, &texture_2d };
     } else {
       EV_WARN("Texture {} doesn't exist. Using default engine texture.", texture_name);
       return Error{ "Texture doesn't exist for AssetManager to Load" };
@@ -69,8 +67,7 @@ Result<ShaderProgramAsset> AssetManager::GetShaderProgram(const std::string& sha
   size_t hash = std::hash<std::string>{}(shader_name);
   if (auto it = shader_program_map_.find(hash); it != shader_program_map_.end()) {
     ShaderProgram& shader_program = it->second.asset;
-    EV_INFO("Exists, returning existing asset");
-    return ShaderProgramAsset{ this, { AssetType::ShaderProgram, hash }, &shader_program };
+    return ShaderProgramAsset{ shared_from_this(), { AssetType::ShaderProgram, hash }, &shader_program };
   } else {
     std::filesystem::path asset_path = asset_directory_;
     asset_path /= "shaders";
@@ -81,7 +78,6 @@ Result<ShaderProgramAsset> AssetManager::GetShaderProgram(const std::string& sha
     fragment_path += ".fs";
     FragmentShader frag_shader;
     if (std::filesystem::exists(fragment_path)) {
-      EV_INFO("Doesn't exist, creating asset");
       err = frag_shader.Initialise(fragment_path.string());
     } else {
       EV_WARN("Shader {} doesn't exist.", shader_name);
@@ -93,7 +89,6 @@ Result<ShaderProgramAsset> AssetManager::GetShaderProgram(const std::string& sha
     vertex_path += ".vs";
     VertexShader vert_shader;
     if (std::filesystem::exists(vertex_path) && err.Good()) {
-      EV_INFO("Doesn't exist, creating asset");
       err = vert_shader.Initialise(vertex_path.string());
     } else {
       EV_WARN("Shader {} doesn't exist.", shader_name);
@@ -107,7 +102,7 @@ Result<ShaderProgramAsset> AssetManager::GetShaderProgram(const std::string& sha
       if (err.Good()) {
         auto shader_program_asset = shader_program_map_.emplace(hash, shader_program);
         ShaderProgram& shader_prog = shader_program_asset.first->second.asset;
-        return ShaderProgramAsset{ this, { AssetType::ShaderProgram, hash }, &shader_prog };
+        return ShaderProgramAsset{ shared_from_this(), { AssetType::ShaderProgram, hash }, &shader_prog };
       } else {
         return Error{ "Shader program failed to initialise" };
       }
@@ -121,11 +116,9 @@ void AssetManager::IncreaseReference(AssetMetadata metadata)
 {
   switch (metadata.type) {
   case AssetType::Texture2D:
-    EV_INFO("Increasing reference count");
     texture_2d_map_.at(metadata.hash).reference_count++;
     break;
   case AssetType::ShaderProgram:
-    EV_INFO("Increasing reference count");
     shader_program_map_.at(metadata.hash).reference_count++;
     break;
   default:
@@ -138,10 +131,8 @@ void AssetManager::DecreaseReference(AssetMetadata metadata)
   switch (metadata.type) {
   case AssetType::Texture2D: {
     auto& asset_handle = texture_2d_map_.at(metadata.hash);
-    EV_INFO("Decreasing reference count");
     asset_handle.reference_count--;
     if (asset_handle.reference_count == 0) {
-      EV_INFO("Erasing texture");
       asset_handle.asset.Destroy();
       // Reference above is invalid after this erase. DO NOT USE IT anymore.
       texture_2d_map_.erase(metadata.hash);
@@ -150,10 +141,8 @@ void AssetManager::DecreaseReference(AssetMetadata metadata)
   }
   case AssetType::ShaderProgram: {
     auto& asset_handle = shader_program_map_.at(metadata.hash);
-    EV_INFO("Decreasing reference count");
     asset_handle.reference_count--;
     if (asset_handle.reference_count == 0) {
-      EV_INFO("Erasing Shader Program");
       asset_handle.asset.Destroy();
       // Reference above is invalid after this erase. DO NOT USE IT anymore.
       shader_program_map_.erase(metadata.hash);

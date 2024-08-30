@@ -128,7 +128,7 @@ evie::Error GameLayer::Initialise(evie::IInputManager* input_manager,
     transform_cid_,
     projectile_cid_,
     velocity_cid_,
-    player_entity_,
+    player_entity_.get(),
     map_scale,
     asset_manager_);
   projectile_system_ = &(ecs_->GetSystem(projectile_sys_id));
@@ -624,7 +624,7 @@ evie::Error GameLayer::SetupPlayer(float map_scale)
   // Create player entity
   auto player_entity = ecs_->CreateEntity();
   if (player_entity.Good()) {
-    player_entity->MoveEntity(player_entity_);
+    player_entity_ = player_entity->Clone();
     if (err.Good()) {
       err = player_entity_->AddComponent(transform_cid_);
       if (err.Good()) {

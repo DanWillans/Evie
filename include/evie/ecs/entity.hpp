@@ -58,10 +58,15 @@ public:
     entity_manager_->DestroyEntity(id_);
   }
 
+  std::unique_ptr<Entity> Clone()
+  {
+    return std::unique_ptr<Entity>(new Entity(system_manager_, component_manager_, entity_manager_, id_));
+  }
+
   // I don't like this. Fix it in the future.
   void MoveEntity(Entity*& other)
   {
-    void* mem = malloc(sizeof(Entity)); //NOLINT
+    void* mem = malloc(sizeof(Entity));// NOLINT
     memcpy(mem, this, sizeof(Entity));
     other = static_cast<Entity*>(mem);
   }

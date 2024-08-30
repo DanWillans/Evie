@@ -44,7 +44,7 @@ private:
   std::unique_ptr<EventManager> event_manager_;
   std::unique_ptr<Layer> debug_layer_;
   std::unique_ptr<IInputManager> input_manager_;
-  std::unique_ptr<IAssetManager> asset_manager_;
+  std::shared_ptr<IAssetManager> asset_manager_;
   std::unique_ptr<ECSController> ecs_controller_;
   LayerQueue layer_queue_;
   Camera camera_;
@@ -124,7 +124,7 @@ Error Application::Initialise(const WindowProperties& props)
   }
 
   if (err.Good()) {
-    impl_->asset_manager_ = std::make_unique<AssetManager>();
+    impl_->asset_manager_ = std::make_shared<AssetManager>();
   }
 
   if (err.Good()) {

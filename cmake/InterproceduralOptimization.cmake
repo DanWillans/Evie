@@ -1,9 +1,14 @@
 macro(Evie_enable_ipo)
   include(CheckIPOSupported)
   check_ipo_supported(RESULT result OUTPUT output)
+
   if(result)
     set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)
     message(STATUS "IPO is supported. Link time optimisation enabled.")
+
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND UNIX)
+      add_link_options(-flto=auto)
+    endif()
   else()
     message(SEND_ERROR "IPO is not supported: ${output}")
   endif()

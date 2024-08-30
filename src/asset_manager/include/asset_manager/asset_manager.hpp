@@ -5,6 +5,7 @@
 #include <filesystem>
 #include <string>
 #include <unordered_map>
+#include <memory>
 
 #include "evie/asset_manager_interface.hpp"
 #include "evie/core.h"
@@ -13,7 +14,7 @@
 
 namespace evie {
 
-class EVIE_API AssetManager final : public IAssetManager
+class EVIE_API AssetManager final : public IAssetManager, public std::enable_shared_from_this<AssetManager>
 {
 public:
   static constexpr const char* TexturesDirectory = "textures";
