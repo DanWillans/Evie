@@ -4,6 +4,7 @@
 
 
 #include "game_layer.hpp"
+#include "timer.hpp"
 
 class DanDanTheGame : public evie::Application
 {
@@ -15,9 +16,12 @@ public:
     props.dimensions.width = 1920;
     props.dimensions.height = 1080;
     APP_INFO("Initialising engine");
+    Timer timer("Initialise");
     evie::Error err = Initialise(props);
+    timer.PrintTime();
     if (err.Good()) {
       err = game_layer_.Initialise(GetInputManager(), GetECSController(), GetWindow(), GetAssetManager());
+      timer.PrintTime();
       if (err.Good()) {
         PushLayerBack(game_layer_);
       }
