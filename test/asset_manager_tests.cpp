@@ -57,7 +57,7 @@ TEST_CASE("Test AssetManager and AssetProxy interaction")
 {
   std::shared_ptr<evie::AssetManagerTest> asset_manager = std::make_unique<evie::AssetManagerTest>();
   {
-    evie::Result<evie::Texture2DAsset> texture_asset = asset_manager->GetTexture2D("dandan.png");
+    evie::Result<evie::Texture2DAsset> texture_asset = asset_manager->GetTexture2D("dandan.jpg");
     REQUIRE(texture_asset.Good());
     REQUIRE(texture_asset->IsValid());
     REQUIRE(texture_asset->Get() != nullptr);

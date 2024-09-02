@@ -491,7 +491,7 @@ evie::Error GameLayer::SetupWalls(float map_scale)
   static evie::Result<evie::Texture2DAsset> tex;
   // Wall texture
   if (err.Good()) {
-    tex = asset_manager_->GetTexture2D("my-wall2.png");
+    tex = asset_manager_->GetTexture2D("my-wall2.jpg");
     if (tex.Good()) {
       if (!tex->IsValid()) {
         EV_ERROR("UH OH Something went wrong");

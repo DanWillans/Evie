@@ -55,7 +55,7 @@ public:
     evie::Error err = evie::Error::OK();
     // DanDan texture
     if (err.Good()) {
-      tex_ = asset_manager_->GetTexture2D("dandan.png");
+      tex_ = asset_manager_->GetTexture2D("dandan2.jpg");
       if (tex_.Good()) {
         if (!tex_->IsValid()) {
           EV_ERROR("UH OH Something went wrong");
