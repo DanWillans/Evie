@@ -80,6 +80,9 @@ public:
         component_wrapper.component.Destroy();
       }
       // Replace removed component with the back of the vector
+      // We specifically std::move() the component here so that any AssetProxy members of the component
+      // move as well and reference counting works. It may also be beneficial for larger data types to be moved instead
+      // of copied here. We don't need the back_component to be valid anymore.
       component_wrapper = std::move(back_component);// NOLINT(*-array-index)
       // Push a free slot onto the queue
       auto back_component_index = entity_index_map_[back_component.id.Get()];
