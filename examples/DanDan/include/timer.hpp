@@ -7,7 +7,10 @@
 class Timer
 {
 public:
-  Timer(const std::string& timer_name) : name_(timer_name) { start_ = std::chrono::high_resolution_clock::now(); }
+  explicit Timer(const std::string& timer_name) : name_(timer_name)
+  {
+    start_ = std::chrono::high_resolution_clock::now();
+  }
 
   void PrintTime()
   {

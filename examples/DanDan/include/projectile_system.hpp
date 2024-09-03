@@ -143,7 +143,7 @@ private:
         if (err.Good()) {
           mesh_component.shader_program.Use();
           mesh_component.shader_program.SetInt("Texture1", 0);
-          mesh_component.texture = *tex_->Get();
+          mesh_component.texture = *tex_;
           err = entity->AddComponent(mesh_cid_, mesh_component);
         }
         if (err.Good()) {

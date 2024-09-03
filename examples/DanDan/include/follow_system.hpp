@@ -6,28 +6,12 @@
 
 #include "evie/ecs/system.hpp"
 #include <evie/ecs/component_array.hpp>
-#include <evie/ecs/components/velocity.hpp>
 #include <evie/ecs/components/transform.hpp>
+#include <evie/ecs/components/velocity.hpp>
 #include <evie/logging.h>
 
 #include <glm/geometric.hpp>
 #include <glm/gtx/string_cast.hpp>
-
-namespace {
-
-int sign(float num)
-{
-  float epsilon = 0.0004;
-  if (num < epsilon) {
-    return -1;
-  } else if (num > epsilon) {
-    return 1;
-  } else {
-    return 0;
-  }
-}
-
-}// namespace
 
 class FollowSystem : public evie::System
 {

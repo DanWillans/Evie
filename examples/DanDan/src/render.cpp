@@ -44,7 +44,7 @@ void Renderer::Update(const float& delta_time)
     mesh.vertex_array.Bind();
 
     // Set texture. Only one texture per mesh component atm.
-    mesh.texture.SetSlot(0);
+    mesh.texture.Get()->SetSlot(0);
 
     // Update uniforms in the shader program
     shader_program.SetMat4("model", glm::value_ptr(model));

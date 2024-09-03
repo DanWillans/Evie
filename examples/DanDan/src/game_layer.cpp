@@ -337,7 +337,7 @@ evie::Error GameLayer::SetupFloor(float map_scale)
   // Now setup the texture slots and bind them to our shader program.
   floor_mesh_component.shader_program.Use();
   floor_mesh_component.shader_program.SetInt("Texture1", 0);
-  floor_mesh_component.texture = *floor_texture->Get();
+  floor_mesh_component.texture = *floor_texture;
 
   // Create floor
   auto floor_entity = ecs_->CreateEntity();
@@ -458,7 +458,7 @@ std::vector<float> sky_cube {
   if (err.Good()) {
     mesh_component.shader_program.Use();
     mesh_component.shader_program.SetInt("Texture1", 0);
-    mesh_component.texture = *sky_texture->Get();
+    mesh_component.texture = *sky_texture;
 
     err = entity->AddComponent(mesh_cid_, mesh_component);
     if (err.Good()) {
@@ -535,7 +535,7 @@ evie::Error GameLayer::SetupWalls(float map_scale)
   // Now setup the texture slots and bind them to our shader program.
   wall_component.shader_program.Use();
   wall_component.shader_program.SetInt("Texture1", 0);
-  wall_component.texture = *tex->Get();
+  wall_component.texture = *tex;
 
   constexpr float wall_height_offset = 0.5F;
   const float wall_offset = map_scale / 2.0F;

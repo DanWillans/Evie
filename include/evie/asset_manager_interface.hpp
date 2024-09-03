@@ -26,6 +26,7 @@ struct AssetMetadata
   AssetType type;
   // A unique identifier for a particular asset
   size_t hash;
+  auto operator<=>(const AssetMetadata&) const = default;
 };
 
 // Forward declaration
@@ -110,10 +111,23 @@ public:
     if (this == &other) {
       return *this;
     }
+    EV_INFO("Copy assignment");
+    // If the new AssetProxy metadata differs then we should
+    // decrease the one we previously proxied because we're losing a reference.
+    if (valid_ && metadata_ != other.metadata_) {
+      if (std::shared_ptr<IAssetManager> asset_m = asset_manager_.lock()) {
+        asset_m->DecreaseReference(metadata_);
+      }
+    } else if (valid_ && metadata_ == other.metadata_) {
+      // Do nothing. The original assetproxy and the one to copy point to the same asset.
+      return *this;
+    }
+
     asset_ = other.asset_;
     metadata_ = other.metadata_;
     asset_manager_ = other.asset_manager_;
     valid_ = other.valid_;
+
     // Only increase reference if this is a valid asset.
     if (std::shared_ptr<IAssetManager> asset_m = asset_manager_.lock()) {
       if (valid_) {
@@ -143,6 +157,7 @@ public:
       }
     }
   }
+  AssetType* Get() { return asset_; }
   const AssetType* Get() const { return asset_; }
   bool IsValid() const { return valid_; }
 

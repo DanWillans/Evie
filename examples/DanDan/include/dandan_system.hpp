@@ -222,7 +222,7 @@ private:
     mesh_component.shader_program = *shader_prog_->Get();
     mesh_component.shader_program.Use();
     mesh_component.shader_program.SetInt("Texture1", 0);
-    mesh_component.texture = *tex_->Get();
+    mesh_component.texture = *tex_;
 
     auto dandan = ecs_->CreateEntity();
     if (dandan && err.Good()) {
