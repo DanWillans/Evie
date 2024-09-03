@@ -3,11 +3,12 @@
 
 #include <array>
 #include <stack>
-#include <vector>
 #include <utility>
+#include <vector>
 
 #include "ecs_constants.hpp"
 #include "evie/ids.h"
+#include "evie/logging.h"
 
 namespace evie {
 
@@ -52,6 +53,7 @@ public:
       // There is a free slot, let's use it instead of allocating more space
       // into the components_ vector.
       const auto& index = free_slots_.top();
+      // Maybe move the component here?
       components_[index].component = component;
       components_[index].id = entity_id;
       // Update the entity position map before we overwrite the component
@@ -62,6 +64,7 @@ public:
       components_.emplace_back(component, entity_id);
       entity_index_map_[entity_id.Get()] = components_.size() - 1;// NOLINT(*-array-index)
     }
+    EV_DEBUG("Components size {}", components_.size());
   }
 
   void RemoveComponent(EntityID entity_id) override
@@ -69,9 +72,15 @@ public:
     // Check if entity was even added to this component
     // NOLINTNEXTLINE(*-array-index)
     if (entity_index_map_[entity_id.Get()] != 0 && components_.size() - free_slots_.size() != 0) {
+      // Get the component from the back
       auto& back_component = components_[components_.size() - 1 - free_slots_.size()];
+      // Do some cleanup on the component if it has Destroy applied.
+      auto& component_wrapper = components_[entity_index_map_[entity_id.Get()]];// NOLINT(*-array-index)
+      if constexpr (requires { component_wrapper.component.Destroy(); }) {
+        component_wrapper.component.Destroy();
+      }
       // Replace removed component with the back of the vector
-      components_[entity_index_map_[entity_id.Get()]] = back_component;// NOLINT(*-array-index)
+      component_wrapper = std::move(back_component);// NOLINT(*-array-index)
       // Push a free slot onto the queue
       auto back_component_index = entity_index_map_[back_component.id.Get()];
       free_slots_.push(back_component_index);

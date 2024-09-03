@@ -2,8 +2,10 @@
 #define INCLUDE_COMPONENT_MANAGER_H_
 
 #include <array>
+#include <concepts>
 #include <cstddef>
 #include <memory>
+#include <type_traits>
 
 #include "component_array.hpp"
 #include "ecs_constants.hpp"
@@ -12,6 +14,14 @@
 #include "evie/ids.h"
 
 namespace evie {
+
+template<typename T>
+concept Destroyable = requires(T t)
+{
+  {
+    t.Destroy()
+    } -> std::same_as<void>;
+};
 
 class EVIE_API ComponentManager
 {

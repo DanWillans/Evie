@@ -15,6 +15,11 @@ struct MeshComponent
   Texture2DAsset texture;
   // How do we handle cleaning up these resources?
 
+  void Destroy(){
+    EV_INFO("MeshComponent destroying");
+    texture.Destroy();
+  }
+
   int GetModelIndices() const { return model_data.GetBuffer().size() / model_data.GetBufferLayout().stride; }
 };
 

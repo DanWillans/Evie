@@ -16,6 +16,17 @@
       "console": "externalTerminal"
     },
     {
+      "name": "Debug Sandbox Unix",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/out/install/unixlike-gcc-debug/bin/dan_dan_the_game",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${fileDirname}",
+      "environment": [{"name":"SPDLOG_LEVEL", "value": "trace"}, {"name": "LD_LIBRARY_PATH", "value":"${workspaceFolder}/out/install/unixlike-gcc-debug/lib"}],
+      "console": "externalTerminal"
+    },
+    {
       "name": "Debug Sandbox",
       "type": "cppdbg",
       "request": "launch",

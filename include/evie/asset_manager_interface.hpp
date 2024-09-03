@@ -108,19 +108,21 @@ public:
   // Copy assignment
   AssetProxy& operator=(const AssetProxy& other)
   {
+    EV_INFO("Copy assignment");
     if (this == &other) {
       return *this;
     }
-    EV_INFO("Copy assignment");
     // If the new AssetProxy metadata differs then we should
     // decrease the one we previously proxied because we're losing a reference.
-    if (valid_ && metadata_ != other.metadata_) {
-      if (std::shared_ptr<IAssetManager> asset_m = asset_manager_.lock()) {
-        asset_m->DecreaseReference(metadata_);
+    if (valid_) {
+      if (metadata_ != other.metadata_) {
+        if (std::shared_ptr<IAssetManager> asset_m = asset_manager_.lock()) {
+          asset_m->DecreaseReference(metadata_);
+        }
+      } else {
+        // Do nothing. The original assetproxy and the one to copy point to the same asset.
+        return *this;
       }
-    } else if (valid_ && metadata_ == other.metadata_) {
-      // Do nothing. The original assetproxy and the one to copy point to the same asset.
-      return *this;
     }
 
     asset_ = other.asset_;
@@ -162,6 +164,25 @@ public:
   bool IsValid() const { return valid_; }
 
   bool operator()() { return valid_; }
+
+  /**
+   * @brief Manually destroy and cleanup the proxy instance. Generally the destructor will handle all of this for you
+   * but there may be instances where you want to destroy the proxy yourself.
+   *
+   */
+  void Destroy()
+  {
+    // Only decrease reference if this is a valid asset
+    if (std::shared_ptr<IAssetManager> asset_m = asset_manager_.lock()) {
+      if (valid_) {
+        asset_m->DecreaseReference(metadata_);
+      }
+    }
+    asset_ = nullptr;
+    valid_ = false;
+    // Don't touch metadata because there's no reasonable data to set it to. valid_ is also false so nothing should be
+    // handling it.
+  }
 
 private:
   friend class AssetManager;

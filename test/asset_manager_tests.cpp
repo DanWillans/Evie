@@ -30,7 +30,7 @@ public:
   template<typename T> int GetTextureRefCount(const AssetProxy<T>& handle)
   {
     return ref_count_vec_[handle.metadata_.hash];
-  };
+  }
 
 private:
   void IncreaseReference(AssetMetadata handle) override { ref_count_vec_[handle.hash]++; };
@@ -155,14 +155,11 @@ TEST_CASE("Test AssetProxy overriden in vector")
   REQUIRE(asset_manager->GetTextureRefCount(*texture_asset_2) == 2);
 
   result[1] = *texture_asset;
-  // The original asset was overwritten with a different asset so it should decrease ref count
   REQUIRE(asset_manager->GetTextureRefCount(*texture_asset) == 5);
-  // The new asset was copied so should increase ref count
   REQUIRE(asset_manager->GetTextureRefCount(*texture_asset_2) == 1);
 
   result[1] = *texture_asset;
-  // The original asset was overwritten with a different asset so it should decrease ref count
+  // Nothing should happen to the reference counts
   REQUIRE(asset_manager->GetTextureRefCount(*texture_asset) == 5);
-  // The new asset was copied so should increase ref count
   REQUIRE(asset_manager->GetTextureRefCount(*texture_asset_2) == 1);
 }

@@ -121,10 +121,12 @@ Result<ShaderProgramAsset> AssetManager::GetShaderProgram(const std::string& sha
 void AssetManager::IncreaseReference(AssetMetadata metadata)
 {
   switch (metadata.type) {
-  case AssetType::Texture2D:
-    EV_DEBUG("Increasing texture reference");
-    texture_2d_map_.at(metadata.hash).reference_count++;
+  case AssetType::Texture2D: {
+    auto& asset_handle = texture_2d_map_.at(metadata.hash);
+    asset_handle.reference_count++;
+    EV_DEBUG("Increasing texture reference {}", asset_handle.reference_count.load());
     break;
+  }
   case AssetType::ShaderProgram:
     EV_DEBUG("Increasing shader reference");
     shader_program_map_.at(metadata.hash).reference_count++;
