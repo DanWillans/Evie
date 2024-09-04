@@ -45,6 +45,13 @@ class IAssetManager
 {
 public:
   virtual ~IAssetManager() = default;
+  /**
+   * @brief Get and/or load a Texture2D object. This will search for a texture with the provided texture_name argument.
+   *
+   * @param texture_name The name of the texture to load
+   * @param texture_wrapping The wrapping required for the texture
+   * @return Result<Texture2DAsset> A Texture2DAsset Result.
+   */
   virtual Result<Texture2DAsset> GetTexture2D(const std::string& texture_name,
     TextureWrapping texture_wrapping = TextureWrapping::Repeat) = 0;
 
@@ -108,7 +115,6 @@ public:
   // Copy assignment
   AssetProxy& operator=(const AssetProxy& other)
   {
-    EV_INFO("Copy assignment");
     if (this == &other) {
       return *this;
     }

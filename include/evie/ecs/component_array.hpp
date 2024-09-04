@@ -64,7 +64,6 @@ public:
       components_.emplace_back(component, entity_id);
       entity_index_map_[entity_id.Get()] = components_.size() - 1;// NOLINT(*-array-index)
     }
-    EV_DEBUG("Components size {}", components_.size());
   }
 
   void RemoveComponent(EntityID entity_id) override
@@ -85,10 +84,10 @@ public:
       // of copied here. We don't need the back_component to be valid anymore.
       component_wrapper = std::move(back_component);// NOLINT(*-array-index)
       // Push a free slot onto the queue
-      auto back_component_index = entity_index_map_[back_component.id.Get()];
+      auto back_component_index = entity_index_map_[component_wrapper.id.Get()];
       free_slots_.push(back_component_index);
       // Update the index map with the new position
-      entity_index_map_[back_component.id.Get()] = entity_index_map_[entity_id.Get()];// NOLINT(*-array-index)
+      entity_index_map_[component_wrapper.id.Get()] = entity_index_map_[entity_id.Get()];// NOLINT(*-array-index)
       // Set the entity_index_map slot to 0 to prove the entity doesn't exist .
       entity_index_map_[entity_id.Get()] = 0;// NOLINT(*-array-index)
     }

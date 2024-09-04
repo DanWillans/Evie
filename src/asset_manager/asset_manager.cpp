@@ -122,13 +122,10 @@ void AssetManager::IncreaseReference(AssetMetadata metadata)
 {
   switch (metadata.type) {
   case AssetType::Texture2D: {
-    auto& asset_handle = texture_2d_map_.at(metadata.hash);
-    asset_handle.reference_count++;
-    EV_DEBUG("Increasing texture reference {}", asset_handle.reference_count.load());
+    texture_2d_map_.at(metadata.hash).reference_count++;
     break;
   }
   case AssetType::ShaderProgram:
-    EV_DEBUG("Increasing shader reference");
     shader_program_map_.at(metadata.hash).reference_count++;
     break;
   default:
@@ -142,9 +139,7 @@ void AssetManager::DecreaseReference(AssetMetadata metadata)
   case AssetType::Texture2D: {
     auto& asset_handle = texture_2d_map_.at(metadata.hash);
     asset_handle.reference_count--;
-    EV_DEBUG("Decreasing texture reference {}", asset_handle.reference_count.load());
     if (asset_handle.reference_count == 0) {
-      EV_DEBUG("Destroying texture reference");
       asset_handle.asset.Destroy();
       // Reference above is invalid after this erase. DO NOT USE IT anymore.
       texture_2d_map_.erase(metadata.hash);
@@ -152,11 +147,9 @@ void AssetManager::DecreaseReference(AssetMetadata metadata)
     break;
   }
   case AssetType::ShaderProgram: {
-    EV_DEBUG("Decreasing shader reference");
     auto& asset_handle = shader_program_map_.at(metadata.hash);
     asset_handle.reference_count--;
     if (asset_handle.reference_count == 0) {
-      EV_DEBUG("Destroying shader reference");
       asset_handle.asset.Destroy();
       // Reference above is invalid after this erase. DO NOT USE IT anymore.
       shader_program_map_.erase(metadata.hash);

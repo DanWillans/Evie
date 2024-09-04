@@ -2,9 +2,6 @@
 #define INCLUDE_DANDAN_SYSTEM_HPP_
 
 #include <cstdlib>
-#include <evie/ecs/components/velocity.hpp>
-#include <evie/ecs/entity.hpp>
-#include <evie/ecs/system_signature.hpp>
 #include <optional>
 #include <random>
 #include <vector>
@@ -15,8 +12,11 @@
 #include <evie/default_models.h>
 #include <evie/ecs/components/mesh_component.hpp>
 #include <evie/ecs/components/transform.hpp>
+#include <evie/ecs/components/velocity.hpp>
 #include <evie/ecs/ecs_controller.hpp>
+#include <evie/ecs/entity.hpp>
 #include <evie/ecs/system.hpp>
+#include <evie/ecs/system_signature.hpp>
 #include <evie/ids.h>
 #include <evie/shader.h>
 #include <evie/shader_program.h>
