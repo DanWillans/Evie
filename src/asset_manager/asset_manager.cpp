@@ -118,6 +118,42 @@ Result<ShaderProgramAsset> AssetManager::GetShaderProgram(const std::string& sha
   }
 }
 
+Result<ModelAsset> AssetManager::GetModel(const std::string& model_name)
+{
+  size_t hash = std::hash<std::string>{}(model_name);
+  if (auto it = model_map_.find(hash); it != model_map_.end()) {
+    // Return a new AssetProxy. This doesn't reload the data just constructs a new proxy with a reference to the
+    // already loaded assets, which in turn will increase the reference count on this asset.
+    EV_DEBUG("Model \"{}\" exists. Reusing", model_name);
+    Model& model = it->second.asset;
+    return ModelAsset{ shared_from_this(), { AssetType::Model, hash }, &model };
+  } else {
+    // Read texture from file system and insert into model_map_.
+    // Check if this file exists or not.
+    std::filesystem::path asset_path = asset_directory_;
+    asset_path /= "models";
+    asset_path /= model_name;
+    asset_path /= model_name;
+    asset_path += ".obj";
+    if (std::filesystem::exists(asset_path)) {
+      EV_DEBUG("Creating model asset from path {}", asset_path.string());
+      Model model;
+      Error error = model.Initialise(asset_path.string());
+      // Add to map
+      if (error.Good()) {
+        auto model_it = model_map_.emplace(hash, model);
+        Model& model_ref = model_it.first->second.asset;
+        return ModelAsset{ shared_from_this(), { AssetType::Model, hash }, &model_ref };
+      } else {
+        return error;
+      }
+    } else {
+      EV_WARN("Model {} doesn't exist.", model_name);
+      return Error{ "Model doesn't exist for AssetManager to Load" };
+    }
+  }
+}
+
 void AssetManager::IncreaseReference(AssetMetadata metadata)
 {
   switch (metadata.type) {
@@ -127,6 +163,9 @@ void AssetManager::IncreaseReference(AssetMetadata metadata)
   }
   case AssetType::ShaderProgram:
     shader_program_map_.at(metadata.hash).reference_count++;
+    break;
+  case AssetType::Model:
+    model_map_.at(metadata.hash).reference_count++;
     break;
   default:
     EV_ERROR("Unknown asset type %d", static_cast<uint16_t>(metadata.type));
@@ -148,6 +187,16 @@ void AssetManager::DecreaseReference(AssetMetadata metadata)
   }
   case AssetType::ShaderProgram: {
     auto& asset_handle = shader_program_map_.at(metadata.hash);
+    asset_handle.reference_count--;
+    if (asset_handle.reference_count == 0) {
+      asset_handle.asset.Destroy();
+      // Reference above is invalid after this erase. DO NOT USE IT anymore.
+      shader_program_map_.erase(metadata.hash);
+    }
+    break;
+  }
+  case AssetType::Model: {
+    auto& asset_handle = model_map_.at(metadata.hash);
     asset_handle.reference_count--;
     if (asset_handle.reference_count == 0) {
       asset_handle.asset.Destroy();

@@ -1,6 +1,7 @@
+#include <evie/asset_manager_interface.hpp>
 #define STB_IMAGE_IMPLEMENTATION
+#include "evie/model.hpp"
 #include "stb/stb_image.h"
-#include "rendering/model.hpp"
 
 #include <GLFW/glfw3.h>
 
@@ -34,8 +35,10 @@
 class ModelExample final : public evie::Layer
 {
 public:
-  evie::Error
-    Initialise(evie::IInputManager* input_manager, evie::ECSController* ecs_controller, evie::IWindow* window);
+  evie::Error Initialise(evie::IInputManager* input_manager,
+    evie::ECSController* ecs_controller,
+    evie::IWindow* window,
+    evie::IAssetManager* asset_manager);
   void OnUpdate() override;
   void OnRender() override;
   void OnEvent(evie::Event& event) override;
@@ -58,19 +61,21 @@ private:
   // Window interface
   evie::IWindow* window_{ nullptr };
 
+  // Asset manage rinterface
+  evie::IAssetManager* asset_manager_{ nullptr };
+
   // Show cursor
   bool enable_cursor_{ false };
 
   // Testing - REMOVE
   evie::ShaderProgram model_prog;
-  evie::Model backpack_model{
-    R"(C:\Users\willa\devel\Evie\out\install\windows-msvc-debug-developer-mode\assets\models\backpack.obj)"
-  };
+  evie::ModelAsset backpack_model;
 };
 
 evie::Error ModelExample::Initialise(evie::IInputManager* input_manager,
   evie::ECSController* ecs_controller,
-  evie::IWindow* window)
+  evie::IWindow* window,
+  evie::IAssetManager* asset_manager)
 {
   evie::Error err = evie::Error::OK();
   // Initialise our variables
@@ -87,6 +92,11 @@ evie::Error ModelExample::Initialise(evie::IInputManager* input_manager,
   window_ = window;
   if (window_ == nullptr) {
     return evie::Error{ "Invalid window" };
+  }
+
+  asset_manager_ = asset_manager;
+  if (asset_manager_ == nullptr) {
+    return evie::Error{ "Invalid Asset Manager" };
   }
 
   // Disable cursor
@@ -111,7 +121,10 @@ evie::Error ModelExample::Initialise(evie::IInputManager* input_manager,
   }
 
   if (err.Good()) {
-    err = backpack_model.Initialise();
+    auto bp_result = asset_manager_->GetModel("backpack");
+    if(bp_result.Good()){
+      backpack_model = *bp_result;
+    }
   }
 
   return err;
@@ -168,7 +181,7 @@ void ModelExample::OnRender()
   evie::mat4 projection =
     glm::perspective(glm::radians(camera_.field_of_view), window_->GetAspectRatio(), near_cull, far_cull);
   model_prog.SetMat4("projection", glm::value_ptr(projection));
-  backpack_model.Draw(model_prog);
+  backpack_model.Get()->Draw(model_prog);
 }
 
 void ModelExample::OnEvent(evie::Event& event)
@@ -233,7 +246,7 @@ public:
       APP_INFO("Creating GameLayer");
       t_layer_ = std::make_unique<ModelExample>();
       APP_INFO("Initialising layer");
-      err = t_layer_->Initialise(GetInputManager(), GetECSController(), GetWindow());
+      err = t_layer_->Initialise(GetInputManager(), GetECSController(), GetWindow(), GetAssetManager());
       if (err.Good()) {
         APP_INFO("Pushing layer");
         PushLayerFront(*t_layer_);

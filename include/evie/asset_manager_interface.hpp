@@ -1,6 +1,7 @@
 #ifndef EVIE_ASSET_MANAGER_INCLUDE_ASSET_MANAGER_INTERFACE_HPP_
 #define EVIE_ASSET_MANAGER_INCLUDE_ASSET_MANAGER_INTERFACE_HPP_
 
+#include <evie/model.hpp>
 #include <evie/shader_program.h>
 #include <evie/texture.h>
 #include <string>
@@ -14,6 +15,7 @@ namespace evie {
 enum class AssetType : uint16_t {
   Texture2D,
   ShaderProgram,
+  Model
 };
 
 /**
@@ -36,6 +38,7 @@ struct AssetMetadata;
 // AssetProxy aliases
 using Texture2DAsset = AssetProxy<Texture2D>;
 using ShaderProgramAsset = AssetProxy<ShaderProgram>;
+using ModelAsset = AssetProxy<Model>;
 
 /**
  * @brief Pure abstract class for AssetManager. Any AssetManager implementation must derive from this interface.
@@ -57,6 +60,14 @@ public:
 
   // This is just temporary until Renderer code is written. No need for users to get shader programs at the moment.
   virtual Result<ShaderProgramAsset> GetShaderProgram(const std::string& shader_name) = 0;
+
+  /**
+   * @brief Get and/or load a Model object. This will search for a model with the provided model name argument.
+   *
+   * @param model_name The name of the model to load.
+   * @return Result<ModelAsset> A ModelAsset Result.
+   */
+  virtual Result<ModelAsset> GetModel(const std::string& model_name) = 0;
 
 private:
   template<typename AssetType> friend class AssetProxy;

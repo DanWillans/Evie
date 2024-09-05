@@ -10,6 +10,8 @@ Evie_add_library(
   indices_array.cpp
   debug.cpp
   model.cpp
+  simple_renderer.cpp
+  mesh.cpp
 )
 
 target_link_libraries(
