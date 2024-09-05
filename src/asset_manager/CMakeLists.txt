@@ -6,9 +6,9 @@ target_link_libraries(
   Evie::Evie_options
   Evie::Evie_warnings
   Evie::WhereAmI
-  Evie::Rendering
   PUBLIC
   Evie::Logging
+  Evie::Rendering
 )
 
 target_link_system_libraries(

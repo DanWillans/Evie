@@ -11,6 +11,8 @@ Evie_add_library(
   debug.cpp
   model.cpp
   camera_manager.cpp
+  simple_renderer.cpp
+  mesh.cpp
 )
 
 target_link_libraries(

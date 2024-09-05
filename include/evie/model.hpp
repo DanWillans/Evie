@@ -11,26 +11,27 @@
 
 #include <evie/shader_program.h>
 
-#include <rendering/mesh.hpp>
+#include <evie/mesh.hpp>
 
 namespace evie {
 class Model
 {
 public:
-  Model(const std::string& path) : path_(path) {}
-  Error EVIE_API Initialise();
+  Error EVIE_API Initialise(const std::string& model_path);
   void EVIE_API Draw(ShaderProgram& shader);
+
+  void EVIE_API Destroy();
 
 private:
   // model data
-  std::vector<Mesh<>> meshes_;
+  std::vector<Mesh> meshes_;
   std::string directory_;
   std::string path_;
   std::unordered_map<std::string, Texture2D> loaded_textures_;
 
-  Error LoadModel(const std::string& path);
+  Error LoadModel();
   void ProcessNode(aiNode* node, const aiScene* scene);
-  Mesh<> ProcessMesh(aiMesh* mesh, const aiScene* scene);
+  Mesh ProcessMesh(aiMesh* mesh, const aiScene* scene);
   std::vector<Texture2D> LoadMaterialTextures(aiMaterial* mat, aiTextureType type, const std::string& typeName);
 };
 }// namespace evie

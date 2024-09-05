@@ -1,54 +1,9 @@
-#ifndef EVIE_INCLUDE_RENDERING_MESH_HPP_
-#define EVIE_INCLUDE_RENDERING_MESH_HPP_
-
-#include <string>
-#include <vector>
-
+#include "evie/mesh.hpp"
 #include "rendering/debug.h"
-
-#include <evie/ids.h>
-#include <evie/indices_array.h>
-#include <evie/shader_program.h>
-#include <evie/texture.h>
-#include <evie/types.h>
-#include <evie/vertex_array.h>
-#include <evie/vertex_buffer.h>
-
 
 namespace evie {
 
-struct Vertex
-{
-  vec3 position{};
-  vec3 normal{};
-  vec2 tex_coords{};
-};
-
-template<typename VertexType = Vertex> class Mesh
-{
-public:
-  std::vector<Vertex> vertices;
-  std::vector<unsigned int> indices;
-  std::vector<Texture2D> textures;
-
-  Mesh(const std::vector<Vertex>& vertices,
-    const std::vector<unsigned int>& indices,
-    const std::vector<Texture2D>& textures)
-    : vertices(vertices), indices(indices), textures(textures)
-  {}
-
-  Error Initialise() { return SetupMesh(); }
-
-  void Draw(ShaderProgram& shader);
-
-private:
-  VertexArray<VertexType> vertex_array_;
-  VertexBuffer<VertexType> vertex_buffer_;
-  IndicesArray indices_array_;
-  Error SetupMesh();
-};
-
-template<typename VertexType> void Mesh<VertexType>::Draw(ShaderProgram& shader_program)
+void Mesh::Draw(ShaderProgram& shader_program)
 {
   int diffuseNr = 1;
   int specularNr = 1;
@@ -78,7 +33,7 @@ template<typename VertexType> void Mesh<VertexType>::Draw(ShaderProgram& shader_
     glDrawElements, GL_TRIANGLES, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, static_cast<void*>(0));
 }
 
-template<typename VertexType> Error Mesh<VertexType>::SetupMesh()
+Error Mesh::SetupMesh()
 {
   evie::Error err = Error::OK();
   vertex_array_.Initialise();
@@ -112,6 +67,11 @@ template<typename VertexType> Error Mesh<VertexType>::SetupMesh()
   return err;
 }
 
-}// namespace evie
+void Mesh::Destroy()
+{
+  vertex_array_.Destroy();
+  vertex_buffer_.Destroy();
+  indices_array_.Destroy();
+}
 
-#endif// !EVIE_INCLUDE_RENDERING_MESH_HPP_
+}// namespace evie

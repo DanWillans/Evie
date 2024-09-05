@@ -29,6 +29,8 @@ public:
 
   Result<ShaderProgramAsset> GetShaderProgram(const std::string& shader_name) override;
 
+  Result<ModelAsset> GetModel(const std::string& model_name) override;
+
 private:
   // Friend all AssetProxy types
   template<typename AssetType> friend class AssetProxy;
@@ -48,6 +50,7 @@ private:
 
   std::unordered_map<size_t, AssetHandle<Texture2D>> texture_2d_map_;
   std::unordered_map<size_t, AssetHandle<ShaderProgram>> shader_program_map_;
+  std::unordered_map<size_t, AssetHandle<Model>> model_map_;
   std::filesystem::path asset_directory_;
 };
 

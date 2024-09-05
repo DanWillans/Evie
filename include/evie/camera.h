@@ -6,6 +6,8 @@
 #include "ids.h"
 
 namespace evie {
+
+// TODO: Make camera interface.
 class EVIE_API Camera
 {
 public:

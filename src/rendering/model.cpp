@@ -1,7 +1,8 @@
 
-#include "rendering/model.hpp"
+#include "evie/model.hpp"
 #include "evie/error.h"
 #include "evie/shader_program.h"
+#include "evie/model.hpp"
 #include "stb/stb_image.h"
 
 #include <assimp/Importer.hpp>
@@ -13,19 +14,23 @@
 
 namespace evie {
 
-Error Model::Initialise() { return LoadModel(path_); }
+Error Model::Initialise(const std::string& model_path)
+{
+  path_ = model_path;
+  return LoadModel();
+}
 
-Error Model::LoadModel(const std::string& path)
+Error Model::LoadModel()
 {
   Assimp::Importer import;
   const aiScene* scene = nullptr;
-  scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+  scene = import.ReadFile(path_, aiProcess_Triangulate | aiProcess_FlipUVs);
 
   if (scene == nullptr || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
     return Error{ "ASSIMP failed to read file" };
   }
 
-  directory_ = path.substr(0, path.find_last_of('\\'));
+  directory_ = path_.substr(0, path_.find_last_of('\\'));
 
   ProcessNode(scene->mRootNode, scene);
   return Error::OK();
@@ -52,7 +57,7 @@ void Model::ProcessNode(aiNode* node, const aiScene* scene)
   }
 }
 
-Mesh<> Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
+Mesh Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 {
   std::vector<Vertex> vertices;
   std::vector<unsigned int> indices;
@@ -118,4 +123,11 @@ std::vector<Texture2D> Model::LoadMaterialTextures(aiMaterial* mat, aiTextureTyp
   }
   return textures;
 }
+
+void Model::Destroy(){
+  for(auto& mesh : meshes_){
+    mesh.Destroy();
+  }
+}
+
 }// namespace evie

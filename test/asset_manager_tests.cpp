@@ -26,6 +26,10 @@ public:
     return AssetProxy<ShaderProgram>{ this, { AssetType::ShaderProgram, 0 }, nullptr };
   }
 
+  Result<ModelAsset> GetModel(const std::string& model_name) override
+  {
+    return AssetProxy<Model>{ shared_from_this(), { AssetType::Model, 0 }, nullptr };
+  }
   template<typename T> int GetTextureRefCount(const AssetProxy<T>& handle)
   {
     return ref_count_vec_[handle.metadata_.hash];
