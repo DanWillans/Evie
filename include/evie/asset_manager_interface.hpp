@@ -1,7 +1,6 @@
 #ifndef EVIE_ASSET_MANAGER_INCLUDE_ASSET_MANAGER_INTERFACE_HPP_
 #define EVIE_ASSET_MANAGER_INCLUDE_ASSET_MANAGER_INTERFACE_HPP_
 
-#include <evie/model.hpp>
 #include <evie/shader_program.h>
 #include <evie/texture.h>
 #include <string>
@@ -12,11 +11,7 @@ namespace evie {
  * @brief All supported asset types in Evie.
  *
  */
-enum class AssetType : uint16_t {
-  Texture2D,
-  ShaderProgram,
-  Model
-};
+enum class AssetType : uint16_t { Texture2D, ShaderProgram, Model, PrimitiveModel };
 
 /**
  * @brief A struct that stores information/metadata about a particular asset. Used by the AssetManager to link
@@ -34,6 +29,10 @@ struct AssetMetadata
 // Forward declaration
 template<typename AssetType> class AssetProxy;
 struct AssetMetadata;
+namespace default_models {
+  enum class PrimitiveModel : uint16_t;
+}
+class Model;
 
 // AssetProxy aliases
 using Texture2DAsset = AssetProxy<Texture2D>;
@@ -68,6 +67,9 @@ public:
    * @return Result<ModelAsset> A ModelAsset Result.
    */
   virtual Result<ModelAsset> GetModel(const std::string& model_name) = 0;
+
+  virtual Result<ModelAsset> GetModel(default_models::PrimitiveModel model_type,
+    const std::vector<Texture2DAsset>& textures) = 0;
 
 private:
   template<typename AssetType> friend class AssetProxy;

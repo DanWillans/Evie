@@ -30,6 +30,13 @@ public:
   {
     return AssetProxy<Model>{ shared_from_this(), { AssetType::Model, 0 }, nullptr };
   }
+
+  Result<ModelAsset> GetModel(default_models::PrimitiveModel model_type,
+    const std::vector<Texture2DAsset>& textures) override
+  {
+    return AssetProxy<Model>{ shared_from_this(), { AssetType::PrimitiveModel, 0 }, nullptr };
+  }
+
   template<typename T> int GetTextureRefCount(const AssetProxy<T>& handle)
   {
     return ref_count_vec_[handle.metadata_.hash];

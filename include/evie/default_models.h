@@ -1,13 +1,17 @@
 #ifndef EVIE_INCLUDE_DEFAULT_MODELS_H_
 #define EVIE_INCLUDE_DEFAULT_MODELS_H_
 
+#include "evie/mesh.hpp"
+
 #include <vector>
 
 namespace evie::default_models {
+
+enum class PrimitiveModel : uint16_t { cube };
 // clang-format off
 //cppcheck-suppress variableScope
 // Layout is 3,2 for x,y,z and 2 for 2d texture coords x,y
-static std::vector<float> cube {
+inline std::vector<float> cube {
     -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
     0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
@@ -51,7 +55,7 @@ static std::vector<float> cube {
     -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
 };
 
-static std::vector<float> cube_texture_up_right {
+inline std::vector<float> cube_texture_up_right {
     -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
     0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
@@ -94,7 +98,8 @@ static std::vector<float> cube_texture_up_right {
     -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
     -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
 };
-static std::vector<float> cube_with_normals {
+
+inline std::vector<float> cube_with_normals {
     -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
      0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
      0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
@@ -138,7 +143,7 @@ static std::vector<float> cube_with_normals {
     -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
 };
 
-static std::vector<float> cube_with_normals_and_tex_coords {
+inline std::vector<float> cube_with_normals_and_tex_coords {
     // positions          // normals           // texture coords
     -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
      0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,
@@ -183,15 +188,66 @@ static std::vector<float> cube_with_normals_and_tex_coords {
     -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
 };
 
-static std::vector<int> cube_indices{
-  // note that we start from 0!
-  0,
-  1,
-  3,// first triangle
-  1,
-  2,
-  3// second triangle
+// Cube vertices (position, normal, texture coordinate)
+inline std::vector<Vertex> cube_with_pos_norm_tex_indices = {
+    // Front face
+    {{-0.5f, -0.5f,  0.5f}, { 0.0f,  0.0f,  1.0f}, {0.0f, 0.0f}},
+    {{ 0.5f, -0.5f,  0.5f}, { 0.0f,  0.0f,  1.0f}, {1.0f, 0.0f}},
+    {{ 0.5f,  0.5f,  0.5f}, { 0.0f,  0.0f,  1.0f}, {1.0f, 1.0f}},
+    {{-0.5f,  0.5f,  0.5f}, { 0.0f,  0.0f,  1.0f}, {0.0f, 1.0f}},
+    
+    // Back face
+    {{-0.5f, -0.5f, -0.5f}, { 0.0f,  0.0f, -1.0f}, {1.0f, 0.0f}},
+    {{ 0.5f, -0.5f, -0.5f}, { 0.0f,  0.0f, -1.0f}, {0.0f, 0.0f}},
+    {{ 0.5f,  0.5f, -0.5f}, { 0.0f,  0.0f, -1.0f}, {0.0f, 1.0f}},
+    {{-0.5f,  0.5f, -0.5f}, { 0.0f,  0.0f, -1.0f}, {1.0f, 1.0f}},
+    
+    // Left face
+    {{-0.5f, -0.5f, -0.5f}, {-1.0f,  0.0f,  0.0f}, {0.0f, 0.0f}},
+    {{-0.5f, -0.5f,  0.5f}, {-1.0f,  0.0f,  0.0f}, {1.0f, 0.0f}},
+    {{-0.5f,  0.5f,  0.5f}, {-1.0f,  0.0f,  0.0f}, {1.0f, 1.0f}},
+    {{-0.5f,  0.5f, -0.5f}, {-1.0f,  0.0f,  0.0f}, {0.0f, 1.0f}},
+    
+    // Right face
+    {{ 0.5f, -0.5f, -0.5f}, { 1.0f,  0.0f,  0.0f}, {1.0f, 0.0f}},
+    {{ 0.5f, -0.5f,  0.5f}, { 1.0f,  0.0f,  0.0f}, {0.0f, 0.0f}},
+    {{ 0.5f,  0.5f,  0.5f}, { 1.0f,  0.0f,  0.0f}, {0.0f, 1.0f}},
+    {{ 0.5f,  0.5f, -0.5f}, { 1.0f,  0.0f,  0.0f}, {1.0f, 1.0f}},
+    
+    // Top face
+    {{-0.5f,  0.5f,  0.5f}, { 0.0f,  1.0f,  0.0f}, {0.0f, 1.0f}},
+    {{ 0.5f,  0.5f,  0.5f}, { 0.0f,  1.0f,  0.0f}, {1.0f, 1.0f}},
+    {{ 0.5f,  0.5f, -0.5f}, { 0.0f,  1.0f,  0.0f}, {1.0f, 0.0f}},
+    {{-0.5f,  0.5f, -0.5f}, { 0.0f,  1.0f,  0.0f}, {0.0f, 0.0f}},
+    
+    // Bottom face
+    {{-0.5f, -0.5f,  0.5f}, { 0.0f, -1.0f,  0.0f}, {1.0f, 1.0f}},
+    {{ 0.5f, -0.5f,  0.5f}, { 0.0f, -1.0f,  0.0f}, {0.0f, 1.0f}},
+    {{ 0.5f, -0.5f, -0.5f}, { 0.0f, -1.0f,  0.0f}, {0.0f, 0.0f}},
+    {{-0.5f, -0.5f, -0.5f}, { 0.0f, -1.0f,  0.0f}, {1.0f, 0.0f}},
 };
+
+// Indices for drawing cube (using triangles)
+inline std::vector<unsigned int> cube_indices = {
+    // Front face
+    0, 1, 2, 2, 3, 0,
+    
+    // Back face
+    4, 5, 6, 6, 7, 4,
+    
+    // Left face
+    8, 9, 10, 10, 11, 8,
+    
+    // Right face
+    12, 13, 14, 14, 15, 12,
+    
+    // Top face
+    16, 17, 18, 18, 19, 16,
+    
+    // Bottom face
+    20, 21, 22, 22, 23, 20
+};
+
 // clang-format on
 }// namespace evie::default_models
 

@@ -1,8 +1,8 @@
 
 #include "evie/model.hpp"
 #include "evie/error.h"
-#include "evie/shader_program.h"
 #include "evie/model.hpp"
+#include "evie/shader_program.h"
 #include "stb/stb_image.h"
 
 #include <assimp/Importer.hpp>
@@ -19,6 +19,8 @@ Error Model::Initialise(const std::string& model_path)
   path_ = model_path;
   return LoadModel();
 }
+
+void Model::Initialise(const std::vector<Mesh>& meshes) { meshes_ = meshes; }
 
 Error Model::LoadModel()
 {
@@ -124,8 +126,9 @@ std::vector<Texture2D> Model::LoadMaterialTextures(aiMaterial* mat, aiTextureTyp
   return textures;
 }
 
-void Model::Destroy(){
-  for(auto& mesh : meshes_){
+void Model::Destroy()
+{
+  for (auto& mesh : meshes_) {
     mesh.Destroy();
   }
 }

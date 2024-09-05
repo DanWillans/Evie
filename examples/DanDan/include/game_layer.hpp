@@ -7,6 +7,7 @@
 #include "physics_system.hpp"
 #include "projectile_system.hpp"
 #include "render.hpp"
+#include "rendering/simple_renderer.hpp"
 
 #include <evie/asset_manager_interface.hpp>
 #include <evie/camera.h>
@@ -24,6 +25,7 @@
 #include <evie/vertex_array.h>
 #include <evie/vertex_buffer.h>
 #include <evie/window.h>
+#include <memory>
 
 class GameLayer final : public evie::Layer
 {
@@ -123,6 +125,9 @@ private:
 
   // Followers follow
   bool follow_on_{ false };
+
+  // Renderer
+  std::unique_ptr<evie::SimpleRenderer> simple_renderer_;
 };
 
 #endif// !INCLUDE_GAME_LAYER_HPP_

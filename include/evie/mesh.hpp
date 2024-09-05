@@ -1,7 +1,7 @@
 #ifndef EVIE_INCLUDE_RENDERING_MESH_HPP_
 #define EVIE_INCLUDE_RENDERING_MESH_HPP_
 
-#include <string>
+#include <evie/asset_manager_interface.hpp>
 #include <vector>
 
 #include <evie/ids.h>
@@ -28,11 +28,18 @@ public:
   std::vector<Vertex> vertices;
   std::vector<unsigned int> indices;
   std::vector<Texture2D> textures;
+  std::vector<Texture2DAsset> texture_assets;
 
   Mesh(const std::vector<Vertex>& vertices,
     const std::vector<unsigned int>& indices,
     const std::vector<Texture2D>& textures)
     : vertices(vertices), indices(indices), textures(textures)
+  {}
+
+  Mesh(const std::vector<Vertex>& vertices,
+    const std::vector<unsigned int>& indices,
+    const std::vector<Texture2DAsset>& textures)
+    : vertices(vertices), indices(indices), texture_assets(textures)
   {}
 
   Error Initialise() { return SetupMesh(); }

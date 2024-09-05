@@ -1,4 +1,6 @@
 #include <cstdlib>
+#include <evie/default_models.h>
+#include <evie/mesh.hpp>
 #include <filesystem>
 #include <memory>
 #include <utility>
@@ -154,6 +156,35 @@ Result<ModelAsset> AssetManager::GetModel(const std::string& model_name)
   }
 }
 
+Result<ModelAsset> AssetManager::GetModel(default_models::PrimitiveModel model_type,
+  const std::vector<Texture2DAsset>& textures)
+{
+  uint16_t model_num = static_cast<uint16_t>(model_type);
+  if (auto it = primitive_model_map_.find(model_num); it != primitive_model_map_.end()) {
+    // Return a new AssetProxy. This doesn't reload the data just constructs a new proxy with a reference to the
+    // already loaded assets, which in turn will increase the reference count on this asset.
+    EV_DEBUG("Model type \"{}\" exists. Reusing", model_num);
+    Model& model = it->second.asset;
+    return ModelAsset{ shared_from_this(), { AssetType::PrimitiveModel, model_num }, &model };
+  } else {
+    // We have these types built in hence primitive models. No need to load from file.
+    std::vector<Mesh> model_meshes;
+    switch (model_type) {
+    case default_models::PrimitiveModel::cube:
+      model_meshes.emplace_back(default_models::cube_with_pos_norm_tex_indices, default_models::cube_indices, textures);
+      break;
+    default:
+      EV_ERROR("Unknown primitive model type");
+      break;
+    }
+    Model model;
+    model.Initialise(model_meshes);
+    auto model_it = primitive_model_map_.emplace(model_num, model);
+    Model& model_ref = model_it.first->second.asset;
+    return ModelAsset{ shared_from_this(), { AssetType::PrimitiveModel, model_num }, &model_ref };
+  }
+}
+
 void AssetManager::IncreaseReference(AssetMetadata metadata)
 {
   switch (metadata.type) {
@@ -166,6 +197,9 @@ void AssetManager::IncreaseReference(AssetMetadata metadata)
     break;
   case AssetType::Model:
     model_map_.at(metadata.hash).reference_count++;
+    break;
+  case AssetType::PrimitiveModel:
+    primitive_model_map_.at(metadata.hash).reference_count++;
     break;
   default:
     EV_ERROR("Unknown asset type %d", static_cast<uint16_t>(metadata.type));
@@ -202,6 +236,16 @@ void AssetManager::DecreaseReference(AssetMetadata metadata)
       asset_handle.asset.Destroy();
       // Reference above is invalid after this erase. DO NOT USE IT anymore.
       shader_program_map_.erase(metadata.hash);
+    }
+    break;
+  }
+  case AssetType::PrimitiveModel: {
+    auto& asset_handle = primitive_model_map_.at(metadata.hash);
+    asset_handle.reference_count--;
+    if (asset_handle.reference_count == 0) {
+      asset_handle.asset.Destroy();
+      // Reference above is invalid after this erase. DO NOT USE IT anymore.
+      primitive_model_map_.erase(metadata.hash);
     }
     break;
   }
