@@ -3,6 +3,7 @@
 #include "follow_system.hpp"
 #include "physics_system.hpp"
 #include "projectile_system.hpp"
+#include "rendering/simple_renderer.hpp"
 
 #include <GLFW/glfw3.h>
 
@@ -10,6 +11,7 @@
 #include <evie/asset_manager_interface.hpp>
 #include <evie/default_models.h>
 #include <evie/ecs/components/mesh_component.hpp>
+#include <evie/ecs/components/transform.hpp>
 #include <evie/ecs/ecs_controller.hpp>
 #include <evie/ecs/system_signature.hpp>
 #include <evie/error.h>
@@ -30,6 +32,7 @@
 #include <glm/geometric.hpp>
 #include <glm/trigonometric.hpp>
 #include <imgui.h>
+#include <memory>
 #include <numbers>
 
 evie::Error GameLayer::Initialise(evie::IInputManager* input_manager,
@@ -154,6 +157,8 @@ evie::Error GameLayer::Initialise(evie::IInputManager* input_manager,
     window_->DisableCursor();
   }
 
+  simple_renderer_ = std::make_unique<evie::SimpleRenderer>(player_camera_);
+
   return err;
 }
 
@@ -181,7 +186,15 @@ void GameLayer::OnUpdate()
   physics_system_->UpdateSystem(delta_time);
 }
 
-void GameLayer::OnRender() { renderer_->UpdateSystem(0.0F); }
+void GameLayer::OnRender()
+{
+  renderer_->UpdateSystem(0.0F);
+  auto texture = asset_manager_->GetTexture2D("dandan2.jpg");
+  auto asset = asset_manager_->GetModel(evie::default_models::PrimitiveModel::cube, {*texture});
+  evie::TransformComponent comp;
+  comp.position = {0.0, 5.0, 0.0};
+  simple_renderer_->DrawModel(*asset, comp);
+}
 
 void GameLayer::OnEvent(evie::Event& event)
 {

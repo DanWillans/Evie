@@ -2,13 +2,16 @@
 
 #include "evie/camera.h"
 #include "evie/ecs/components/transform.hpp"
+#include "evie/asset_manager_interface.hpp"
+#include "evie/model.hpp"
+
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/gtx/quaternion.hpp>
 
 
 namespace evie {
 
-SimpleRenderer::SimpleRenderer(Camera& camera) : camera_(camera) {}
+SimpleRenderer::SimpleRenderer(FPSCamera& camera) : camera_(camera) {}
 void SimpleRenderer::DrawModel(ModelAsset& model, const TransformComponent& transform)
 {
   DrawModel(model, transform.position, transform.rotation, transform.scale);

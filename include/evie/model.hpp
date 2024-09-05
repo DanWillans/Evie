@@ -18,6 +18,14 @@ class Model
 {
 public:
   Error EVIE_API Initialise(const std::string& model_path);
+
+  /**
+   * @brief Initialise the Model manually with an array of meshes.
+   *
+   * @param meshes The meshes to use for the model.
+   */
+  void EVIE_API Initialise(const std::vector<Mesh>& meshes);
+
   void EVIE_API Draw(ShaderProgram& shader);
 
   void EVIE_API Destroy();

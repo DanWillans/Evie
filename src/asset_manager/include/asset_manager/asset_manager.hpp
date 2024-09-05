@@ -10,6 +10,7 @@
 #include "evie/core.h"
 #include "evie/shader_program.h"
 #include "evie/texture.h"
+#include "evie/model.hpp"
 
 namespace evie {
 
@@ -31,6 +32,8 @@ public:
 
   Result<ModelAsset> GetModel(const std::string& model_name) override;
 
+  Result<ModelAsset> GetModel(default_models::PrimitiveModel model_type, const std::vector<Texture2DAsset>& textures) override;
+
 private:
   // Friend all AssetProxy types
   template<typename AssetType> friend class AssetProxy;
@@ -51,6 +54,7 @@ private:
   std::unordered_map<size_t, AssetHandle<Texture2D>> texture_2d_map_;
   std::unordered_map<size_t, AssetHandle<ShaderProgram>> shader_program_map_;
   std::unordered_map<size_t, AssetHandle<Model>> model_map_;
+  std::unordered_map<uint16_t, AssetHandle<Model>> primitive_model_map_;
   std::filesystem::path asset_directory_;
 };
 

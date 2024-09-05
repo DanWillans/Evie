@@ -8,15 +8,15 @@
 
 
 namespace evie {
-class SimpleRenderer : public IRenderer
+class EVIE_API SimpleRenderer : public IRenderer
 {
 public:
-  explicit SimpleRenderer(Camera& camera);
+  explicit SimpleRenderer(FPSCamera& camera);
   void DrawModel(ModelAsset& model, const TransformComponent& component) override;
   void DrawModel(ModelAsset& model, const vec3& position, const quat& rotation, const vec3& scale) override;
 
 private:
-  Camera& camera_;
+  FPSCamera& camera_;
   ShaderProgram shader_program_;
 };
 }// namespace evie
