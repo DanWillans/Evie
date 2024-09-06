@@ -1,4 +1,4 @@
-#include "rendering/debug.h"
+#include "evie/debug.h"
 #include "evie/error.h"
 
 namespace evie {

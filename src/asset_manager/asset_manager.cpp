@@ -1,6 +1,4 @@
 #include <cstdlib>
-#include <evie/default_models.h>
-#include <evie/mesh.hpp>
 #include <filesystem>
 #include <memory>
 #include <utility>
@@ -11,8 +9,10 @@
 #include "evie/error.h"
 #include "evie/logging.h"
 #include "evie/result.h"
-
+#include <evie/default_models.h>
+#include <evie/mesh.hpp>
 #include "evie/shader_program.h"
+
 #include "whereami/whereami.h"
 
 namespace evie {
@@ -172,6 +172,7 @@ Result<ModelAsset> AssetManager::GetModel(default_models::PrimitiveModel model_t
     switch (model_type) {
     case default_models::PrimitiveModel::cube:
       model_meshes.emplace_back(default_models::cube_with_pos_norm_tex_indices, default_models::cube_indices, textures);
+      model_meshes.back().Initialise();
       break;
     default:
       EV_ERROR("Unknown primitive model type");

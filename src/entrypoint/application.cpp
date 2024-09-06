@@ -12,7 +12,7 @@
 #include "evie/input_manager.h"
 #include "evie/logging.h"
 #include "evie/window.h"
-#include "rendering/debug.h"
+#include "evie/debug.h"
 #include "rendering/simple_renderer.hpp"
 #include "window/debug_layer.h"
 #include "window/event_manager.h"

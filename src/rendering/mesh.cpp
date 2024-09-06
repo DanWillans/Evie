@@ -1,5 +1,5 @@
 #include "evie/mesh.hpp"
-#include "rendering/debug.h"
+#include "evie/debug.h"
 
 namespace evie {
 

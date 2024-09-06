@@ -4,7 +4,7 @@
 #include "evie/ids.h"
 #include "evie/result.h"
 #include "evie/texture.h"
-#include "rendering/debug.h"
+#include "evie/debug.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb/stb_image.h"

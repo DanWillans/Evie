@@ -3,7 +3,7 @@
 #include "evie/ids.h"
 #include "evie/logging.h"
 #include "evie/shader.h"
-#include "rendering/debug.h"
+#include "evie/debug.h"
 
 #include <array>
 #include <evie/types.h>

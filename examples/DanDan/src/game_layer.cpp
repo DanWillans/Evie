@@ -157,7 +157,12 @@ evie::Error GameLayer::Initialise(evie::IInputManager* input_manager,
     window_->DisableCursor();
   }
 
-  simple_renderer_ = std::make_unique<evie::SimpleRenderer>(player_camera_);
+  auto shader_program = asset_manager_->GetShaderProgram("light_shader");
+  if(shader_program.Good()){
+    simple_renderer_ = std::make_unique<evie::SimpleRenderer>(player_camera_, *shader_program);
+  } else {
+    err = shader_program.Error();
+  }
 
   return err;
 }
@@ -190,9 +195,9 @@ void GameLayer::OnRender()
 {
   renderer_->UpdateSystem(0.0F);
   auto texture = asset_manager_->GetTexture2D("dandan2.jpg");
-  auto asset = asset_manager_->GetModel(evie::default_models::PrimitiveModel::cube, {*texture});
+  auto asset = asset_manager_->GetModel(evie::default_models::PrimitiveModel::cube, { *texture });
   evie::TransformComponent comp;
-  comp.position = {0.0, 5.0, 0.0};
+  comp.position = { 0.0, 5.0, 0.0 };
   simple_renderer_->DrawModel(*asset, comp);
 }
 

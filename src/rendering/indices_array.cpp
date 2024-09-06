@@ -1,6 +1,6 @@
 #include "evie/indices_array.h"
 #include "evie/ids.h"
-#include "rendering/debug.h"
+#include "evie/debug.h"
 
 
 #include "glad/glad.h"
