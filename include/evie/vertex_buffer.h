@@ -8,9 +8,9 @@
 #include "evie/core.h"
 #include "evie/error.h"
 #include "evie/ids.h"
-#include "rendering/debug.h"
 
 #include "glad/glad.h"
+#include "evie/debug.h"
 
 namespace evie {
 

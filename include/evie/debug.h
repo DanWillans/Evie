@@ -2,7 +2,6 @@
 #define EVIE_INCLUDE_RENDERING_DEBUG_H_
 
 #include <source_location>
-#include <string>
 
 #include "evie/error.h"
 #include "evie/logging.h"
