@@ -7,24 +7,48 @@ void Mesh::Draw(ShaderProgram& shader_program)
 {
   int diffuseNr = 1;
   int specularNr = 1;
-  for (int i = 0; i < textures.size(); i++) {
-    textures[i].SetSlot(i);
-    std::string texture_name;
-    TextureType& type = textures[i].type;
-    if (type == TextureType::Diffuse) {
-      texture_name = "texture_diffuse" + std::to_string(diffuseNr++);
-    } else if (type == TextureType::Specular) {
-      texture_name = "texture_specular" + std::to_string(specularNr++);
-    } else {
-      EV_INFO("Unsupported texture type");
-      continue;
+  // THIS branching SUCKS - Don't do this. Move everything to AssetProxies.
+  if (texture_assets.size() > 0) {
+    for (int i = 0; i < texture_assets.size(); i++) {
+      texture_assets[i].Get()->SetSlot(i);
+      std::string texture_name;
+      TextureType& type = texture_assets[i].Get()->type;
+      if (type == TextureType::Diffuse) {
+        texture_name = "texture_diffuse" + std::to_string(diffuseNr++);
+      } else if (type == TextureType::Specular) {
+        texture_name = "texture_specular" + std::to_string(specularNr++);
+      } else {
+        EV_INFO("Unsupported texture type");
+        continue;
+      }
+      shader_program.SetInt("material." + texture_name, i);
+      texture_assets[i].Get()->Bind();
     }
-    shader_program.SetInt("material." + texture_name, i);
-    textures[i].Bind();
-  }
-  // Reset current active texture
-  if (!textures.empty()) {
-    textures[0].SetSlot(0);
+    // Reset current active texture
+    if (!texture_assets.empty()) {
+      texture_assets[0].Get()->SetSlot(0);
+    }
+
+  } else {
+    for (int i = 0; i < textures.size(); i++) {
+      textures[i].SetSlot(i);
+      std::string texture_name;
+      TextureType& type = textures[i].type;
+      if (type == TextureType::Diffuse) {
+        texture_name = "texture_diffuse" + std::to_string(diffuseNr++);
+      } else if (type == TextureType::Specular) {
+        texture_name = "texture_specular" + std::to_string(specularNr++);
+      } else {
+        EV_INFO("Unsupported texture type");
+        continue;
+      }
+      shader_program.SetInt("material." + texture_name, i);
+      textures[i].Bind();
+    }
+    // Reset current active texture
+    if (!textures.empty()) {
+      textures[0].SetSlot(0);
+    }
   }
 
   // Draw mesh
