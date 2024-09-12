@@ -9,8 +9,7 @@
 // NOLINTBEGIN
 
 namespace evie {
-class AssetManagerTest
-  : public IAssetManager
+class AssetManagerTest : public IAssetManager
 {
 public:
   virtual ~AssetManagerTest() = default;
@@ -28,13 +27,13 @@ public:
 
   Result<ModelAsset> GetModel(const std::string& model_name) override
   {
-    return AssetProxy<Model>{ shared_from_this(), { AssetType::Model, 0 }, nullptr };
+    return AssetProxy<Model>{ this, { AssetType::Model, 0 }, nullptr };
   }
 
   Result<ModelAsset> GetModel(default_models::PrimitiveModel model_type,
     const std::vector<Texture2DAsset>& textures) override
   {
-    return AssetProxy<Model>{ shared_from_this(), { AssetType::PrimitiveModel, 0 }, nullptr };
+    return AssetProxy<Model>{ this, { AssetType::PrimitiveModel, 0 }, nullptr };
   }
 
   template<typename T> int GetTextureRefCount(const AssetProxy<T>& handle)

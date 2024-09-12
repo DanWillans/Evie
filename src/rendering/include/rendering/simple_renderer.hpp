@@ -5,17 +5,19 @@
 #include <evie/camera.h>
 #include <evie/renderer_interface.hpp>
 #include <evie/shader_program.h>
+#include <evie/window.h>
 
 
 namespace evie {
 class EVIE_API SimpleRenderer : public IRenderer
 {
 public:
-  explicit SimpleRenderer(FPSCamera& camera, const ShaderProgramAsset& shader_program);
+  SimpleRenderer(IWindow& dinwo, FPSCamera& camera, const ShaderProgramAsset& shader_program);
   void DrawModel(ModelAsset& model, const TransformComponent& component) override;
   void DrawModel(ModelAsset& model, const vec3& position, const quat& rotation, const vec3& scale) override;
 
 private:
+  IWindow& window_;
   FPSCamera& camera_;
   ShaderProgramAsset shader_program_;
 };

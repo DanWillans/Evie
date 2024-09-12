@@ -128,7 +128,7 @@ Result<ModelAsset> AssetManager::GetModel(const std::string& model_name)
     // already loaded assets, which in turn will increase the reference count on this asset.
     EV_DEBUG("Model \"{}\" exists. Reusing", model_name);
     Model& model = it->second.asset;
-    return ModelAsset{ shared_from_this(), { AssetType::Model, hash }, &model };
+    return ModelAsset{ this, { AssetType::Model, hash }, &model };
   } else {
     // Read texture from file system and insert into model_map_.
     // Check if this file exists or not.
@@ -145,7 +145,7 @@ Result<ModelAsset> AssetManager::GetModel(const std::string& model_name)
       if (error.Good()) {
         auto model_it = model_map_.emplace(hash, model);
         Model& model_ref = model_it.first->second.asset;
-        return ModelAsset{ shared_from_this(), { AssetType::Model, hash }, &model_ref };
+        return ModelAsset{ this, { AssetType::Model, hash }, &model_ref };
       } else {
         return error;
       }
@@ -165,7 +165,7 @@ Result<ModelAsset> AssetManager::GetModel(default_models::PrimitiveModel model_t
     // already loaded assets, which in turn will increase the reference count on this asset.
     EV_DEBUG("Model type \"{}\" exists. Reusing", model_num);
     Model& model = it->second.asset;
-    return ModelAsset{ shared_from_this(), { AssetType::PrimitiveModel, model_num }, &model };
+    return ModelAsset{ this, { AssetType::PrimitiveModel, model_num }, &model };
   } else {
     // We have these types built in hence primitive models. No need to load from file.
     std::vector<Mesh> model_meshes;
@@ -187,7 +187,7 @@ Result<ModelAsset> AssetManager::GetModel(default_models::PrimitiveModel model_t
     model.Initialise(model_meshes);
     auto model_it = primitive_model_map_.emplace(model_num, model);
     Model& model_ref = model_it.first->second.asset;
-    return ModelAsset{ shared_from_this(), { AssetType::PrimitiveModel, model_num }, &model_ref };
+    return ModelAsset{ this, { AssetType::PrimitiveModel, model_num }, &model_ref };
   }
 }
 

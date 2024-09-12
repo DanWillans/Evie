@@ -1,3 +1,4 @@
+#include <evie/renderer_interface.hpp>
 #include <imgui_internal.h>
 #include <memory>
 #include <thread>
@@ -6,13 +7,13 @@
 #include "evie/application.h"
 #include "evie/asset_manager_interface.hpp"
 #include "evie/camera.h"
+#include "evie/debug.h"
 #include "evie/ecs/ecs_controller.hpp"
 #include "evie/error.h"
 #include "evie/events.h"
 #include "evie/input_manager.h"
 #include "evie/logging.h"
 #include "evie/window.h"
-#include "evie/debug.h"
 #include "rendering/simple_renderer.hpp"
 #include "window/debug_layer.h"
 #include "window/event_manager.h"
@@ -45,6 +46,7 @@ private:
   std::unique_ptr<EventManager> event_manager_;
   std::unique_ptr<Layer> debug_layer_;
   std::unique_ptr<IInputManager> input_manager_;
+  std::unique_ptr<IRenderer> renderer_;
   std::shared_ptr<IAssetManager> asset_manager_;
   std::unique_ptr<ECSController> ecs_controller_;
   LayerQueue layer_queue_;
@@ -71,6 +73,8 @@ ECSController* Application::GetECSController() const { return impl_->ecs_control
 ImGuiContext* Application::GetImGuiContext() const { return ImGui::GetCurrentContext(); }
 
 IAssetManager* Application::GetAssetManager() const { return impl_->asset_manager_.get(); }
+
+IRenderer* Application::GetRenderer() const { return impl_->renderer_.get(); }
 
 Error Application::Initialise(const WindowProperties& props)
 {
@@ -126,6 +130,10 @@ Error Application::Initialise(const WindowProperties& props)
 
   if (err.Good()) {
     impl_->asset_manager_ = std::make_shared<AssetManager>();
+  }
+
+  if (err.Good()) {
+    impl_->renderer_ = std::make_shared<SimpleRenderer>(impl_->window_, );
   }
 
   if (err.Good()) {
