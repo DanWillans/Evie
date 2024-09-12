@@ -11,6 +11,7 @@
 #include "evie/layer.h"
 #include "evie/types.h"
 #include "evie/window.h"
+#include "renderer_interface.hpp"
 
 namespace evie {
 class EVIE_API Application
@@ -30,6 +31,7 @@ public:
   [[nodiscard]] IWindow* GetWindow() const;
   [[nodiscard]] ImGuiContext* GetImGuiContext() const;
   [[nodiscard]] IAssetManager* GetAssetManager() const;
+  [[nodiscard]] IRenderer* GetRenderer() const; // Could probably benefit from not being an interface once we've solidified on a renderer.
   void PushLayerFront(Layer& layer);
   void PushLayerBack(Layer& layer);
   void Shutdown();

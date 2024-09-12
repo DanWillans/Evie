@@ -159,7 +159,7 @@ evie::Error GameLayer::Initialise(evie::IInputManager* input_manager,
 
   auto shader_program = asset_manager_->GetShaderProgram("light_shader");
   if(shader_program.Good()){
-    simple_renderer_ = std::make_unique<evie::SimpleRenderer>(player_camera_, *shader_program);
+    simple_renderer_ = std::make_unique<evie::SimpleRenderer>(*window_, player_camera_, *shader_program);
   } else {
     err = shader_program.Error();
   }

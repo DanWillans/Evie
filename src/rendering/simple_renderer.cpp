@@ -6,6 +6,7 @@
 #include "evie/model.hpp"
 
 #include <evie/shader_program.h>
+#include <evie/window.h>
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -15,8 +16,8 @@
 
 namespace evie {
 
-SimpleRenderer::SimpleRenderer(FPSCamera& camera, const ShaderProgramAsset& shader_program)
-  : camera_(camera), shader_program_(shader_program)
+SimpleRenderer::SimpleRenderer(IWindow& window, FPSCamera& camera, const ShaderProgramAsset& shader_program)
+  : window_(window), camera_(camera), shader_program_(shader_program)
 {}
 void SimpleRenderer::DrawModel(ModelAsset& model, const TransformComponent& transform)
 {
@@ -58,7 +59,7 @@ void SimpleRenderer::DrawModel(ModelAsset& model, const vec3& position, const qu
   constexpr float near_cull = 0.1F;
   constexpr float far_cull = 1000.0F;
   evie::mat4 projection =
-    glm::perspective(glm::radians(camera_.field_of_view), 1.6F, near_cull, far_cull);
+    glm::perspective(glm::radians(camera_.field_of_view), window_.GetAspectRatio(), near_cull, far_cull);
   model_prog.SetMat4("projection", glm::value_ptr(projection));
 
   // Setup the shader program and give to the model object to draw.
