@@ -41,7 +41,7 @@ Result<Texture2DAsset> AssetManager::GetTexture2D(const std::string& texture_nam
     // already loaded assets, which in turn will increase the reference count on this asset.
     EV_DEBUG("Texture \"{}\" exists. Reusing", texture_name);
     Texture2D& texture_2d = it->second.asset;
-    return Texture2DAsset{ shared_from_this(), { AssetType::Texture2D, hash }, &texture_2d };
+    return Texture2DAsset{ this, { AssetType::Texture2D, hash }, &texture_2d };
   } else {
     // Read texture from file system and insert into texture_2d_map_.
     // Check if this file exists or not.
@@ -55,7 +55,7 @@ Result<Texture2DAsset> AssetManager::GetTexture2D(const std::string& texture_nam
       // Add to map
       auto texture_2d_asset = texture_2d_map_.emplace(hash, texture);
       Texture2D& texture_2d = texture_2d_asset.first->second.asset;
-      return Texture2DAsset{ shared_from_this(), { AssetType::Texture2D, hash }, &texture_2d };
+      return Texture2DAsset{ this, { AssetType::Texture2D, hash }, &texture_2d };
     } else {
       EV_WARN("Texture {} doesn't exist. Using default engine texture.", texture_name);
       return Error{ "Texture doesn't exist for AssetManager to Load" };
@@ -70,7 +70,7 @@ Result<ShaderProgramAsset> AssetManager::GetShaderProgram(const std::string& sha
   if (auto it = shader_program_map_.find(hash); it != shader_program_map_.end()) {
     EV_DEBUG("ShaderProgram \"{}\" exists. Reusing", shader_name);
     ShaderProgram& shader_program = it->second.asset;
-    return ShaderProgramAsset{ shared_from_this(), { AssetType::ShaderProgram, hash }, &shader_program };
+    return ShaderProgramAsset{ this, { AssetType::ShaderProgram, hash }, &shader_program };
   } else {
     std::filesystem::path asset_path = asset_directory_;
     asset_path /= "shaders";
@@ -108,7 +108,7 @@ Result<ShaderProgramAsset> AssetManager::GetShaderProgram(const std::string& sha
           fragment_path.string());
         auto shader_program_asset = shader_program_map_.emplace(hash, shader_program);
         ShaderProgram& shader_prog = shader_program_asset.first->second.asset;
-        return ShaderProgramAsset{ shared_from_this(), { AssetType::ShaderProgram, hash }, &shader_prog };
+        return ShaderProgramAsset{ this, { AssetType::ShaderProgram, hash }, &shader_prog };
       } else {
         return Error{ "Shader program failed to initialise" };
       }

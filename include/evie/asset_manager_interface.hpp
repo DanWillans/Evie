@@ -91,10 +91,8 @@ public:
     : asset_(other.asset_), metadata_(other.metadata_), asset_manager_(other.asset_manager_), valid_(other.valid_)
   {
     // Only increase reference if this is a valid asset.
-    if (std::shared_ptr<IAssetManager> asset_m = asset_manager_.lock()) {
-      if (valid_) {
-        asset_m->IncreaseReference(metadata_);
-      }
+    if (valid_) {
+      asset_manager_->IncreaseReference(metadata_);
     }
   }
 
@@ -122,9 +120,7 @@ public:
     // decrease the one we previously proxied because we're losing a reference.
     if (valid_) {
       if (metadata_ != other.metadata_) {
-        if (std::shared_ptr<IAssetManager> asset_m = asset_manager_.lock()) {
-          asset_m->DecreaseReference(metadata_);
-        }
+        asset_manager_->DecreaseReference(metadata_);
       } else {
         // Do nothing. The original assetproxy and the one to copy point to the same asset.
         return *this;
@@ -137,10 +133,8 @@ public:
     valid_ = other.valid_;
 
     // Only increase reference if this is a valid asset.
-    if (std::shared_ptr<IAssetManager> asset_m = asset_manager_.lock()) {
-      if (valid_) {
-        asset_m->IncreaseReference(metadata_);
-      }
+    if (valid_) {
+      asset_manager_->IncreaseReference(metadata_);
     }
     return *this;
   }
@@ -159,10 +153,8 @@ public:
   ~AssetProxy()
   {
     // Only decrease reference if this is a valid asset
-    if (std::shared_ptr<IAssetManager> asset_m = asset_manager_.lock()) {
-      if (valid_) {
-        asset_m->DecreaseReference(metadata_);
-      }
+    if (valid_) {
+      asset_manager_->DecreaseReference(metadata_);
     }
   }
   AssetType* Get() { return asset_; }
@@ -178,11 +170,8 @@ public:
    */
   void Destroy()
   {
-    // Only decrease reference if this is a valid asset
-    if (std::shared_ptr<IAssetManager> asset_m = asset_manager_.lock()) {
-      if (valid_) {
-        asset_m->DecreaseReference(metadata_);
-      }
+    if (valid_) {
+      asset_manager_->DecreaseReference(metadata_);
     }
     asset_ = nullptr;
     valid_ = false;
@@ -203,19 +192,17 @@ private:
    * @param asset A pointer to the asset that this Proxy will expose.
    * @param valid Determines where this proxy is valid or not
    */
-  AssetProxy(std::shared_ptr<IAssetManager> asset_manager, AssetMetadata metadata, AssetType* asset, bool valid = true)
+  AssetProxy(IAssetManager* asset_manager, AssetMetadata metadata, AssetType* asset, bool valid = true)
     : asset_manager_(asset_manager), metadata_(metadata), asset_(asset), valid_(valid)
   {
-    if (std::shared_ptr<IAssetManager> asset_m = asset_manager_.lock()) {
-      if (valid_) {
-        asset_m->IncreaseReference(metadata_);
-      }
+    if (valid_) {
+      asset_manager_->IncreaseReference(metadata_);
     }
   }
 
   AssetType* asset_{ nullptr };
   AssetMetadata metadata_{};
-  std::weak_ptr<IAssetManager> asset_manager_;
+  IAssetManager* asset_manager_;
   bool valid_{ false };
 };
 

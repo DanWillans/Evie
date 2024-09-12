@@ -11,7 +11,6 @@
 namespace evie {
 class AssetManagerTest
   : public IAssetManager
-  , public std::enable_shared_from_this<AssetManagerTest>
 {
 public:
   virtual ~AssetManagerTest() = default;
@@ -19,12 +18,12 @@ public:
     TextureWrapping texture_wrapping = TextureWrapping::Repeat) override
   {
     ref_count_vec_.push_back(0);
-    return AssetProxy<Texture2D>{ shared_from_this(), { AssetType::Texture2D, count_++ }, &texture_2d };
+    return AssetProxy<Texture2D>{ this, { AssetType::Texture2D, count_++ }, &texture_2d };
   }
 
   Result<ShaderProgramAsset> GetShaderProgram(const std::string& shader_name) override
   {
-    return AssetProxy<ShaderProgram>{ shared_from_this(), { AssetType::ShaderProgram, 0 }, nullptr };
+    return AssetProxy<ShaderProgram>{ this, { AssetType::ShaderProgram, 0 }, nullptr };
   }
 
   template<typename T> int GetTextureRefCount(const AssetProxy<T>& handle)
