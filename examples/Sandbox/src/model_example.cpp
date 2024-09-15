@@ -44,7 +44,7 @@ private:
   void HandlePlayerCameraMovement(float delta_time);
 
   // Player camera
-  evie::FPSCamera camera_;
+  evie::Camera camera_;
 
   // Last frame time stamp
   float last_frame_{ 0.0F };

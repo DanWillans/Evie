@@ -276,3 +276,29 @@ doctest_discover_tests(
   TEST_PREFIX
   "AssetManagerUnitTests."
 )
+
+###### Camera Manager Tests ########
+add_executable(camera_manager_tests main.cpp camera_manager_tests.cpp)
+target_link_libraries(
+  camera_manager_tests
+  PRIVATE
+  Evie::Evie_warnings
+  Evie::Evie_options
+  Evie::Rendering
+  doctest::doctest)
+
+if(WIN32)
+  add_custom_command(
+    TARGET camera_manager_tests
+    PRE_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:camera_manager_tests> $<TARGET_FILE_DIR:camera_manager_tests>
+    COMMAND_EXPAND_LISTS)
+endif()
+
+# automatically discover tests that are defined in catch based test files you can modify the unittests. Set TEST_PREFIX
+# to whatever you want, or use different for different binaries
+doctest_discover_tests(
+  camera_manager_tests
+  TEST_PREFIX
+  "CameraManagerTests."
+)

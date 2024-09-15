@@ -10,6 +10,7 @@ Evie_add_library(
   indices_array.cpp
   debug.cpp
   model.cpp
+  camera_manager.cpp
 )
 
 target_link_libraries(

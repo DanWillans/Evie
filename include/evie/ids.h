@@ -10,7 +10,8 @@ namespace evie {
 template<typename T, typename Tag> class ID
 {
 public:
-  constexpr explicit ID(const T& identifier) : id_(identifier) {}
+  constexpr ID() : id_(0) {}
+  constexpr explicit ID(const T& identifier) : id_(identifier), valid_(true) {}
 
   constexpr bool operator==(const ID<T, Tag>& other) const { return id_ == other.Get(); }
 
@@ -18,6 +19,7 @@ public:
 
 private:
   T id_;
+  bool valid_{ false };
 };
 
 // Aliases of ID
@@ -60,6 +62,11 @@ struct EntityTag
 {
 };
 using EntityID = ID<uint64_t, EntityTag>;
+
+struct CameraTag
+{
+};
+using CameraID = ID<unsigned int, CameraTag>;
 
 template<typename ComponentName> using ComponentID = ID<uint64_t, ComponentName>;
 

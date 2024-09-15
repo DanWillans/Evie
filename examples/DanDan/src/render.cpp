@@ -10,7 +10,7 @@
 
 void Renderer::Initialise(evie::ComponentID<evie::MeshComponent> mesh_cid,
   evie::ComponentID<evie::TransformComponent> transform_cid,
-  evie::FPSCamera* camera,
+  evie::Camera* camera,
   evie::IWindow* window)
 {
   mesh_cid_ = mesh_cid;

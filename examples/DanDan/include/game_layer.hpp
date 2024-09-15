@@ -53,7 +53,7 @@ private:
   evie::Error SetupDanDan();
 
   // Player camera
-  evie::FPSCamera player_camera_;
+  evie::Camera player_camera_{true};
 
   // Last frame time stamp
   float last_frame_{ 0.0F };
